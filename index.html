@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The 1 to 20 Challenge</title>
+    <style>
+        /* Basic styling for the body */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* Main container for the game */
+        #game-container {
+            width: 100%;
+            max-width: 500px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            text-align: center;
+        }
+
+        /* Styling for the main title */
+        h1 {
+            color: #1a237e;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Styling for the AI status box */
+        #ai-status {
+            background-color: #e8eaf6;
+            border-left: 5px solid #3f51b5;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 6px;
+            min-height: 24px;
+            font-style: italic;
+            color: #3d3d3d;
+        }
+
+        /* Styling for the current count display */
+        #current-count {
+            font-size: 5rem;
+            font-weight: bold;
+            color: #3f51b5;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Container for player action buttons */
+        #player-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* General styling for buttons */
+        button {
+            background-color: #3f51b5;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #303f9f;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background-color: #9fa8da;
+            cursor: not-allowed;
+        }
+
+        /* Styling for the move history log */
+        #move-history {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 1rem;
+            max-height: 150px;
+            overflow-y: auto;
+            text-align: left;
+            margin-bottom: 1.5rem;
+        }
+
+        #move-history div {
+            padding: 0.25rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        #move-history div:last-child {
+            border-bottom: none;
+        }
+
+        /* Styling for game controls */
+        #game-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        #restart-btn {
+            background-color: #f44336;
+        }
+
+        #restart-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        /* Styling for the difficulty dropdown */
+        #difficulty-select {
+            padding: 0.5rem;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <h1>The 1 to 20 Challenge</h1>
+
+        <div id="ai-status">Select a difficulty and start the game!</div>
+
+        <div id="current-count">0</div>
+
+        <div id="player-actions">
+            <button id="say-1-btn">Say 1 Number</button>
+            <button id="say-2-btn">Say 2 Numbers</button>
+            <button id="say-3-btn">Say 3 Numbers</button>
+        </div>
+
+        <div id="move-history">
+            <!-- Move history will be dynamically populated here -->
+        </div>
+
+        <div id="game-controls">
+            <button id="restart-btn">Restart Game</button>
+            <div>
+                <label for="difficulty-select">Difficulty:</label>
+                <select id="difficulty-select">
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard" selected>Hard</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Element References ---
+            const aiStatusBox = document.getElementById('ai-status');
+            const currentCountDisplay = document.getElementById('current-count');
+            const playerActionButtons = {
+                say1: document.getElementById('say-1-btn'),
+                say2: document.getElementById('say-2-btn'),
+                say3: document.getElementById('say-3-btn')
+            };
+            const moveHistoryLog = document.getElementById('move-history');
+            const restartButton = document.getElementById('restart-btn');
+            const difficultySelect = document.getElementById('difficulty-select');
+
+            // --- Game State Variables ---
+            let currentCount = 0;
+            let playerTurn = true;
+            let gameOver = false;
+            let aiDifficulty = 'hard';
+
+            // --- AI Psychological Dialogue ---
+            const aiDialogue = {
+                thinking: ["Hmm...", "Let me see...", "Calculating...", "...", "An interesting move."],
+                playerMistake: ["An interesting choice...", "I see an opening!", "Are you sure about that?", "Aha!"],
+                winningMove: ["That sets me up perfectly.", "A perfect calculation.", "I believe this is checkmate.", "Gotcha!"]
+            };
+
+            // --- Initialization ---
+            const initGame = () => {
+                currentCount = 0;
+                playerTurn = true;
+                gameOver = false;
+                aiDifficulty = difficultySelect.value;
+                currentCountDisplay.textContent = currentCount;
+                moveHistoryLog.innerHTML = '';
+                aiStatusBox.textContent = "Your turn to start. Good luck!";
+                togglePlayerButtons(true);
+            };
+
+            // --- Game Logic Functions ---
+            /**
+             * Handles the player's move.
+             * @param {number} numCount - The number of numbers the player chooses to say (1, 2, or 3).
+             */
+            const playerMove = (numCount) => {
+                if (!playerTurn || gameOver) return;
+
+                const numbersSaid = [];
+                for (let i = 0; i < numCount; i++) {
+                    currentCount++;
+                    numbersSaid.push(currentCount);
+                }
+
+                updateGame(numbersSaid, 'Player');
+
+                if (currentCount >= 20) {
+                    endGame('Player');
+                } else {
+                    playerTurn = false;
+                    togglePlayerButtons(false);
+                    aiTurn();
+                }
+            };
+            
+            /**
+             * Handles the AI's turn after a delay.
+             */
+            const aiTurn = () => {
+                if (gameOver) return;
+
+                // Psychological Simulation: Set AI status to "thinking"
+                displayAiMessage('thinking');
+                
+                // Determine AI thinking time based on strategy
+                const isStrategicMove = aiDifficulty !== 'easy' && (currentCount + 1) % 4 === 0;
+                const thinkingTime = isStrategicMove ? 1500 : 500;
+
+                setTimeout(() => {
+                    let numbersToSay;
+                    
+                    // --- AI Difficulty Logic ---
+                    switch (aiDifficulty) {
+                        case 'easy':
+                            // Easy Mode: AI chooses a random number of steps.
+                            numbersToSay = Math.floor(Math.random() * 3) + 1;
+                            break;
+                            
+                        case 'medium':
+                            // Medium Mode: 40% chance of a random move, otherwise perfect strategy.
+                            if (Math.random() < 0.4) {
+                                numbersToSay = Math.floor(Math.random() * 3) + 1;
+                            } else {
+                                numbersToSay = getOptimalMove();
+                            }
+                            break;
+
+                        case 'hard':
+                        default:
+                            // Hard Mode: AI uses the perfect winning strategy.
+                            numbersToSay = getOptimalMove();
+                            break;
+                    }
+
+                    // Ensure AI doesn't overshoot 20
+                    if (currentCount + numbersToSay > 20) {
+                        numbersToSay = 20 - currentCount;
+                    }
+
+                    const numbersSaid = [];
+                    for (let i = 0; i < numbersToSay; i++) {
+                        currentCount++;
+                        numbersSaid.push(currentCount);
+                    }
+
+                    // Psychological Simulation: Check for winning move or player mistake
+                    const isWinningMove = currentCount === 20 || currentCount === 16 || currentCount === 12 || currentCount === 8 || currentCount === 4;
+                    if(isWinningMove) {
+                        displayAiMessage('winningMove');
+                    } else if (isPlayerMistake()) {
+                        displayAiMessage('playerMistake');
+                    }
+
+                    updateGame(numbersSaid, 'AI');
+
+                    if (currentCount >= 20) {
+                        endGame('AI');
+                    } else {
+                        playerTurn = true;
+                        togglePlayerButtons(true);
+                    }
+                }, thinkingTime);
+            };
+
+            /**
+             * Calculates the optimal move for the AI (to land on a multiple of 4).
+             * @returns {number} The optimal number of steps (1, 2, or 3).
+             */
+            const getOptimalMove = () => {
+                const remainder = (currentCount) % 4;
+                // The goal is to leave the player at a number where count % 4 == 0
+                // AI wants to say a number that makes (currentCount + aiMove) % 4 == 0 (if possible)
+                // Or rather, the AI wants to land on 4, 8, 12, 16, 20
+                const target = [4, 8, 12, 16, 20].find(n => n > currentCount);
+                if (target) {
+                    const diff = target - currentCount;
+                    if (diff <= 3) return diff;
+                }
+                // If no strategic move is available, make a random move
+                return Math.floor(Math.random() * 3) + 1;
+            };
+
+            /**
+             * Checks if the player made a move that allows the AI to get to a multiple of 4.
+             * @returns {boolean} True if the player made a mistake.
+             */
+            const isPlayerMistake = () => {
+                const target = [4, 8, 12, 16].find(n => n > currentCount);
+                if (target) {
+                    const diff = target - currentCount;
+                    return diff <= 3;
+                }
+                return false;
+            };
+
+
+            // --- UI and State Update Functions ---
+            
+            /**
+             * Updates the game display and history after a move.
+             * @param {number[]} numbers - Array of numbers said in the turn.
+             * @param {string} actor - 'Player' or 'AI'.
+             */
+            const updateGame = (numbers, actor) => {
+                currentCountDisplay.textContent = currentCount;
+                
+                const moveEntry = document.createElement('div');
+                moveEntry.textContent = `${actor} played: ${numbers.join(', ')}`;
+                moveHistoryLog.appendChild(moveEntry);
+                moveHistoryLog.scrollTop = moveHistoryLog.scrollHeight; // Auto-scroll to the latest move
+            };
+
+            /**
+             * Ends the game and declares a winner.
+             * @param {string} winner - 'Player' or 'AI'.
+             */
+            const endGame = (winner) => {
+                gameOver = true;
+                if (winner === 'AI') {
+                    aiStatusBox.textContent = "I win! Better luck next time.";
+                } else {
+                    aiStatusBox.textContent = "You win! Impossible!";
+                }
+                togglePlayerButtons(false);
+            };
+
+            /**
+             * Enables or disables player action buttons.
+             * @param {boolean} enable - True to enable, false to disable.
+             */
+            const togglePlayerButtons = (enable) => {
+                playerActionButtons.say1.disabled = !enable;
+                playerActionButtons.say2.disabled = !enable;
+                playerActionButtons.say3.disabled = !enable;
+
+                // Also ensure buttons are disabled if the move is not possible
+                if (enable) {
+                    if (currentCount >= 20) playerActionButtons.say1.disabled = true;
+                    if (currentCount >= 19) playerActionButtons.say2.disabled = true;
+                    if (currentCount >= 18) playerActionButtons.say3.disabled = true;
+                }
+            };
+            
+            /**
+             * Displays a random message from a given category in the AI status box.
+             * @param {string} category - The key from the aiDialogue object ('thinking', 'playerMistake', 'winningMove').
+             */
+            const displayAiMessage = (category) => {
+                const messages = aiDialogue[category];
+                const randomIndex = Math.floor(Math.random() * messages.length);
+                aiStatusBox.textContent = messages[randomIndex];
+            };
+
+            // --- Event Listeners ---
+            playerActionButtons.say1.addEventListener('click', () => playerMove(1));
+            playerActionButtons.say2.addEventListener('click', () => playerMove(2));
+            playerActionButtons.say3.addEventListener('click', () => playerMove(3));
+            restartButton.addEventListener('click', initGame);
+            difficultySelect.addEventListener('change', initGame);
+
+            // --- Initial Game Start ---
+            initGame();
+        });
+    </script>
+</body>
+</html>
