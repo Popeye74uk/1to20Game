@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v1.4</title>
+    <title>The 1 to 20 Game v1.5</title>
     <style>
         :root {
             --color-background: #f0f2f5; --color-container-bg: #ffffff; --color-text-primary: #212529; --color-text-secondary: #6c757d; --color-accent: #6f42c1; --color-accent-dark: #5a359a; --color-accent-light: #e9e5f5; --color-primary-button: #007bff; --color-primary-button-hover: #0069d9; --color-danger: #dc3545; --color-success: #28a745; --color-button-disabled-bg: #adb5bd; --color-shadow: rgba(0, 0, 0, 0.1); --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -15,19 +15,19 @@
             font-family: var(--font-main); background-color: var(--color-background); color: var(--color-text-primary); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; transition: background-color 0.3s, color 0.3s;
         }
         .container {
-            position: relative; width: 100%; max-width: 420px; margin: 0; text-align: center;
+            width: 100%; max-width: 420px; margin: 0 auto; text-align: center;
         }
         .game-header {
-            text-align: center; margin-bottom: 20px; height: 44px; display: flex; align-items: center; justify-content: center;
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; width: 100%;
         }
+        .title-wrapper { flex-grow: 1; text-align: center; }
+        .header-spacer, .header-buttons { flex-basis: 98px; flex-shrink: 0; }
+        .header-buttons { display: flex; gap: 10px; justify-content: flex-end; }
         h1 {
             color: var(--color-text-primary); font-size: 2rem; margin: 0; white-space: nowrap;
         }
-        .header-buttons {
-            position: absolute; top: 0; left: 100%; margin-left: 10px; display: flex; gap: 10px; height: 44px; align-items: center;
-        }
         #theme-toggle-btn, #fullscreen-btn {
-            background: none; border: 2px solid var(--color-text-secondary); color: var(--color-text-secondary); width: 44px; height: 44px; padding: 0; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: all 0.2s; flex-shrink: 0;
+            background: none; border: 2px solid var(--color-text-secondary); color: var(--color-text-secondary); width: 44px; height: 44px; padding: 0; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: all 0.2s;
         }
         #theme-toggle-btn:hover, #fullscreen-btn:hover {
              border-color: var(--color-text-primary); color: var(--color-text-primary);
@@ -39,7 +39,7 @@
         #game-container {
             background-color: var(--color-container-bg); border-radius: 16px; box-shadow: 0 8px 32px var(--color-shadow); padding: 2rem; transition: background-color 0.3s; display: flex; flex-direction: column;
         }
-        body:fullscreen .game-header, body:fullscreen .header-buttons { display: none; }
+        body:fullscreen .game-header { display: none; }
         #ai-status-wrapper {
             background-color: var(--color-accent-light); border-left: 5px solid var(--color-accent); padding: 1rem 1.5rem; margin-bottom: 2rem; border-radius: 8px; min-height: 30px; display: flex; align-items: center; justify-content: center; gap: 10px;
         }
@@ -84,13 +84,11 @@
         }
         #play-again-btn:hover { background-color: var(--color-accent-dark); }
         
-        @media (max-width: 600px) {
-            #fullscreen-btn { display: none; } /* Hide only fullscreen button on mobile */
-        }
-        @media (max-width: 450px) {
+        @media (max-width: 500px) {
             body { padding: 10px; }
             h1 { font-size: 1.6rem; }
-            .header-buttons { margin-left: 5px; }
+            #fullscreen-btn, .header-spacer { display: none; } /* Hide spacer and fullscreen on mobile */
+            .title-wrapper { text-align: left; } /* Align title to the left */
             #game-container { padding: 1.5rem; }
             #current-count { font-size: 6rem; }
             .action-btn { font-size: 2rem; }
@@ -101,18 +99,18 @@
 <body>
     <div class="container">
         <header class="game-header">
-            <h1>The 1 to 20 Game</h1>
+            <div class="header-spacer"></div>
+            <div class="title-wrapper"><h1>The 1 to 20 Game</h1></div>
+            <div class="header-buttons">
+                 <button id="fullscreen-btn" title="Toggle Fullscreen (F)">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                </button>
+                <button id="theme-toggle-btn" title="Toggle Theme">
+                    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.64 5.64c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zm12.73 12.73c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zM5.64 18.36c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0zM18.36 5.64c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.38-1.03-.38-1.41 0z"/></svg>
+                    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.11-1.36c-0.98,1.37-2.58,2.26-4.39,2.26 c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.39C12.92,3.04,12.46,3,12,3z"/></svg>
+                </button>
+            </div>
         </header>
-
-        <div class="header-buttons">
-            <button id="fullscreen-btn" title="Toggle Fullscreen (F)">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-            </button>
-            <button id="theme-toggle-btn" title="Toggle Theme">
-                <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.64 5.64c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zm12.73 12.73c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zM5.64 18.36c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0zM18.36 5.64c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.38-1.03-.38-1.41 0z"/></svg>
-                <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.11-1.36c-0.98,1.37-2.58,2.26-4.39,2.26 c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.39C12.92,3.04,12.46,3,12,3z"/></svg>
-            </button>
-        </div>
 
         <div id="game-container">
             <div id="ai-status-wrapper">
@@ -149,7 +147,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const ui = {
-                gameContainer: document.getElementById('game-container'),
                 aiStatusBox: document.getElementById('ai-status'),
                 currentCountDisplay: document.getElementById('current-count'),
                 playerActionButtons: document.querySelectorAll('.action-btn'),
@@ -166,21 +163,21 @@
             let currentCount = 0, playerTurn = true, gameOver = true, aiDifficulty = 'hard';
 
             const aiDialogue = {
-                waiting: ["Select a difficulty and press Start.", "Ready when you are. Hit Start."],
-                start: ["The game begins. You may go first.", "You may begin."],
-                aiStart: ["I'll take the lead this time.", "Alright, my turn to start."],
-                thinking: ["Hmm...", "Let me see...", "Calculating...", "Interesting..."],
-                playerPrompt: ["Your move.", "Your turn.", "What will you do?"],
-                playerMistake: ["An interesting choice...", "I see an opening!", "Are you sure about that?"],
-                playerGoodMove: ["Well played.", "A clever move.", "You've blocked my path... for now."],
-                winningMove: ["That sets me up perfectly.", "A perfect calculation.", "The path to victory is clear."],
-                aiWin: ["A logical conclusion. Victory is mine!", "A predictable outcome. Well played, though."],
-                playerWin: ["You've bested me! I won't make that mistake again.", "A surprising victory! Well done."]
+                waiting: ["Select a difficulty and press Start.", "Ready when you are..."],
+                start: ["The game begins. You may go first.", "You may begin.", "Let's see what you've got."],
+                aiStart: ["I'll take the lead this time.", "My turn to start.", "Let's begin. I'll go first."],
+                thinking: ["Hmm...", "Let me see...", "Calculating...", "Interesting...", "Just a moment..."],
+                playerPrompt: ["Your move.", "Your turn.", "What will you do?", "Make your move.", "I'm waiting."],
+                playerMistake: ["An interesting choice...", "I see an opening!", "Are you sure about that?", "A bold move.", "Not what I would have done..."],
+                playerGoodMove: ["Well played.", "A clever move.", "You've blocked my path... for now.", "I see you know the trick.", "A formidable move."],
+                winningMove: ["That sets me up perfectly.", "A perfect calculation.", "The path to victory is clear.", "And that should be game.", "Precisely as I planned."],
+                tieBreaker: ["You've left it to chance, have you?", "A risky position. Let's see...", "This could go either way."],
+                aiWin: ["A logical conclusion. Victory is mine!", "A predictable outcome. Well played, though.", "Better luck next time, human.", "Checkmate."],
+                playerWin: ["You've bested me! I won't make that mistake again.", "A surprising victory! Well done.", "You have my congratulations.", "I'll get you next time!"]
             };
 
             const initGame = () => {
-                gameOver = true;
-                currentCount = 0;
+                gameOver = true; currentCount = 0; playerTurn = true;
                 ui.difficultySelect.disabled = false;
                 ui.currentCountDisplay.textContent = currentCount;
                 ui.gameOverModal.classList.remove('visible');
@@ -211,18 +208,12 @@
                 playerTurn = false;
                 updateGame(currentCount + numCount);
 
-                if (currentCount >= 20) {
-                    endGame('Player');
-                    return;
-                }
+                if (currentCount >= 20) { return endGame('Player'); }
 
-                if(isPlayerMistake()) {
-                    displayAiMessage('playerMistake');
-                } else if (isMultipleOfFour(currentCount)) {
-                    displayAiMessage('playerGoodMove');
-                }
+                if(isPlayerMistake()) { displayAiMessage('playerMistake'); } 
+                else if (isMultipleOfFour(currentCount)) { displayAiMessage('playerGoodMove'); }
                 
-                const randomDelay = Math.floor(Math.random() * 400) + 400; // 400ms to 800ms
+                const randomDelay = Math.floor(Math.random() * 400) + 400;
                 setTimeout(aiTurn, randomDelay);
             };
             
@@ -232,40 +223,47 @@
                 displayAiMessage('thinking', true);
                 
                 setTimeout(() => {
-                    let numbersToSay = getAiMove();
-                    if (currentCount + numbersToSay > 20) numbersToSay = 20 - currentCount;
+                    const { move, wasOptimal } = getAiMove();
+                    let numbersToSay = move;
+                    if (currentCount + numbersToSay > 20) { numbersToSay = 20 - currentCount; }
                     
-                    if (isMultipleOfFour(currentCount + numbersToSay) && numbersToSay > 0) {
-                        displayAiMessage('winningMove');
-                    }
+                    const isWinningMove = isMultipleOfFour(currentCount + numbersToSay) && numbersToSay > 0 && wasOptimal;
 
+                    if (isWinningMove) { displayAiMessage('winningMove'); }
+                    
                     updateGame(currentCount + numbersToSay);
 
-                    if (currentCount >= 20) {
-                        endGame('AI');
-                    } else {
-                        playerTurn = true;
-                        // Use a brief delay before showing the next prompt to let the "winning move" message be seen
-                        setTimeout(() => {
-                            displayAiMessage('playerPrompt');
-                            updatePlayerActionButtons();
-                        }, 200);
-                    }
+                    if (currentCount >= 20) { return endGame('AI'); }
+                    
+                    playerTurn = true;
+                    const promptDelay = isWinningMove ? 1000 : 100;
+                    setTimeout(() => {
+                        displayAiMessage('playerPrompt');
+                        updatePlayerActionButtons();
+                    }, promptDelay);
+
                 }, thinkingTime);
             };
 
             const getAiMove = () => {
                 const playOptimal = Math.random() < { 'easy': 0.2, 'medium': 0.6, 'hard': 0.95 }[aiDifficulty];
-                return playOptimal ? getOptimalMove() : getRandomMove();
+                if (playOptimal) {
+                    const optimalMove = getOptimalMove();
+                    return { move: optimalMove.move, wasOptimal: optimalMove.wasOptimal };
+                }
+                return { move: getRandomMove(), wasOptimal: false };
             };
 
             const getOptimalMove = () => {
                 const remainder = currentCount % 4;
-                return (remainder === 0) ? getRandomMove() : 4 - remainder;
+                if (remainder === 0) {
+                    displayAiMessage('tieBreaker');
+                    return { move: getRandomMove(), wasOptimal: false };
+                }
+                return { move: 4 - remainder, wasOptimal: true };
             };
 
             const getRandomMove = () => Math.floor(Math.random() * 3) + 1;
-            
             const isMultipleOfFour = (num) => num > 0 && num % 4 === 0;
             const isPlayerMistake = () => [1, 2, 3].some(i => isMultipleOfFour(currentCount + i) && currentCount + i <= 20);
 
@@ -276,30 +274,23 @@
             };
 
             const endGame = (winner) => {
-                gameOver = true;
-                playerTurn = false;
+                gameOver = true; playerTurn = false;
                 updatePlayerActionButtons();
                 ui.difficultySelect.disabled = false;
                 let title, message;
                 if (winner === 'AI') {
-                    title = "You Lost";
-                    message = getRandomMessage('aiWin');
-                    ui.modalTitle.style.color = 'var(--color-danger)';
+                    title = "You Lost"; message = getRandomMessage('aiWin'); ui.modalTitle.style.color = 'var(--color-danger)';
                 } else {
-                    title = "You Win!";
-                    message = getRandomMessage('playerWin');
-                    ui.modalTitle.style.color = 'var(--color-success)';
+                    title = "You Win!"; message = getRandomMessage('playerWin'); ui.modalTitle.style.color = 'var(--color-success)';
                 }
-                ui.modalTitle.textContent = title;
-                ui.modalMessage.textContent = message;
+                ui.modalTitle.textContent = title; ui.modalMessage.textContent = message;
                 setTimeout(() => ui.gameOverModal.classList.add('visible'), 500);
             };
 
             const updatePlayerActionButtons = () => {
                 ui.playerActionButtons.forEach(button => {
                     const moveCount = parseInt(button.dataset.move, 10);
-                    const isPossible = currentCount + moveCount <= 20;
-                    button.disabled = !playerTurn || gameOver || !isPossible;
+                    button.disabled = !playerTurn || gameOver || (currentCount + moveCount > 20);
                     button.textContent = currentCount + moveCount;
                 });
             };
@@ -312,24 +303,21 @@
             const getRandomMessage = (category) => aiDialogue[category][Math.floor(Math.random() * aiDialogue[category].length)];
 
             const setTheme = (theme) => {
-                document.body.classList.toggle('dark-mode', theme === 'dark');
+                document.body.classList.toggle('dank-mode', theme === 'dark');
                 localStorage.setItem('game-theme', theme);
             };
             const toggleFullScreen = () => {
-                if (!document.fullscreenElement) {
-                    document.body.requestFullscreen().catch(err => {});
-                } else { document.exitFullscreen(); }
+                if (!document.fullscreenElement) { document.body.requestFullscreen().catch(err => {}); } 
+                else { document.exitFullscreen(); }
             };
+
             ui.themeToggleBtn.addEventListener('click', () => setTheme(document.body.classList.contains('dark-mode') ? 'light' : 'dark'));
             ui.fullscreenBtn.addEventListener('click', toggleFullScreen);
             setTheme(localStorage.getItem('game-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
 
             document.addEventListener('keydown', (e) => {
                 if (ui.gameOverModal.classList.contains('visible')) return;
-                if (e.key === 'f' && !e.ctrlKey && !e.metaKey) {
-                    e.preventDefault();
-                    toggleFullScreen();
-                }
+                if (e.key === 'f' && !e.ctrlKey && !e.metaKey) { e.preventDefault(); toggleFullScreen(); }
             });
 
             ui.playerActionButtons.forEach(button => {
