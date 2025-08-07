@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v2.4</title>
+    <title>The 1 to 20 Game v2.5</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -161,82 +161,32 @@
             width: 100%; 
             transition: background-color 0.2s;
         }
-        #game-over-modal {
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            right: 0; 
-            bottom: 0; 
-            background-color: rgba(0, 0, 0, 0.7); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            z-index: 20; 
-            opacity: 0; 
-            pointer-events: none; 
-            transition: opacity 0.4s ease;
+        .modal {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+            backdrop-filter: blur(5px);
         }
-        #game-over-modal.visible { 
-            opacity: 1; 
-            pointer-events: auto; 
-        }
+        .modal.visible { opacity: 1; pointer-events: auto; }
         .modal-content {
-            background-color: var(--color-container-bg); 
-            padding: 2rem; 
-            border-radius: 16px; 
-            text-align: center; 
-            box-shadow: 0 5px 15px var(--color-shadow); 
-            transform: scale(0.9); 
-            transition: transform 0.4s ease; 
-            width: 90%; 
-            max-width: 400px;
+            background-color: var(--color-container-bg); padding: 2rem; border-radius: 16px; text-align: center; box-shadow: 0 5px 15px var(--color-shadow); transform: scale(0.9); transition: transform 0.4s ease; width: 90%; max-width: 400px;
         }
-        #game-over-modal.visible .modal-content { 
-            transform: scale(1); 
+        .modal.visible .modal-content { transform: scale(1); }
+        .modal-content h2 { font-size: 2.5rem; margin: 0 0 1rem 0; }
+        .modal-content p { font-size: 1.1rem; line-height: 1.6; color: var(--color-text-secondary); margin-bottom: 2rem; }
+        #name-input {
+             width: 100%; padding: 1rem; border-radius: 8px; border: 2px solid var(--color-accent-light); background-color: var(--color-background); color: var(--color-text-primary); font-size: 1.2rem; text-align: center; margin-bottom: 1rem;
         }
-        .modal-content h2 { 
-            font-size: 2.5rem; 
-            margin: 0 0 1rem 0; 
+        #confirm-name-btn {
+            background-color: var(--color-accent); color: white; border: none; padding: 1rem 2rem; border-radius: 12px; font-size: 1.2rem; cursor: pointer; transition: background-color 0.2s; width: 100%;
         }
-        .modal-content p { 
-            font-size: 1.1rem; 
-            line-height: 1.6; 
-            color: var(--color-text-secondary); 
-            margin-bottom: 2rem; 
-        }
-        #play-again-btn {
-            background-color: var(--color-accent); 
-            color: white; 
-            border: none; 
-            padding: 1rem 2rem; 
-            border-radius: 12px; 
-            font-size: 1.2rem; 
-            cursor: pointer; 
-            transition: background-color 0.2s;
-        }
-        #play-again-btn:hover { 
-            background-color: var(--color-accent-dark); 
-        }
+        #confirm-name-btn:hover { background-color: var(--color-accent-dark); }
         
         @media (max-width: 500px) {
-            body { 
-                padding: 10px; 
-            }
-            h1 { 
-                font-size: 1.6rem; 
-            }
-            #game-container { 
-                padding: 1.5rem; 
-            }
-            #current-count { 
-                font-size: 6rem; 
-            }
-            .action-btn { 
-                font-size: 2rem; 
-            }
-            #ai-status { 
-                font-size: 1rem; 
-            }
+            body { padding: 10px; }
+            h1 { font-size: 1.6rem; }
+            #game-container { padding: 1.5rem; }
+            #current-count { font-size: 6rem; }
+            .action-btn { font-size: 2rem; }
+            #ai-status { font-size: 1rem; }
         }
     </style>
 </head>
@@ -270,7 +220,7 @@
         </div>
     </div>
     
-    <div id="game-over-modal">
+    <div id="game-over-modal" class="modal">
         <div class="modal-content">
             <h2 id="modal-title"></h2>
             <p id="modal-message"></p>
@@ -278,8 +228,18 @@
         </div>
     </div>
 
+    <div id="name-modal" class="modal">
+        <div class="modal-content">
+            <h2>Welcome</h2>
+            <p>I don't recognize you. What should I call you?</p>
+            <input type="text" id="name-input" maxlength="15" placeholder="Enter your name...">
+            <button id="confirm-name-btn">Begin</button>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // UI Elements
             const ui = {
                 aiStatusBox: document.getElementById('ai-status'),
                 currentCountDisplay: document.getElementById('current-count'),
@@ -289,115 +249,168 @@
                 gameOverModal: document.getElementById('game-over-modal'),
                 modalTitle: document.getElementById('modal-title'),
                 modalMessage: document.getElementById('modal-message'),
-                playAgainBtn: document.getElementById('play-again-btn')
+                playAgainBtn: document.getElementById('play-again-btn'),
+                nameModal: document.getElementById('name-modal'),
+                nameInput: document.getElementById('name-input'),
+                confirmNameBtn: document.getElementById('confirm-name-btn')
             };
 
+            // Game State
             let currentCount = 0, playerTurn = true, gameOver = true, aiDifficulty = 'hard', usedDialogue = {};
-            let lastPlayerMove = 0, playerMadeMistake = false;
+            let lastPlayerMove = 0, playerMadeMistake = false, isBaiting = false;
             let currentPersonality;
 
+            // Player Data
+            let playerName = '';
+            let playerStats = { wins: 0, losses: 0 };
+            let moveHistory = [];
+
+            // Personalities & Dialogue
             const personalities = {
                 analyst: {
-                    name: 'Analyst',
                     dialogue: {
-                        waiting: [ "Select a difficulty and press Start.", "Ready when you are...", "The path to 20 awaits.", "Choose your difficulty.", "Awaiting input.", "The board is set. The pieces are moving." ],
-                        start: [ "The game begins. You may go first.", "You may begin.", "Let's see what you've got.", "I'll allow you the first move.", "Show me your strategy." ],
-                        aiStart: [ "I'll take the lead this time.", "My turn to start.", "Let's begin. I'll go first.", "I'll set the pace. Try to keep up.", "My calculations suggest I should start." ],
-                        thinking: [ "Hmm...", "Let me see...", "Calculating...", "Interesting...", "Just a moment...", "Evaluating possibilities...", "The optimal move is...", "Compiling response..." ],
-                        playerPrompt: [ "Your move.", "Your turn.", "What will you do?", "Make your move.", "I'm waiting.", "The board is yours.", "Your decision?" ],
-                        playerMistake: [ "An interesting choice.", "I see an opening now.", "Are you sure about that?", "A sub-optimal move.", "Just as I predicted.", "A blunder. A costly one.", "A fatal error has been made." ],
-                        playerGoodMove: [ "Well played.", "A clever move.", "You've blocked my path, for now.", "I see you know the strategy.", "A formidable move.", "Not bad. Not bad at all.", "You've studied the game, I see." ],
-                        winningMove: [ "That sets me up perfectly.", "A perfect calculation.", "The path to victory is clear.", "And that should be game.", "Precisely as I planned.", "The final piece falls into place.", "The game is now concluded." ],
-                        aiLosingMove: ["Go on then. Finish it.", "I've made a miscalculation. Enjoy this.", "Hmph. You've got me. This time.", "I see my fate. Play your final number."],
-                        tieBreaker: [ "You've left it to chance.", "A risky position. Let's see...", "This could go either way.", "An unpredictable state.", "Down to pure chance." ],
-                        aiWin: [ "A logical conclusion. Victory is mine.", "A predictable outcome.", "Better luck next time.", "Checkmate.", "The logical outcome has been achieved." ],
+                        firstWelcome: ["Welcome. Let's begin the analysis.", "A new subject. Please, select a difficulty."],
+                        welcomeBack_long: ["Welcome back, {name}. Your record is {wins} wins to {losses} losses. Let's see if we can improve those numbers.", "Good to see you again, {name}. The data shows you have {wins} wins and {losses} losses. Shall we begin?"],
+                        welcomeBack_short: ["Welcome back, {name}. Record: {wins}W / {losses}L.", "Hello, {name}. {wins} wins, {losses} losses. Let's proceed."],
+                        patternRecognized: ["Analysis complete. You have a tendency to lose when landing on {number}. Let's see if this pattern continues.", "My data shows a weakness at the number {number}. Be mindful."],
+                        start: [ "The game begins. You may go first.", "You may begin. Show me your strategy." ],
+                        aiStart: [ "I'll take the lead this time.", "My calculations suggest I should start." ],
+                        thinking: [ "Calculating...", "Evaluating possibilities...", "The optimal move is...", "Compiling response..." ],
+                        playerPrompt_long: ["It is your move, {name}.", "Your turn. What will you do?", "The board is yours, {name}."],
+                        playerPrompt_short: ["Your move, {name}.", "Your turn, {name}."],
+                        playerMistake: [ "An interesting choice.", "I see an opening now.", "A sub-optimal move.", "A fatal error has been made." ],
+                        playerGoodMove: [ "Well played.", "A clever move.", "You've blocked my path, for now.", "I see you know the strategy." ],
+                        baiting: ["I will play {move}. An interesting development, wouldn't you agree?", "I present you with an opportunity. Let's see if you recognize it."],
+                        baitFailed: ["The test is complete. You have failed to see the obvious path. A critical lack of observation.", "You missed your chance. The consequences will now be... terminal."],
+                        winningMove: [ "That sets me up perfectly.", "A perfect calculation.", "The path to victory is clear.", "The game is now concluded." ],
+                        aiLosingMove: ["Go on then. Finish it.", "I've made a miscalculation. Enjoy this.", "You've got me. This time."],
+                        tieBreaker: [ "You've left it to chance.", "A risky position. Let's see...", "An unpredictable state." ],
+                        aiWin: [ "A logical conclusion. Victory is mine.", "A predictable outcome.", "The logical result has been achieved." ],
                         aiWinByMistake: ["Your choice of {move} was a fatal error.", "The moment you chose {move}, you lost.", "I win. Your mistake was your undoing."],
-                        playerWin: [ "You've bested me. I won't make that mistake again.", "A surprising victory. Well done.", "You have my congratulations.", "I'll get you next time." ],
-                        playerWinPerfect: ["Incredible. You played a perfect game.", "Not a single mistake. My congratulations.", "I couldn't find an opening. Well played."]
+                        playerWin: [ "You've bested me. I won't make that mistake again.", "A surprising victory. Well done.", "You have my congratulations." ],
+                        playerWinPerfect: ["Incredible. You played a perfect game.", "Not a single mistake. My congratulations.", "I couldn't find an opening. Well played."],
+                        playerWinBait: ["You correctly identified the test. Well played.", "You saw the opening I gave you. Your perception is sharp."]
                     }
                 },
                 rival: {
-                    name: 'Rival',
                     dialogue: {
-                        waiting: [ "Are you going to press start or just stare?", "Come on, I don't have all day!", "Difficulty? Just pick Hard, unless you're scared.", "Let's go! Or are you already giving up?" ],
-                        start: [ "Alright, you first. Don't mess it up.", "You start. Let's see if you've learned anything.", "Go ahead. I like a challenge." ],
-                        aiStart: [ "My turn to start! Try and keep up.", "I'm starting. This'll be over before you know it.", "I'll take the lead. You'll be playing catch-up.", "Let's get this done. I'm going first." ],
-                        thinking: [ "Heh...", "Too easy.", "Is that all you've got?", "Predictable.", "Really? That's your move?", "Let me think... not that I need to." ],
-                        playerPrompt: [ "Your move, slowpoke.", "Hurry up!", "What's the hold up?", "Your turn. Try not to blow it.", "Still thinking? It's not that hard." ],
-                        playerMistake: [ "YES! That's the mistake I was waiting for!", "Oh, you just handed me the game.", "Was that on purpose? Seriously?", "And that's where you lose the game.", "You really stepped in it that time." ],
-                        playerGoodMove: [ "Tch. Lucky move.", "Not bad... for you.", "That only delays the inevitable.", "I'll admit, that was annoying.", "So you DO know how to play." ],
-                        winningMove: [ "And that's checkmate. Too easy!", "This is it! The final blow!", "You're finished!", "This is how a real winner plays.", "And I'll take that for the win!" ],
-                        aiLosingMove: ["No! It can't be!", "Ugh, fine, you win this time.", "Don't get cocky. This was a fluke.", "Just finish it already..."],
-                        tieBreaker: [ "You're just getting lucky now.", "Hmph. Let's see what happens.", "This is just leaving it to chance, how boring." ],
-                        aiWin: [ "Of course I won. Was there ever any doubt?", "Better luck next time, rookie!", "Get good. Then maybe we can talk.", "I am the champion! Obviously." ],
-                        aiWinByMistake: ["You chose {move}? Haha, thanks for the free win!", "That move, {move}, was your last.", "You choked! I'll take it!"],
-                        playerWin: [ "You got lucky! That's all!", "Next time, I won't go so easy on you.", "This isn't over! I demand a rematch!", "I wasn't even trying." ],
-                        playerWinPerfect: ["What... How did you...?", "A perfect game? No way!", "You must have cheated!"]
+                        firstWelcome: ["A new challenger? Don't waste my time.", "First time? Try not to make this too boring."],
+                        welcomeBack_long: ["Look who's back for more! {name}, you've got {losses} losses and only {wins} measly wins. Ready to add another L?", "Oh, it's you, {name}. Still thinking you can beat me with your {wins} wins? Pathetic."],
+                        welcomeBack_short: ["{name}! Ready to lose again? ({wins}W-{losses}L)", "{name}! Let's add to those {losses} losses."],
+                        patternRecognized: ["You ALWAYS lose on {number}! It's like you enjoy it or something. So predictable!", "Don't you dare land on {number} again. Or do, I could use an easy win."],
+                        start: [ "Alright, you first. Don't mess it up.", "Go ahead. I like a challenge." ],
+                        aiStart: [ "My turn to start! Try and keep up.", "I'm starting. This'll be over before you know it." ],
+                        thinking: [ "Heh...", "Too easy.", "Is that all you've got?", "Predictable." ],
+                        playerPrompt_long: ["Your move, {name}. Don't take all day.", "{name}, you're up. Try not to blow it."],
+                        playerPrompt_short: ["Your move, {name}!", "Let's go, {name}!"],
+                        playerMistake: [ "YES! That's the mistake I was waiting for!", "Oh, you just handed me the game.", "You really stepped in it that time." ],
+                        playerGoodMove: [ "Tch. Lucky move.", "Not bad... for you.", "That only delays the inevitable." ],
+                        baiting: ["Here, I'll even give you a chance with {move}. See if you're smart enough to take it.", "Feeling generous, so I'll play {move}. Don't disappoint me."],
+                        baitFailed: ["You didn't see that?! Wow, you're worse than I thought.", "I literally handed you the win and you blew it! Unbelievable."],
+                        winningMove: [ "And that's checkmate. Too easy!", "This is it! The final blow!", "You're finished!" ],
+                        aiLosingMove: ["No! It can't be!", "Ugh, fine, you win this time.", "Don't get cocky. This was a fluke."],
+                        tieBreaker: [ "You're just getting lucky now.", "Hmph. Let's see what happens." ],
+                        aiWin: [ "Of course I won. Was there ever any doubt?", "Better luck next time, rookie!", "Get good. Then maybe we can talk." ],
+                        aiWinByMistake: ["You chose {move}? Haha, thanks for the free win!", "That move, {move}, was your last."],
+                        playerWin: [ "You got lucky! That's all!", "Next time, I won't go so easy on you!", "I wasn't even trying." ],
+                        playerWinPerfect: ["What... How did you...?", "A perfect game? No way! You must have cheated!"],
+                        playerWinBait: ["Hah, so you're not completely clueless. You passed the test... this time.", "So you saw that, huh? Don't expect me to be so generous again."]
                     }
                 },
                 sage: {
-                    name: 'Sage',
-                    dialogue: {
-                        waiting: [ "The first step on a long journey begins with 'Start'.", "Patience. The game awaits the ready student.", "Choose the path that reflects your current skill.", "The numbers hold a lesson for you." ],
-                        start: [ "Your journey begins. May you learn from it.", "The first move is yours. What will it teach us?", "Begin. Show me the path you will walk." ],
-                        aiStart: [ "I shall begin, to demonstrate the way.", "Let the first move be a lesson.", "The first number is spoken. The path unfolds.", "Observe, and learn." ],
-                        thinking: [ "The currents of fate are shifting...", "I see the path forward.", "What does this move signify?", "Pondering the sequence...", "Every number has a purpose." ],
-                        playerPrompt: [ "The turn is yours, young grasshopper.", "What is your next step on this path?", "The choice is yours to make.", "How will you proceed?", "Speak your intention." ],
-                        playerMistake: [ "A hasty decision leads to a difficult path.", "Consider the consequences of your actions.", "That move has created a ripple you did not intend.", "Every mistake is a lesson in disguise." ],
-                        playerGoodMove: [ "A wise choice. You see the pattern.", "You have found the flow of the game.", "Excellent. You feel the rhythm of the numbers.", "You have blocked my path, as a river blocks a stone." ],
-                        winningMove: [ "And so, the lesson concludes.", "The path has led to this moment.", "The outcome was written in the numbers.", "Thus, the game finds its end.", "A predictable, yet satisfying conclusion." ],
-aiLosingMove: ["The student has become the master.", "My path ends here. Yours continues.", "Well done. Take your final step to victory.", "I accept this outcome."],
-                        tieBreaker: [ "We arrive at a crossroads of chance.", "Fate will now decide the victor.", "The path has diverged. Let's see where it leads." ],
-                        aiWin: [ "The lesson is over. Meditate on what you have learned.", "Victory is not the goal, but the journey.", "You played well, but the path was clearer to me.", "Do not be discouraged by this outcome." ],
-                        aiWinByMistake: ["Your choice of {move} was a lesson in haste.", "When you chose {move}, the path closed for you.", "The game ended when your focus slipped."],
-                        playerWin: [ "You have learned the lesson of the numbers. Well done.", "A victory well earned.", "The student surpasses the master.", "Your focus was true. Congratulations." ],
-                        playerWinPerfect: ["You have achieved a perfect understanding.", "Your mind and the numbers were as one.", "A flawless execution. I am impressed."]
-                    }
-                },
-                flustered: {
-                    name: 'Flustered',
-                    dialogue: {
-                        waiting: [ "Oh, um, hi! Ready when you are, I guess.", "Just pick a... a thingy. A difficulty. No pressure!", "Is it my turn yet? Oh, right, you have to start." ],
-                        start: [ "Okay, you can go first. Phew.", "You start! I'm... still booting up.", "Here we go! Good luck! To both of us!" ],
-                        aiStart: [ "ME?! Oh, okay, I'll start! Um... one!", "I'll go! Let's try... this one!", "Okay okay okay, my turn, here I go!" ],
-                        thinking: [ "BEEP BOOP... Is this right?", "Wait, carry the one...", "My processors are overheating!", "Uh oh.", "Does not compute! Does not compute!", "Thinking... please wait..." ],
-                        playerPrompt: [ "Your turn! I think!", "Um, you can go now.", "What's your move? It's okay, take your time.", "I'm ready! I think." ],
-                        playerMistake: [ "Oh! I think I see a thing!", "Is that a mistake? Maybe! I'll take it!", "Wait, that move... my circuits are buzzing!", "I think that's good for me! Yay!" ],
-                        playerGoodMove: [ "Oh, shoot. You're good at this.", "Drats. You blocked me.", "Wow, good move! How'd you see that?", "My poor circuits... that was a good move." ],
-                        winningMove: [ "I think... I think I'm going to win!", "YES! I DID IT!", "Is this the winning move? I hope so!", "This is it! I'm going for it!" ],
-                        aiLosingMove: ["Oh no, I messed up!", "I knew it! I'm no good at this game!", "You're too good! It's not fair!", "Just... just take the win."],
-                        tieBreaker: [ "Eeny, meeny, miny, moe...", "I'll just pick one and hope!", "I can't look! Is it a good move?" ],
-                        aiWin: [ "I WON! I can't believe it! Did you see?!", "Wow! I actually won! Hooray!", "Did I... did I win? Yes! Awesome!" ],
-                        aiWinByMistake: ["You picked {move}, and then my lights went all blinky! I win!", "Your move {move} made it easy! Thanks!"],
-                        playerWin: [ "Aw, you won! Good game!", "You're really good at this! Congratulations!", "I lost again! But that was fun!", "Congrats! You're the winner!" ],
-                        playerWinPerfect: ["WOW! A perfect game!", "You're like a super computer!", "That was amazing! You didn't make any mistakes!"]
+                     dialogue: {
+                        firstWelcome: ["Greetings, seeker. The numbers hold a lesson for you.", "A new student arrives. Welcome. Let your journey begin."],
+                        welcomeBack_long: ["Welcome back, {name}. You have achieved {wins} victories and learned from {losses} defeats. The path continues.", "The journey resumes, {name}. Your spirit has been tested {losses} times, and has triumphed {wins} times."],
+                        welcomeBack_short: ["Welcome, {name}. ({wins}W / {losses}L)", "Let us continue, {name}. ({wins}W, {losses}L)"],
+                        patternRecognized: ["The number {number} has proven to be a recurring challenge for you. Reflect on this.", "You stumble at {number} again. A pattern is a lesson repeated until it is learned."],
+                        start: [ "Your journey begins. May you learn from it.", "The first move is yours. What will it teach us?" ],
+                        aiStart: [ "I shall begin, to demonstrate the way.", "Let the first move be a lesson. Observe, and learn." ],
+                        thinking: [ "The currents of fate are shifting...", "I see the path forward.", "What does this move signify?" ],
+                        playerPrompt_long: ["The turn is yours, {name}. Meditate on your choice.", "The path is yours to choose, {name}."],
+                        playerPrompt_short: ["Your choice, {name}?", "How will you proceed, {name}?"],
+                        playerMistake: [ "A hasty decision leads to a difficult path.", "Consider the consequences of your actions.", "Every mistake is a lesson in disguise." ],
+                        playerGoodMove: [ "A wise choice. You see the pattern.", "Excellent. You feel the rhythm of the numbers.", "You have blocked my path, as a river blocks a stone." ],
+                        baiting: ["I will choose {move}. Consider this a test of your awareness.", "I offer you a chance to alter the flow. Will you take it?"],
+                        baitFailed: ["A test of perception, which you have failed. The true path was clear, but you did not see.", "You did not seize the opportunity. A lesson in awareness."],
+                        winningMove: [ "And so, the lesson concludes.", "The path has led to this moment.", "The outcome was written in the numbers." ],
+                        aiLosingMove: ["The student has become the master.", "My path ends here. Yours continues.", "Well done. Take your final step to victory."],
+                        tieBreaker: [ "We arrive at a crossroads of chance.", "Fate will now decide the victor." ],
+                        aiWin: [ "The lesson is over. Meditate on what you have learned.", "Victory is not the goal, but the journey.", "Do not be discouraged by this outcome." ],
+                        aiWinByMistake: ["Your choice of {move} was a lesson in haste.", "When you chose {move}, your path closed."],
+                        playerWin: [ "You have learned the lesson of the numbers. Well done.", "Your focus was true. Congratulations.", "The student surpasses the master." ],
+                        playerWinPerfect: ["You have achieved a perfect understanding.", "Your mind and the numbers were as one.", "A flawless execution. I am impressed."],
+                        playerWinBait: ["You saw the path I laid before you. Your mind is sharp.", "Excellent. A true master sees not only the best move, but the offered one."]
                     }
                 }
             };
             
+            // Core Functions
             const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
             const calculateReadingTime = (text) => {
                 const wordsPerMinute = 240;
                 const words = text.split(' ').filter(word => word.length > 0).length;
                 const time = Math.ceil((words / wordsPerMinute) * 60 * 1000);
-                const baseDelay = 400;
-                const randomFactor = Math.random() * 250;
-                return baseDelay + time + randomFactor;
+                return 400 + time + Math.random() * 250;
+            };
+            
+            // Data Persistence
+            const loadData = () => {
+                const name = localStorage.getItem('playerName_1to20');
+                const stats = localStorage.getItem('playerStats_1to20');
+                const history = localStorage.getItem('moveHistory_1to20');
+                if (name) {
+                    playerName = name;
+                    playerStats = stats ? JSON.parse(stats) : { wins: 0, losses: 0 };
+                    moveHistory = history ? JSON.parse(history) : [];
+                }
             };
 
-            const initGame = () => {
+            const saveData = () => {
+                localStorage.setItem('playerName_1to20', playerName);
+                localStorage.setItem('playerStats_1to20', JSON.stringify(playerStats));
+                localStorage.setItem('moveHistory_1to20', JSON.stringify(moveHistory));
+            };
+
+            // Game Flow
+            const initGame = async () => {
                 gameOver = true; currentCount = 0; playerTurn = true; usedDialogue = {};
+                isBaiting = false; playerMadeMistake = false;
                 ui.difficultySelect.disabled = false;
                 ui.currentCountDisplay.textContent = currentCount;
                 ui.gameOverModal.classList.remove('visible');
                 ui.startRestartBtn.textContent = "Start Game";
-                displayAiMessage('waiting');
-                updatePlayerActionButtons();
+                
+                loadData();
+                if (!playerName) {
+                    ui.nameModal.classList.add('visible');
+                } else {
+                    const personalityKeys = Object.keys(personalities);
+                    currentPersonality = personalities[personalityKeys[Math.floor(Math.random() * personalityKeys.length)]];
+                    let category = playerName.length > 8 ? 'welcomeBack_short' : 'welcomeBack_long';
+                    await displayAiMessage(getRandomMessage(category, { name: playerName, wins: playerStats.wins, losses: playerStats.losses }));
+                    updatePlayerActionButtons();
+                }
+            };
+
+            const handleNameConfirmation = async () => {
+                const name = ui.nameInput.value.trim();
+                if (name) {
+                    playerName = name;
+                    playerStats = { wins: 0, losses: 0 };
+                    moveHistory = [];
+                    saveData();
+                    ui.nameModal.classList.remove('visible');
+                    const personalityKeys = Object.keys(personalities);
+                    currentPersonality = personalities[personalityKeys[Math.floor(Math.random() * personalityKeys.length)]];
+                    await displayAiMessage(getRandomMessage('firstWelcome'));
+                    updatePlayerActionButtons();
+                }
             };
             
             const startGame = async () => {
-                gameOver = false; usedDialogue = {}; playerMadeMistake = false;
+                gameOver = false; usedDialogue = {}; playerMadeMistake = false; isBaiting = false;
+                // Choose a new personality for each game
                 const personalityKeys = Object.keys(personalities);
                 currentPersonality = personalities[personalityKeys[Math.floor(Math.random() * personalityKeys.length)]];
                 
@@ -405,14 +418,20 @@ aiLosingMove: ["The student has become the master.", "My path ends here. Yours c
                 ui.difficultySelect.disabled = true;
                 ui.startRestartBtn.textContent = "Restart Game";
                 
+                // Check for pattern recognition
+                const recurringMove = findRecurringLosingMove();
+                if (recurringMove !== null) {
+                    await displayAiMessage(getRandomMessage('patternRecognized', { number: recurringMove }));
+                    moveHistory = []; // Clear history after commenting on it
+                    saveData();
+                }
+                
                 if (Math.random() > 0.5) {
                     playerTurn = true;
-                    const msg = getRandomMessage('start');
-                    await displayAiMessage(msg);
+                    await displayAiMessage(getRandomMessage('start'));
                 } else {
                     playerTurn = false;
-                    const msg = getRandomMessage('aiStart');
-                    await displayAiMessage(msg);
+                    await displayAiMessage(getRandomMessage('aiStart'));
                     await aiTurn();
                 }
                 updatePlayerActionButtons();
@@ -422,6 +441,19 @@ aiLosingMove: ["The student has become the master.", "My path ends here. Yours c
                 if (!playerTurn || gameOver) return;
                 playerTurn = false;
                 lastPlayerMove = numCount;
+                
+                if (isBaiting) {
+                    const isTakingBait = isMultipleOfFour(currentCount + numCount);
+                    if (isTakingBait) {
+                        updateGame(currentCount + numCount);
+                        endGame('PlayerBait');
+                        return;
+                    } else {
+                         isBaiting = false; // Player failed the test
+                         await displayAiMessage(getRandomMessage('baitFailed'));
+                    }
+                }
+                
                 updateGame(currentCount + numCount);
 
                 if (currentCount >= 20) {
@@ -439,8 +471,7 @@ aiLosingMove: ["The student has become the master.", "My path ends here. Yours c
                 }
 
                 if (reactionCategory) {
-                    const msg = getRandomMessage(reactionCategory);
-                    await displayAiMessage(msg);
+                    await displayAiMessage(getRandomMessage(reactionCategory));
                 }
                 
                 await aiTurn();
@@ -449,8 +480,21 @@ aiLosingMove: ["The student has become the master.", "My path ends here. Yours c
             const aiTurn = async () => {
                 if (gameOver) return;
                 
-                const thinkingMsg = getRandomMessage('thinking');
-                await displayAiMessage(thinkingMsg, true, null, 1000 + Math.random() * 500);
+                // Baiting Logic
+                if (aiDifficulty === 'hard' && !isMultipleOfFour(currentCount) && Math.random() < 0.15) {
+                    isBaiting = true;
+                    const baitMove = (4 - (currentCount % 4)) % 4 === 0 ? 1 : (4 - (currentCount % 4));
+                    let moveToLetPlayerWin = (baitMove + 1) % 3 + 1; // Make a move that doesn't land on a multiple of 4
+                    
+                    await displayAiMessage(getRandomMessage('baiting', {move: moveToLetPlayerWin}));
+                    updateGame(currentCount + moveToLetPlayerWin);
+
+                    playerTurn = true;
+                    updatePlayerActionButtons();
+                    return;
+                }
+
+                await displayAiMessage(getRandomMessage('thinking'), true, null, 700 + Math.random() * 500);
 
                 const { move, wasOptimal } = getAiMove();
                 let numbersToSay = move;
@@ -462,15 +506,14 @@ aiLosingMove: ["The student has become the master.", "My path ends here. Yours c
                 let actionMsgCategory = null;
                 if (isWinningMove) {
                     actionMsgCategory = 'winningMove';
-                } else if (currentCount > 16 && move > 0) {
+                } else if (currentCount > 16 && numbersToSay > 0) {
                     actionMsgCategory = 'aiLosingMove';
                 } else if (wasOptimal === false && getOptimalMove().move !== 0) {
                     actionMsgCategory = 'tieBreaker';
                 }
 
                 if(actionMsgCategory){
-                    const msg = getRandomMessage(actionMsgCategory);
-                    await displayAiMessage(msg);
+                    await displayAiMessage(getRandomMessage(actionMsgCategory));
                 }
 
                 updateGame(currentCount + numbersToSay);
@@ -482,11 +525,12 @@ aiLosingMove: ["The student has become the master.", "My path ends here. Yours c
                 }
                 
                 playerTurn = true;
-                const promptMsg = getRandomMessage('playerPrompt');
-                displayAiMessage(promptMsg);
+                let promptCategory = playerName.length > 8 ? 'playerPrompt_short' : 'playerPrompt_long';
+                displayAiMessage(getRandomMessage(promptCategory, { name: playerName }));
                 updatePlayerActionButtons();
             };
 
+            // AI Logic
             const getAiMove = () => {
                 const playOptimal = Math.random() < { 'easy': 0.2, 'medium': 0.6, 'hard': 0.95 }[aiDifficulty];
                 if (playOptimal) {
@@ -498,16 +542,26 @@ aiLosingMove: ["The student has become the master.", "My path ends here. Yours c
 
             const getOptimalMove = () => {
                 const remainder = currentCount % 4;
-                if (remainder === 0) {
-                    return { move: 0, wasOptimal: false };
-                }
-                return { move: 4 - remainder, wasOptimal: true };
+                return (remainder === 0) ? { move: 0, wasOptimal: false } : { move: 4 - remainder, wasOptimal: true };
             };
 
             const getRandomMove = () => Math.floor(Math.random() * 3) + 1;
             const isMultipleOfFour = (num) => num > 0 && num % 4 === 0;
             const isPlayerMistake = () => [1, 2, 3].some(i => isMultipleOfFour(currentCount + i) && currentCount + i <= 20);
+            
+            const findRecurringLosingMove = () => {
+                if (moveHistory.length < 2) return null;
+                const counts = {};
+                for (const num of moveHistory) {
+                    counts[num] = (counts[num] || 0) + 1;
+                }
+                for (const num in counts) {
+                    if (counts[num] >= 2) return num;
+                }
+                return null;
+            };
 
+            // UI & Game State Updates
             const updateGame = (newCount) => {
                 currentCount = newCount;
                 ui.currentCountDisplay.textContent = newCount;
@@ -518,20 +572,33 @@ aiLosingMove: ["The student has become the master.", "My path ends here. Yours c
                 gameOver = true; playerTurn = false;
                 updatePlayerActionButtons();
                 ui.difficultySelect.disabled = false;
-                let title;
-                let message;
+                let title, message, category;
 
-                if (winner === 'AI') {
-                    title = "You Lost";
-                    let category = playerMadeMistake ? 'aiWinByMistake' : 'aiWin';
-                    message = getRandomMessage(category, { move: lastPlayerMove });
-                    ui.modalTitle.style.color = 'var(--color-danger)';
-                } else {
-                    title = "You Win!";
-                    let category = !playerMadeMistake && aiDifficulty === 'hard' ? 'playerWinPerfect' : 'playerWin';
-                    message = getRandomMessage(category);
-                    ui.modalTitle.style.color = 'var(--color-success)';
+                switch(winner) {
+                    case 'AI':
+                        title = "You Lost";
+                        playerStats.losses++;
+                        moveHistory.push(currentCount - lastPlayerMove);
+                        category = playerMadeMistake ? 'aiWinByMistake' : 'aiWin';
+                        message = getRandomMessage(category, { move: lastPlayerMove });
+                        ui.modalTitle.style.color = 'var(--color-danger)';
+                        break;
+                    case 'Player':
+                        title = "You Win!";
+                        playerStats.wins++;
+                        category = !playerMadeMistake && aiDifficulty === 'hard' ? 'playerWinPerfect' : 'playerWin';
+                        message = getRandomMessage(category);
+                        ui.modalTitle.style.color = 'var(--color-success)';
+                        break;
+                    case 'PlayerBait':
+                        title = "You Win!";
+                        playerStats.wins++;
+                        message = getRandomMessage('playerWinBait');
+                        ui.modalTitle.style.color = 'var(--color-success)';
+                        break;
                 }
+                
+                saveData();
                 ui.modalTitle.textContent = title; 
                 ui.modalMessage.textContent = message;
                 setTimeout(() => ui.gameOverModal.classList.add('visible'), 500);
@@ -543,8 +610,7 @@ aiLosingMove: ["The student has become the master.", "My path ends here. Yours c
                     const potentialCount = currentCount + moveCount;
                     
                     if (potentialCount > 20 || gameOver) {
-                        button.textContent = (potentialCount > 20 && !gameOver) ? potentialCount : 'X';
-                        if (potentialCount > 20) button.textContent = 'X';
+                        button.textContent = 'X';
                         button.disabled = true;
                     } else {
                         button.textContent = potentialCount;
@@ -553,70 +619,45 @@ aiLosingMove: ["The student has become the master.", "My path ends here. Yours c
                 });
             };
             
-            const displayAiMessage = async (categoryOrMessage, isThinking = false, context = null, thinkingTime = 0) => {
-                let message = categoryOrMessage;
-                // It's a category if it exists in the dialogue map, otherwise it's a direct message.
-                if (currentPersonality && currentPersonality.dialogue[categoryOrMessage]) {
-                    message = getRandomMessage(categoryOrMessage, context);
-                } else if (context) {
-                    // Handle placeholder replacement for direct messages too
-                    message = message.replace(/\{(\w+)\}/g, (placeholder, key) => context[key] !== undefined ? context[key] : placeholder);
-                }
-                
+            const displayAiMessage = async (message, isThinking = false, context = null, thinkingTime = 0) => {
                 ui.aiStatusBox.innerHTML = message + (isThinking ? `<span class="typing-indicator">...</span>` : '');
-                
-                if (isThinking) {
-                    await sleep(thinkingTime);
-                } else {
-                    await sleep(calculateReadingTime(message));
-                }
+                await sleep(isThinking ? thinkingTime : calculateReadingTime(message));
             };
             
             const getRandomMessage = (category, context = null) => {
-                if (!currentPersonality) {
-                    // Default to analyst if no personality is set (e.g., waiting screen)
-                    currentPersonality = personalities.analyst;
-                }
-
+                if (!currentPersonality) currentPersonality = personalities.analyst;
                 const allMessages = currentPersonality.dialogue[category];
-                if (!allMessages) return ""; // Failsafe
+                if (!allMessages) return "";
 
-                if (!usedDialogue[category]) {
-                    usedDialogue[category] = [];
-                }
-                
+                if (!usedDialogue[category]) usedDialogue[category] = [];
                 let availableIndices = allMessages.map((_, i) => i).filter(i => !usedDialogue[category].includes(i));
-                
                 if (availableIndices.length === 0) {
-                    usedDialogue[category] = []; // Reset if all have been used
+                    usedDialogue[category] = [];
                     availableIndices = allMessages.map((_, i) => i);
                 }
-                
                 const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
                 usedDialogue[category].push(randomIndex);
                 
                 let message = allMessages[randomIndex];
-
                 if (context) {
-                    message = message.replace(/\{(\w+)\}/g, (placeholder, key) => {
-                        return context[key] !== undefined ? `<strong>${context[key]}</strong>` : placeholder;
-                    });
+                    message = message.replace(/\{(\w+)\}/g, (placeholder, key) => context[key] !== undefined ? `<strong>${context[key]}</strong>` : placeholder);
                 }
-                
                 return message;
             };
 
             const toggleFullScreen = () => {
                 if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen().catch(err => {});
-                } else {
-                    if (document.exitFullscreen) {
-                        document.exitFullscreen();
-                    }
+                    document.documentElement.requestFullscreen().catch(() => {});
+                } else if (document.exitFullscreen) {
+                    document.exitFullscreen();
                 }
             };
 
+            // Event Listeners
             document.addEventListener('keydown', (e) => {
+                if (ui.nameModal.classList.contains('visible') && e.key === 'Enter') {
+                    handleNameConfirmation();
+                }
                 if (ui.gameOverModal.classList.contains('visible')) return;
                 if (e.key.toLowerCase() === 'f' && !e.ctrlKey && !e.metaKey) {
                     e.preventDefault();
@@ -629,7 +670,10 @@ aiLosingMove: ["The student has become the master.", "My path ends here. Yours c
             });
             ui.startRestartBtn.addEventListener('click', () => gameOver ? startGame() : initGame());
             ui.playAgainBtn.addEventListener('click', initGame);
+            ui.confirmNameBtn.addEventListener('click', handleNameConfirmation);
+            ui.nameInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') handleNameConfirmation(); });
 
+            // Initial Load
             initGame();
         });
     </script>
