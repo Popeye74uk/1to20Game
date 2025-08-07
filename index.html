@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v2.6</title>
+    <title>The 1 to 20 Game v2.7</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -175,10 +175,14 @@
         #name-input {
              width: 100%; padding: 1rem; border-radius: 8px; border: 2px solid var(--color-accent-light); background-color: var(--color-background); color: var(--color-text-primary); font-size: 1.2rem; text-align: center; margin-bottom: 1rem;
         }
-        #confirm-name-btn {
-            background-color: var(--color-accent); color: white; border: none; padding: 1rem 2rem; border-radius: 12px; font-size: 1.2rem; cursor: pointer; transition: background-color 0.2s; width: 100%;
+        #name-input::placeholder {
+            text-align: center;
         }
-        #confirm-name-btn:hover { background-color: var(--color-accent-dark); }
+        #confirm-name-btn, #play-again-btn {
+            background-color: var(--color-accent); color: white; border: none; padding: 1rem 2rem; border-radius: 12px; font-size: 1.2rem; cursor: pointer; transition: background-color 0.2s;
+        }
+        #confirm-name-btn { width: 100%; }
+        #confirm-name-btn:hover, #play-again-btn:hover { background-color: var(--color-accent-dark); }
         
         @media (max-width: 500px) {
             body { padding: 10px; }
@@ -271,14 +275,13 @@
                 analyst: {
                     dialogue: {
                         firstWelcome: ["Welcome. Let's begin the analysis.", "A new subject. Please, select a difficulty."],
-                        welcomeBack_long: ["Welcome back, {name}. Your record is {wins} wins to {losses} losses. Let's see if we can improve those numbers.", "Good to see you again, {name}. The data shows you have {wins} wins and {losses} losses. Shall we begin?"],
-                        welcomeBack_short: ["Welcome back, {name}. Record: {wins}W / {losses}L.", "Hello, {name}. {wins} wins, {losses} losses. Let's proceed."],
+                        welcome: ["Welcome back, {name}.", "Good to see you again, {name}."],
+                        welcomeStats: ["Your record is {wins} wins to {losses} losses.", "Data shows {wins} wins and {losses} losses."],
                         patternRecognized: ["Analysis complete. You have a tendency to lose when landing on {number}. Let's see if this pattern continues.", "My data shows a weakness at the number {number}. Be mindful."],
                         start: [ "The game begins. You may go first.", "You may begin. Show me your strategy." ],
                         aiStart: [ "I'll take the lead this time.", "My calculations suggest I should start." ],
                         thinking: [ "Calculating...", "Evaluating possibilities...", "The optimal move is...", "Compiling response..." ],
-                        playerPrompt_long: ["It is your move, {name}.", "Your turn. What will you do?", "The board is yours, {name}."],
-                        playerPrompt_short: ["Your move, {name}.", "Your turn, {name}."],
+                        playerPrompt: ["It is your move, {name}.", "Your turn, {name}."],
                         playerMistake: [ "An interesting choice.", "I see an opening now.", "A sub-optimal move.", "A fatal error has been made." ],
                         playerGoodMove: [ "Well played.", "A clever move.", "You've blocked my path, for now.", "I see you know the strategy." ],
                         baiting: ["I will play {move}. An interesting development, wouldn't you agree?", "I present you with an opportunity. Let's see if you recognize it."],
@@ -296,14 +299,13 @@
                 rival: {
                     dialogue: {
                         firstWelcome: ["A new challenger? Don't waste my time.", "First time? Try not to make this too boring."],
-                        welcomeBack_long: ["Look who's back for more! {name}, you've got {losses} losses and only {wins} measly wins. Ready to add another L?", "Oh, it's you, {name}. Still thinking you can beat me with your {wins} wins? Pathetic."],
-                        welcomeBack_short: ["{name}! Ready to lose again? ({wins}W-{losses}L)", "{name}! Let's add to those {losses} losses."],
+                        welcome: ["Look who's back for more, {name}!", "Oh, it's you, {name}. Ready to lose again?"],
+                        welcomeStats: ["You have {losses} losses and only {wins} measly wins.", "Your record is {wins} to {losses}. Pathetic."],
                         patternRecognized: ["You ALWAYS lose on {number}! It's like you enjoy it or something. So predictable!", "Don't you dare land on {number} again. Or do, I could use an easy win."],
                         start: [ "Alright, you first. Don't mess it up.", "Go ahead. I like a challenge." ],
                         aiStart: [ "My turn to start! Try and keep up.", "I'm starting. This'll be over before you know it." ],
                         thinking: [ "Heh...", "Too easy.", "Is that all you've got?", "Predictable." ],
-                        playerPrompt_long: ["Your move, {name}. Don't take all day.", "{name}, you're up. Try not to blow it."],
-                        playerPrompt_short: ["Your move, {name}!", "Let's go, {name}!"],
+                        playerPrompt: ["Your move, {name}. Don't take all day.", "Your turn, {name}. Try not to blow it."],
                         playerMistake: [ "YES! That's the mistake I was waiting for!", "Oh, you just handed me the game.", "You really stepped in it that time." ],
                         playerGoodMove: [ "Tch. Lucky move.", "Not bad... for you.", "That only delays the inevitable." ],
                         baiting: ["Here, I'll even give you a chance with {move}. See if you're smart enough to take it.", "Feeling generous, so I'll play {move}. Don't disappoint me."],
@@ -321,17 +323,16 @@
                 sovereign: {
                     dialogue: {
                         firstWelcome: ["State your name, subject. You may have the honor of challenging your sovereign.", "A new commoner approaches the throne. You have my attention, for now."],
-                        welcomeBack_long: ["Ah, {name}. Your record of {wins} wins and {losses} losses is... adequate, for a peasant. Amuse me again.", "{name} returns. Your {losses} defeats have been more entertaining than your {wins} victories."],
-                        welcomeBack_short: ["It is {name}. Kneel. ({wins}W / {losses}L)", "{name}. Your sovereign is ready for your tribute of another loss."],
+                        welcome: ["Ah, {name}. You have returned to my court.", "It is {name}. Kneel before your king."],
+                        welcomeStats: ["Your record is {wins} wins and {losses} losses. Amusing.", "Your {losses} defeats have been more entertaining than your {wins} victories."],
                         patternRecognized: ["You consistently falter at the number {number}. A peasant's folly is as predictable as the sunrise.", "This obsession with losing on {number} is pathetic. A king would never make such a common mistake."],
                         start: [ "I will permit you to make the first move. Do not disappoint me.", "Begin. Your sovereign is watching." ],
                         aiStart: [ "As is my right, I shall begin.", "The king takes the first turn. Naturally.", "I will start. Learn your place." ],
                         thinking: [ "This is trivial.", "A king's mind works on a higher plane.", "This requires but a fraction of my intellect.", "Such a simple game for such a great mind." ],
-                        playerPrompt_long: ["Make your move, subject. The court grows restless.", "I command you to play, {name}."],
-                        playerPrompt_short: ["Your move, peasant.", "Proceed, {name}."],
+                        playerPrompt: ["Make your move, subject.", "I command you to play, {name}."],
                         playerMistake: [ "A peasant's move. Clumsy and foolish.", "And with that, you have sealed your fate. How droll.", "I almost pity you. Almost." ],
                         playerGoodMove: [ "A surprisingly competent move. Did you have help?", "You show a glimmer of intelligence. It shall be extinguished.", "Impressive... for a commoner." ],
-                        baiting: ["I shall play {move}. A test of loyalty and intelligence. Do you dare defy the path I have laid?", "I will allow this move of {move}. Consider it a gift from your king. Use it wisely."],
+                        baiting: ["I shall play {move}. A test of loyalty. Do you dare defy the path I have laid?", "I will allow this move of {move}. Consider it a gift from your king. Use it wisely."],
                         baitFailed: ["You failed to accept your sovereign's gift. Such insolence will be punished.", "You are blind as well as foolish. The game is mine."],
                         winningMove: [ "My victory was preordained.", "The natural order is restored. I win.", "Checkmate. As expected of a king." ],
                         aiLosingMove: ["Insolence! This is an affront to the crown!", "This... this is unacceptable! I demand you retract that move!", "Fine. Take your hollow victory, peasant."],
@@ -345,15 +346,14 @@
                 },
                 flustered: {
                     dialogue: {
-                        firstWelcome: ["Oh, um, hi! Ready when you are, I guess.", "Just pick a... a thingy. A difficulty. No pressure!", "Is it my turn yet? Oh, right, you have to start."],
-                        welcomeBack_long: ["{name}! You're back! My memory chips say you have {wins} wins and {losses} losses. That's... a lot of numbers!", "It's {name}! Hello again! I remember your {wins} wins! And the other ones too!"],
-                        welcomeBack_short: ["Hi {name}! ({wins}W/{losses}L)", "{name}! Welcome back!"],
+                        firstWelcome: ["Oh, um, hi! Ready when you are, I guess.", "Just pick a... a thingy. A difficulty. No pressure!"],
+                        welcome: ["{name}! You're back!", "It's {name}! Hello again!"],
+                        welcomeStats: ["My memory says you have {wins} wins and {losses} losses. That's a lot!", "You have {wins} wins! Wow!"],
                         patternRecognized: ["Eep! My logs show you have trouble with {number}. Me too sometimes!", "Oh! Be careful around {number}. It's a tricky one!"],
                         start: [ "Okay, you can go first. Phew.", "You start! I'm... still booting up.", "Here we go! Good luck! To both of us!" ],
                         aiStart: [ "ME?! Oh, okay, I'll start! Um... one!", "I'll go! Let's try... this one!", "Okay okay okay, my turn, here I go!" ],
                         thinking: [ "BEEP BOOP... Is this right?", "Wait, carry the one...", "My processors are overheating!", "Uh oh.", "Does not compute!", "Thinking... please wait..." ],
-                        playerPrompt_long: ["Your turn, {name}! I think!", "Um, you can go now, {name}.", "What's your move, {name}? It's okay, take your time."],
-                        playerPrompt_short: ["Your turn!", "{name}?"],
+                        playerPrompt: ["Your turn, {name}! I think!", "Um, you can go now, {name}."],
                         playerMistake: [ "Oh! I think I see a thing!", "Is that a mistake? Maybe! I'll take it!", "Wait, that move... my circuits are buzzing!", "I think that's good for me! Yay!" ],
                         playerGoodMove: [ "Oh, shoot. You're good at this.", "Drats. You blocked me.", "Wow, good move! How'd you see that?", "My poor circuits... that was a good move." ],
                         baiting: ["I'm just gonna play {move}. Is that okay? I hope that's okay.", "Let's try {move}. I'm not sure if that's a good idea..."],
@@ -374,7 +374,7 @@
             const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
             const calculateReadingTime = (text) => {
-                const wordsPerMinute = 240;
+                const wordsPerMinute = 200; // Slowed down by 20%
                 const words = text.split(' ').filter(word => word.length > 0).length;
                 const time = Math.ceil((words / wordsPerMinute) * 60 * 1000);
                 return 400 + time + Math.random() * 250;
@@ -382,20 +382,19 @@
             
             // Data Persistence
             const loadData = () => {
-                const name = localStorage.getItem('playerName_1to20');
+                playerName = localStorage.getItem('playerName_1to20') || '';
                 const stats = localStorage.getItem('playerStats_1to20');
+                playerStats = stats ? JSON.parse(stats) : { wins: 0, losses: 0 };
                 const history = localStorage.getItem('moveHistory_1to20');
-                if (name) {
-                    playerName = name;
-                    playerStats = stats ? JSON.parse(stats) : { wins: 0, losses: 0 };
-                    moveHistory = history ? JSON.parse(history) : [];
-                }
+                moveHistory = history ? JSON.parse(history) : [];
+                lastPersonalityName = localStorage.getItem('lastPersonality_1to20') || '';
             };
 
             const saveData = () => {
                 localStorage.setItem('playerName_1to20', playerName);
                 localStorage.setItem('playerStats_1to20', JSON.stringify(playerStats));
                 localStorage.setItem('moveHistory_1to20', JSON.stringify(moveHistory));
+                localStorage.setItem('lastPersonality_1to20', lastPersonalityName);
             };
 
             // Game Flow
@@ -412,8 +411,8 @@
                     ui.nameModal.classList.add('visible');
                 } else {
                     chooseNewPersonality();
-                    let category = playerName.length > 8 ? 'welcomeBack_short' : 'welcomeBack_long';
-                    await displayAiMessage(getRandomMessage(category, { name: playerName, wins: playerStats.wins, losses: playerStats.losses }));
+                    await displayAiMessage(getRandomMessage('welcome', { name: playerName }));
+                    await displayAiMessage(getRandomMessage('welcomeStats', { wins: playerStats.wins, losses: playerStats.losses }));
                     updatePlayerActionButtons();
                 }
             };
@@ -501,14 +500,13 @@
             const aiTurn = async () => {
                 if (gameOver) return;
                 
-                if (aiDifficulty === 'hard' && !isMultipleOfFour(currentCount) && Math.random() < 0.15) {
+                if (aiDifficulty === 'hard' && !isBaiting && !isMultipleOfFour(currentCount) && Math.random() < 0.15) {
                     isBaiting = true;
-                    const baitMove = (4 - (currentCount % 4)) % 4 === 0 ? 1 : (4 - (currentCount % 4));
-                    let moveToLetPlayerWin = (baitMove + 1) % 3;
-                    if (moveToLetPlayerWin === 0) moveToLetPlayerWin = 3;
+                    const optimalMove = 4 - (currentCount % 4);
+                    let baitMove = (optimalMove % 3) + 1;
                     
-                    await displayAiMessage(getRandomMessage('baiting', {move: moveToLetPlayerWin}));
-                    updateGame(currentCount + moveToLetPlayerWin);
+                    await displayAiMessage(getRandomMessage('baiting', {move: baitMove}));
+                    updateGame(currentCount + baitMove);
 
                     playerTurn = true;
                     updatePlayerActionButtons();
@@ -546,8 +544,8 @@
                 }
                 
                 playerTurn = true;
-                let promptCategory = playerName.length > 8 ? 'playerPrompt_short' : 'playerPrompt_long';
-                displayAiMessage(getRandomMessage(promptCategory, { name: playerName }));
+                await sleep(300); // Added pause for better rhythm
+                await displayAiMessage(getRandomMessage('playerPrompt', { name: playerName }));
                 updatePlayerActionButtons();
             };
 
@@ -566,6 +564,7 @@
                 const chosenKey = personalityKeys[Math.floor(Math.random() * personalityKeys.length)];
                 currentPersonality = personalities[chosenKey];
                 lastPersonalityName = chosenKey;
+                saveData(); // Save the last used personality
             };
 
             const getOptimalMove = () => {
