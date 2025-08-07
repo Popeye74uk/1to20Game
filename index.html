@@ -61,19 +61,15 @@
         
         /* --- CORRECTED HEADER LAYOUT --- */
         .game-header {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr; /* 3-column grid */
+            display: flex;
+            justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
         }
-        .header-buttons { 
-            display: flex; 
-            justify-content: flex-end; 
-            gap: 10px; 
-            grid-column: 3 / 4; /* Place in the 3rd column */
-        }
+        .header-buttons { display: flex; justify-content: flex-end; gap: 10px; flex-basis: 100px; }
+        .header-spacer { flex-basis: 100px; } /* This spacer forces the title to center */
         h1 {
-            grid-column: 2 / 3; /* Place in the 2nd (center) column */
+            flex-grow: 1;
             text-align: center;
             color: var(--color-text-primary);
             font-size: 2rem;
@@ -119,11 +115,16 @@
             width: 100%;
             height: 100%;
             padding: 2rem;
-            justify-content: center;
-            gap: 1.5rem;
+            justify-content: center; /* Center the content block vertically */
+            gap: 1.5rem; /* Add consistent spacing */
             overflow-y: auto; /* Allow scrolling if content overflows on small screens */
+            background-color: var(--color-background); /* Match the body background */
         }
-
+        
+        #game-container:fullscreen #ai-status-wrapper {
+             background-color: var(--color-container-bg);
+        }
+        
         /* AI Status Box */
         #ai-status-wrapper {
             background-color: var(--color-accent-light);
@@ -139,8 +140,6 @@
         }
         #game-container:fullscreen #ai-status-wrapper {
             margin-bottom: 0;
-            padding: 1.5rem 2rem;
-            font-size: 1.2rem;
         }
         #ai-status {
             font-style: italic;
@@ -513,7 +512,7 @@
             };
             const toggleFullScreen = () => {
                 if (!document.fullscreenElement) {
-                    ui.gameContainer.requestFullscreen().catch(err => alert(`Fullscreen error: ${err.message}`));
+                    document.documentElement.requestFullscreen().catch(err => alert(`Fullscreen error: ${err.message}`));
                 } else {
                     document.exitFullscreen();
                 }
