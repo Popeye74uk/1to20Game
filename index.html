@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game (Final)</title>
+    <title>The 1 to 20 Game v1.6</title>
     <style>
         :root {
             --color-background: #f0f2f5; --color-container-bg: #ffffff; --color-text-primary: #212529; --color-text-secondary: #6c757d; --color-accent: #6f42c1; --color-accent-dark: #5a359a; --color-accent-light: #e9e5f5; --color-primary-button: #007bff; --color-primary-button-hover: #0069d9; --color-danger: #dc3545; --color-success: #28a745; --color-button-disabled-bg: #adb5bd; --color-shadow: rgba(0, 0, 0, 0.1); --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -15,35 +15,20 @@
             font-family: var(--font-main); background-color: var(--color-background); color: var(--color-text-primary); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; transition: background-color 0.3s, color 0.3s;
         }
         .container {
-            width: 100%; max-width: 420px; margin: 0 auto; text-align: center;
+            position: relative; /* Anchor for the buttons */
+            width: 100%; max-width: 420px; text-align: center;
         }
-        /* --- DEFINITIVE HEADER LAYOUT --- */
         .game-header {
-            position: relative; /* Establish positioning context */
-            display: flex;
-            justify-content: center; /* Center the title */
-            align-items: center;
-            margin-bottom: 20px;
-            width: 100%;
-            height: 44px; /* Give header a defined height */
-        }
-        .title-wrapper {
-            text-align: center;
+            text-align: center; margin-bottom: 20px; height: 44px; display: flex; align-items: center; justify-content: center;
         }
         h1 {
             color: var(--color-text-primary); font-size: 2rem; margin: 0; white-space: nowrap;
         }
         .header-buttons {
-            position: absolute; /* Position relative to .game-header */
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            gap: 10px;
-            align-items: center;
+            position: absolute; top: 0; left: 100%; margin-left: 10px; display: flex; gap: 10px; height: 44px; align-items: center;
         }
         #theme-toggle-btn, #fullscreen-btn {
-            background: none; border: 2px solid var(--color-text-secondary); color: var(--color-text-secondary); width: 44px; height: 44px; padding: 0; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: all 0.2s;
+            background: none; border: 2px solid var(--color-text-secondary); color: var(--color-text-secondary); width: 44px; height: 44px; padding: 0; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: all 0.2s; flex-shrink: 0;
         }
         #theme-toggle-btn:hover, #fullscreen-btn:hover {
              border-color: var(--color-text-primary); color: var(--color-text-primary);
@@ -55,9 +40,9 @@
         #game-container {
             background-color: var(--color-container-bg); border-radius: 16px; box-shadow: 0 8px 32px var(--color-shadow); padding: 2rem; transition: background-color 0.3s; display: flex; flex-direction: column;
         }
-        body:fullscreen .game-header { display: none; }
+        body:fullscreen .game-header, body:fullscreen .header-buttons { display: none; }
         #ai-status-wrapper {
-            background-color: var(--color-accent-light); border-left: 5px solid var(--color-accent); padding: 1rem 1.5rem; margin-bottom: 2rem; border-radius: 8px; min-height: 60px; display: flex; align-items: center; justify-content: center; gap: 10px;
+            background-color: var(--color-accent-light); border-left: 5px solid var(--color-accent); padding: 1rem 1.5rem; margin-bottom: 2rem; border-radius: 8px; min-height: 30px; display: flex; align-items: center; justify-content: center; gap: 10px;
         }
         #ai-status {
             font-style: italic; font-size: 1.2rem; color: var(--color-text-primary); line-height: 1.5;
@@ -79,7 +64,6 @@
         .action-btn:disabled {
             background-color: var(--color-button-disabled-bg); color: #ffffffc0; cursor: not-allowed; transform: none; opacity: 0.5;
         }
-        body:not(.dark-mode) .action-btn:disabled { color: #555; background-color: #e9ecef; }
         #game-controls { display: grid; grid-template-columns: 1fr; align-items: center; gap: 1rem; }
         .control-group { display: flex; flex-direction: column; align-items: center; gap: 5px; }
         #difficulty-select { padding: 0.8rem; border-radius: 8px; width: 100%; border: 2px solid var(--color-accent-light); background-color: var(--color-container-bg); color: var(--color-text-primary); font-size: 1rem; font-weight: bold; text-align: center; }
@@ -101,13 +85,12 @@
         }
         #play-again-btn:hover { background-color: var(--color-accent-dark); }
         
-        @media (max-width: 500px) {
+        @media (max-width: 600px) {
+            .header-buttons { display: none; }
+        }
+        @media (max-width: 450px) {
             body { padding: 10px; }
             h1 { font-size: 1.6rem; }
-            .game-header { justify-content: space-between; }
-            .title-wrapper { text-align: left; }
-            #fullscreen-btn { display: none; }
-            .header-buttons { position: static; transform: none; }
             #game-container { padding: 1.5rem; }
             #current-count { font-size: 6rem; }
             .action-btn { font-size: 2rem; }
@@ -118,19 +101,17 @@
 <body>
     <div class="container">
         <header class="game-header">
-            <div class="title-wrapper">
-                <h1>The 1 to 20 Game</h1>
-            </div>
-            <div class="header-buttons">
-                 <button id="fullscreen-btn" title="Toggle Fullscreen (F)">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-                </button>
-                <button id="theme-toggle-btn" title="Toggle Theme">
-                    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.64 5.64c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zm12.73 12.73c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zM5.64 18.36c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0zM18.36 5.64c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.38-1.03-.38-1.41 0z"/></svg>
-                    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.11-1.36c-0.98,1.37-2.58,2.26-4.39,2.26 c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.39C12.92,3.04,12.46,3,12,3z"/></svg>
-                </button>
-            </div>
+            <h1>The 1 to 20 Game</h1>
         </header>
+        <div class="header-buttons">
+            <button id="fullscreen-btn" title="Toggle Fullscreen (F)">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            </button>
+            <button id="theme-toggle-btn" title="Toggle Theme">
+                <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.64 5.64c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zm12.73 12.73c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zM5.64 18.36c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0zM18.36 5.64c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.38-1.03-.38-1.41 0z"/></svg>
+                <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.11-1.36c-0.98,1.37-2.58,2.26-4.39,2.26 c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.39C12.92,3.04,12.46,3,12,3z"/></svg>
+            </button>
+        </div>
 
         <div id="game-container">
             <div id="ai-status-wrapper">
@@ -180,26 +161,24 @@
                 playAgainBtn: document.getElementById('play-again-btn')
             };
 
-            let currentCount = 0, playerTurn = true, gameOver = true, aiDifficulty = 'hard', usedDialogue = {};
+            let currentCount = 0, playerTurn = true, gameOver = true, aiDifficulty = 'hard';
 
             const aiDialogue = {
                 waiting: ["Select a difficulty and press Start.", "Ready when you are..."],
                 start: ["The game begins. You may go first.", "You may begin.", "Let's see what you've got."],
-                aiStart: ["I'll take the lead this time.", "My turn to start.", "Allow me to demonstrate the optimal strategy."],
-                thinking: ["Hmm...", "Let me see...", "Calculating...", "Interesting...", "Predictable.", "Really? That's your move?"],
+                aiStart: ["I'll take the lead this time.", "My turn to start.", "Let's begin. I'll go first."],
+                thinking: ["Hmm...", "Let me see...", "Calculating...", "Interesting...", "Just a moment..."],
                 playerPrompt: ["Your move.", "Your turn.", "What will you do?", "Make your move.", "I'm waiting."],
-                playerMistake: ["An interesting choice...", "I see an opening!", "Are you sure about that?", "A fatal error.", "And that's where you lose the game."],
-                playerGoodMove: ["Well played.", "A clever move.", "You've blocked my path... for now.", "Impressive... for a human.", "That only delays the inevitable."],
-                winningMove: ["That sets me up perfectly.", "A perfect calculation.", "The path to victory is clear.", "The outcome was never in doubt.", "Precisely as I planned."],
-                aiLosingMove: ["Go on then. Finish it.", "I've made a slight miscalculation. Enjoy your moment.", "Hmph. You've got me. This time.", "I see my fate. Play your final number."],
-                playerWinningMove: ["Oh, you've reached 20. How... surprising.", "Clever. You've won. Are you proud of yourself?", "20. I suppose even a broken clock is right twice a day.", "So you can count. Bravo."],
+                playerMistake: ["An interesting choice...", "I see an opening!", "Are you sure about that?", "A bold move.", "Not what I would have done..."],
+                playerGoodMove: ["Well played.", "A clever move.", "You've blocked my path... for now.", "I see you know the trick.", "A formidable move."],
+                winningMove: ["That sets me up perfectly.", "A perfect calculation.", "The path to victory is clear.", "And that should be game.", "Precisely as I planned."],
                 tieBreaker: ["You've left it to chance, have you?", "A risky position. Let's see...", "This could go either way."],
-                aiWin: ["A logical conclusion. Victory is mine!", "As expected. The machine is superior.", "Better luck next time, human.", "Perhaps a simpler game would be more your speed?"],
+                aiWin: ["A logical conclusion. Victory is mine!", "A predictable outcome. Well played, though.", "Better luck next time, human.", "Checkmate."],
                 playerWin: ["You've bested me! I won't make that mistake again.", "A surprising victory! Well done.", "You have my congratulations.", "I'll get you next time!"]
             };
 
             const initGame = () => {
-                gameOver = true; currentCount = 0; playerTurn = true; usedDialogue = {};
+                gameOver = true; currentCount = 0; playerTurn = true;
                 ui.difficultySelect.disabled = false;
                 ui.currentCountDisplay.textContent = currentCount;
                 ui.gameOverModal.classList.remove('visible');
@@ -209,7 +188,7 @@
             };
             
             const startGame = () => {
-                gameOver = false; usedDialogue = {};
+                gameOver = false;
                 aiDifficulty = ui.difficultySelect.value;
                 ui.difficultySelect.disabled = true;
                 ui.startRestartBtn.textContent = "Restart Game";
@@ -220,7 +199,7 @@
                 } else {
                     playerTurn = false;
                     displayAiMessage('aiStart');
-                    setTimeout(aiTurn, 1800);
+                    setTimeout(aiTurn, 1200);
                 }
                 updatePlayerActionButtons();
             };
@@ -230,62 +209,59 @@
                 playerTurn = false;
                 updateGame(currentCount + numCount);
 
-                if (currentCount >= 20) {
-                    displayAiMessage('playerWinningMove');
-                    setTimeout(() => endGame('Player'), 1800);
-                    return;
-                }
+                if (currentCount >= 20) { return endGame('Player'); }
 
                 if(isPlayerMistake()) { displayAiMessage('playerMistake'); } 
                 else if (isMultipleOfFour(currentCount)) { displayAiMessage('playerGoodMove'); }
                 
-                const randomDelay = Math.floor(Math.random() * 500) + 700;
+                const randomDelay = Math.floor(Math.random() * 400) + 400;
                 setTimeout(aiTurn, randomDelay);
             };
             
             const aiTurn = () => {
                 if (gameOver) return;
-                const thinkingTime = (aiDifficulty === 'hard') ? 1500 : 800;
-                
-                const { move, wasOptimal } = getAiMove(true); 
-                const isWinningMove = isMultipleOfFour(currentCount + move) && move > 0 && wasOptimal;
-
-                if (isWinningMove) {
-                    displayAiMessage('winningMove');
-                } else if (isAiForcedToLose()) {
-                    displayAiMessage('aiLosingMove');
-                } else {
-                    displayAiMessage('thinking', true);
-                }
+                const thinkingTime = (aiDifficulty === 'hard') ? 1000 : 500;
+                displayAiMessage('thinking', true);
                 
                 setTimeout(() => {
+                    const { move, wasOptimal } = getAiMove();
                     let numbersToSay = move;
                     if (currentCount + numbersToSay > 20) { numbersToSay = 20 - currentCount; }
                     
+                    const isWinningMove = isMultipleOfFour(currentCount + numbersToSay) && numbersToSay > 0 && wasOptimal;
+
                     updateGame(currentCount + numbersToSay);
 
                     if (currentCount >= 20) { return endGame('AI'); }
                     
                     playerTurn = true;
-                    
-                    setTimeout(() => {
+
+                    if (isWinningMove) {
+                        displayAiMessage('winningMove');
+                        setTimeout(() => {
+                            displayAiMessage('playerPrompt');
+                            updatePlayerActionButtons();
+                        }, 1200); // Longer pause to read the winning move message
+                    } else {
                         displayAiMessage('playerPrompt');
                         updatePlayerActionButtons();
-                    }, isWinningMove ? 1800 : 100);
+                    }
 
                 }, thinkingTime);
             };
-            
-            const getAiMove = (precheck = false) => {
+
+            const getAiMove = () => {
                 const playOptimal = Math.random() < { 'easy': 0.2, 'medium': 0.6, 'hard': 0.95 }[aiDifficulty];
-                if (playOptimal) { return getOptimalMove(precheck); }
+                if (playOptimal) {
+                    return getOptimalMove();
+                }
                 return { move: getRandomMove(), wasOptimal: false };
             };
 
-            const getOptimalMove = (precheck = false) => {
+            const getOptimalMove = () => {
                 const remainder = currentCount % 4;
                 if (remainder === 0) {
-                    if(!precheck) displayAiMessage('tieBreaker');
+                    displayAiMessage('tieBreaker');
                     return { move: getRandomMove(), wasOptimal: false };
                 }
                 return { move: 4 - remainder, wasOptimal: true };
@@ -294,11 +270,10 @@
             const getRandomMove = () => Math.floor(Math.random() * 3) + 1;
             const isMultipleOfFour = (num) => num > 0 && num % 4 === 0;
             const isPlayerMistake = () => [1, 2, 3].some(i => isMultipleOfFour(currentCount + i) && currentCount + i <= 20);
-            const isAiForcedToLose = () => currentCount >= 17 && currentCount <= 19;
 
             const updateGame = (newCount) => {
                 currentCount = newCount;
-                ui.currentCountDisplay.textContent = newCount;
+                ui.currentCountDisplay.textContent = currentCount;
                 updatePlayerActionButtons();
             };
 
@@ -310,7 +285,7 @@
                 if (winner === 'AI') {
                     title = "You Lost"; message = getRandomMessage('aiWin'); ui.modalTitle.style.color = 'var(--color-danger)';
                 } else {
-                    title = "You Win!"; message = getRandom.get(getRandomMessage('playerWin')); ui.modalTitle.style.color = 'var(--color-success)';
+                    title = "You Win!"; message = getRandomMessage('playerWin'); ui.modalTitle.style.color = 'var(--color-success)';
                 }
                 ui.modalTitle.textContent = title; ui.modalMessage.textContent = message;
                 setTimeout(() => ui.gameOverModal.classList.add('visible'), 500);
@@ -324,23 +299,12 @@
                 });
             };
             
-            const getRandomMessage = (category) => {
-                const allMessages = aiDialogue[category];
-                if (!usedDialogue[category]) { usedDialogue[category] = []; }
-                let availableIndices = allMessages.map((_, i) => i).filter(i => !usedDialogue[category].includes(i));
-                if (availableIndices.length === 0) {
-                    usedDialogue[category] = [];
-                    availableIndices = allMessages.map((_, i) => i);
-                }
-                const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
-                usedDialogue[category].push(randomIndex);
-                return allMessages[randomIndex];
-            };
-
             const displayAiMessage = (category, isThinking = false) => {
                 const message = getRandomMessage(category);
                 ui.aiStatusBox.innerHTML = message + (isThinking ? `<span class="typing-indicator">...</span>` : '');
             };
+            
+            const getRandomMessage = (category) => aiDialogue[category][Math.floor(Math.random() * aiDialogue[category].length)];
 
             const setTheme = (theme) => {
                 document.body.classList.toggle('dark-mode', theme === 'dark');
