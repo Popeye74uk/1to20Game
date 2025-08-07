@@ -13,7 +13,9 @@
             --color-text-secondary: #6c757d;
             --color-accent: #6f42c1;
             --color-accent-dark: #5a359a;
-            --color-accent-light: #e0d9f2;
+            --color-accent-light: #e9e5f5;
+            --color-primary-button: #007bff;
+            --color-primary-button-hover: #0069d9;
             --color-danger: #dc3545;
             --color-success: #28a745;
             --color-button-disabled-bg: #adb5bd;
@@ -29,6 +31,8 @@
             --color-accent: #9b7de2;
             --color-accent-dark: #8166c1;
             --color-accent-light: #2a2536;
+            --color-primary-button: #3685e0;
+            --color-primary-button-hover: #58a6ff;
             --color-button-disabled-bg: #444;
             --color-shadow: rgba(0, 0, 0, 0.4);
         }
@@ -68,7 +72,7 @@
             text-align: center;
             color: var(--color-text-primary);
             font-size: 2.5rem;
-            margin: 0;
+            margin: 0 10px;
         }
         
         #theme-toggle-btn {
@@ -84,6 +88,7 @@
             justify-content: center;
             align-items: center;
             transition: all 0.2s;
+            flex-shrink: 0;
         }
         #theme-toggle-btn:hover {
              border-color: var(--color-text-primary);
@@ -119,8 +124,9 @@
         }
         #ai-status {
             font-style: italic;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             color: var(--color-text-primary);
+            line-height: 1.5;
         }
         .typing-indicator {
             font-weight: bold;
@@ -146,11 +152,11 @@
 
         .action-btn {
             background-color: var(--color-accent);
-            color: white;
+            color: #ffffff;
             border: none;
             padding: 1rem;
             border-radius: 12px;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: bold;
             cursor: pointer;
             transition: background-color 0.2s, transform 0.2s;
@@ -161,9 +167,10 @@
         }
         .action-btn:disabled {
             background-color: var(--color-button-disabled-bg);
-            color: #ffffff99;
+            color: #ffffffc0;
             cursor: not-allowed;
             opacity: 0.7;
+            transform: none;
         }
 
         /* Move History Log */
@@ -188,19 +195,47 @@
 
         /* Game Controls */
         #game-controls {
-            display: flex;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             align-items: center;
             gap: 1rem;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        .control-group label {
+            font-weight: bold;
+            font-size: 1rem;
         }
         #difficulty-select {
             padding: 0.8rem;
             border-radius: 8px;
+            width: 100%;
             border: 2px solid var(--color-accent-light);
             background-color: var(--color-container-bg);
             color: var(--color-text-primary);
             font-size: 1rem;
             font-weight: bold;
+            text-align: center;
+        }
+        #start-restart-btn {
+            background-color: var(--color-primary-button);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            grid-column: 1 / -1; /* Span across both columns */
+            transition: background-color 0.2s;
+        }
+        #start-restart-btn:hover {
+            background-color: var(--color-primary-button-hover);
         }
         
         /* Game Over Modal */
@@ -241,11 +276,12 @@
             margin-bottom: 1rem;
         }
         .modal-content p {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
+            line-height: 1.6;
             color: var(--color-text-secondary);
             margin-bottom: 2rem;
         }
-        #restart-btn {
+        #play-again-btn {
             background-color: var(--color-accent);
             color: white;
             border: none;
@@ -255,7 +291,7 @@
             cursor: pointer;
             transition: background-color 0.2s;
         }
-        #restart-btn:hover {
+        #play-again-btn:hover {
             background-color: var(--color-accent-dark);
         }
     </style>
@@ -263,7 +299,6 @@
 <body>
     <div class="container">
         <header class="game-header">
-            <!-- Spacer to help center the title -->
             <div style="width: 44px; height: 44px;"></div>
             <h1>The 20 Challenge</h1>
             <button id="theme-toggle-btn" title="Toggle Theme">
@@ -274,22 +309,25 @@
 
         <div id="game-container">
             <div id="ai-status-wrapper">
-                <span id="ai-status">Select a difficulty to begin!</span>
+                <span id="ai-status"></span>
             </div>
             <div id="current-count">0</div>
             <div id="player-actions">
-                <button class="action-btn" data-move="1"></button>
-                <button class="action-btn" data-move="2"></button>
-                <button class="action-btn" data-move="3"></button>
+                <button class="action-btn" data-move="1">Say 1 Number</button>
+                <button class="action-btn" data-move="2">Say 2 Numbers</button>
+                <button class="action-btn" data-move="3">Say 3 Numbers</button>
             </div>
             <div id="move-history"></div>
             <div id="game-controls">
-                <label for="difficulty-select"><b>Difficulty:</b></label>
-                <select id="difficulty-select">
-                    <option value="easy">Easy</option>
-                    <option value="medium">Medium</option>
-                    <option value="hard" selected>Hard</option>
-                </select>
+                <div class="control-group" style="grid-column: 1 / -1;">
+                    <label for="difficulty-select">Difficulty</label>
+                    <select id="difficulty-select">
+                        <option value="easy">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard" selected>Hard</option>
+                    </select>
+                </div>
+                <button id="start-restart-btn">Start Game</button>
             </div>
         </div>
     </div>
@@ -298,7 +336,7 @@
         <div class="modal-content">
             <h2 id="modal-title"></h2>
             <p id="modal-message"></p>
-            <button id="restart-btn">Play Again</button>
+            <button id="play-again-btn">Play Again</button>
         </div>
     </div>
 
@@ -311,40 +349,53 @@
                 playerActionButtons: document.querySelectorAll('.action-btn'),
                 moveHistoryLog: document.getElementById('move-history'),
                 difficultySelect: document.getElementById('difficulty-select'),
+                startRestartBtn: document.getElementById('start-restart-btn'),
                 themeToggleBtn: document.getElementById('theme-toggle-btn'),
                 gameOverModal: document.getElementById('game-over-modal'),
                 modalTitle: document.getElementById('modal-title'),
                 modalMessage: document.getElementById('modal-message'),
-                restartBtn: document.getElementById('restart-btn')
+                playAgainBtn: document.getElementById('play-again-btn')
             };
 
             // --- Game State Variables ---
             let currentCount = 0;
             let playerTurn = true;
-            let gameOver = false;
+            let gameOver = true; // Game starts as "over" until Start is pressed
             let aiDifficulty = 'hard';
 
             // --- Enhanced AI Psychological Dialogue ---
             const aiDialogue = {
-                start: ["Let's begin. You first.", "The board is set. Your move.", "I'll let you start. Good luck."],
-                aiStart: ["I'll take the lead this time.", "Alright, my turn to start.", "Let's get this underway."],
-                thinking: ["Hmm...", "Let me see...", "Calculating the possibilities...", "An interesting position..."],
-                playerMistake: ["An interesting choice...", "I see an opening!", "Are you sure about that move?", "Aha! Just what I was waiting for."],
-                playerGoodMove: ["Well played.", "You've blocked my path... for now.", "A clever move. I'll have to reconsider."],
+                waiting: ["Select your difficulty and press Start.", "Ready when you are. Hit Start.", "Let's have a match! Press Start to begin."],
+                start: ["The game begins. You may go first.", "A good choice. Your move.", "I'll let you start. Don't disappoint me."],
+                aiStart: ["I'll take the lead this time.", "Alright, my turn to start.", "Let's get this underway. I'll begin."],
+                thinking: ["Hmm...", "Let me see...", "Calculating...", "An interesting position..."],
+                playerMistake: ["An interesting choice...", "I see an opening!", "Are you sure about that?", "Just what I was waiting for."],
+                playerGoodMove: ["Well played.", "You've blocked my optimal path... for now.", "A clever move. I'll have to adapt."],
                 winningMove: ["That sets me up perfectly.", "A perfect calculation.", "I believe this is checkmate.", "The path to victory is clear."],
-                aiWin: ["Strategy prevails. Better luck next time!", "A predictable outcome. Well played, though.", "Checkmate."],
-                playerWin: ["You've bested me! I won't make that mistake again.", "A surprising victory. Well done!", "You found the winning path! I'm impressed."]
+                aiWin: ["A logical conclusion. Victory is mine!", "A predictable outcome. Well played, though.", "Checkmate. A flawless strategy."],
+                playerWin: ["You've bested me! I won't make that mistake again.", "A surprising victory. You earned it!", "You found the winning path! I'm impressed."]
             };
 
-            // --- Game Initialization ---
+            // --- Game Setup and Initialization ---
             const initGame = () => {
+                gameOver = true;
                 currentCount = 0;
-                gameOver = false;
-                aiDifficulty = ui.difficultySelect.value;
-                currentCountDisplay.textContent = currentCount;
+                ui.difficultySelect.disabled = false;
+                ui.currentCountDisplay.textContent = currentCount;
                 ui.moveHistoryLog.innerHTML = '';
                 ui.gameOverModal.classList.remove('visible');
-
+                ui.startRestartBtn.textContent = "Start Game";
+                displayAiMessage('waiting');
+                updatePlayerActionButtons();
+            };
+            
+            const startGame = () => {
+                gameOver = false;
+                aiDifficulty = ui.difficultySelect.value;
+                ui.difficultySelect.disabled = true; // Lock difficulty during the game
+                ui.startRestartBtn.textContent = "Restart Game";
+                ui.moveHistoryLog.innerHTML = '';
+                
                 // Randomly decide who starts
                 if (Math.random() > 0.5) {
                     playerTurn = true;
@@ -352,21 +403,17 @@
                     updatePlayerActionButtons();
                 } else {
                     playerTurn = false;
-                    updatePlayerActionButtons(); // Disables buttons
+                    updatePlayerActionButtons();
                     displayAiMessage('aiStart');
-                    setTimeout(aiTurn, 1000); // Give player time to read message
+                    setTimeout(aiTurn, 1200);
                 }
             };
 
             // --- Game Logic Functions ---
             const playerMove = (numCount) => {
                 if (!playerTurn || gameOver) return;
-
-                const numbersSaid = [];
-                for (let i = 0; i < numCount; i++) {
-                    currentCount++;
-                    numbersSaid.push(currentCount);
-                }
+                const numbersSaid = Array.from({ length: numCount }, (_, i) => currentCount + i + 1);
+                currentCount += numCount;
                 updateGame(numbersSaid, 'Player');
 
                 if (currentCount >= 20) {
@@ -380,66 +427,32 @@
             
             const aiTurn = () => {
                 if (gameOver) return;
-
                 const isStrategicPosition = (currentCount + 1) % 4 === 0 || (currentCount + 2) % 4 === 0 || (currentCount + 3) % 4 === 0;
-                const thinkingTime = (aiDifficulty === 'hard' && isStrategicPosition) ? 1500 : 600;
-
-                // Psychological Simulation: Show "thinking" message with typing indicator
+                const thinkingTime = (aiDifficulty === 'hard' && isStrategicPosition) ? 1500 : 700;
                 displayAiMessage('thinking', true);
 
                 setTimeout(() => {
                     let numbersToSay;
-                    let moveIsStrategic = false;
-
-                    // --- AI Difficulty Logic ---
+                    // AI Difficulty Logic... (same as before)
                     switch (aiDifficulty) {
-                        case 'easy':
-                            numbersToSay = Math.floor(Math.random() * 3) + 1;
-                            break;
-                        case 'medium':
-                            if (Math.random() < 0.4) { // 40% chance of random move
-                                numbersToSay = Math.floor(Math.random() * 3) + 1;
-                            } else {
-                                numbersToSay = getOptimalMove();
-                                moveIsStrategic = true;
-                            }
-                            break;
-                        case 'hard':
-                        default:
-                            numbersToSay = getOptimalMove();
-                            moveIsStrategic = true;
-                            break;
+                        case 'easy': numbersToSay = Math.floor(Math.random() * 3) + 1; break;
+                        case 'medium': numbersToSay = (Math.random() < 0.4) ? Math.floor(Math.random() * 3) + 1 : getOptimalMove(); break;
+                        default: numbersToSay = getOptimalMove();
                     }
-                    
-                    // Ensure AI doesn't overshoot 20
-                    if (currentCount + numbersToSay > 20) {
-                        numbersToSay = 20 - currentCount;
-                    }
+                    if (currentCount + numbersToSay > 20) numbersToSay = 20 - currentCount;
 
-                    // Check if player just made a mistake
                     const isWinningCounter = isMultipleOfFour(currentCount + numbersToSay);
+                    if (isWinningCounter) displayAiMessage('winningMove');
+                    else displayAiMessage('thinking', true); // Keep a thinking message
 
-                    if (moveIsStrategic && isWinningCounter) {
-                         displayAiMessage('winningMove');
-                    } else if (moveIsStrategic && isPlayerMistake()) {
-                        displayAiMessage('playerMistake');
-                    } else {
-                        // If it's not a strategic reply, remove the "thinking" text
-                        ui.aiStatusBox.innerHTML = '';
-                    }
-
-                    const numbersSaid = [];
-                    for (let i = 0; i < numbersToSay; i++) {
-                        currentCount++;
-                        numbersSaid.push(currentCount);
-                    }
+                    const numbersSaid = Array.from({ length: numbersToSay }, (_, i) => currentCount + i + 1);
+                    currentCount += numbersToSay;
                     updateGame(numbersSaid, 'AI');
 
                     if (currentCount >= 20) {
                         endGame('AI');
                     } else {
-                        // Before giving turn back, check if player's move was good
-                        if(!isPlayerMistake() && !isMultipleOfFour(currentCount)) {
+                        if (!isPlayerMistake() && !isMultipleOfFour(currentCount)) {
                             displayAiMessage('playerGoodMove');
                         }
                         playerTurn = true;
@@ -450,29 +463,16 @@
 
             const getOptimalMove = () => {
                 const remainder = currentCount % 4;
-                // The winning strategy is to always land on a multiple of 4.
-                // The AI wants to say a number that makes the new currentCount a multiple of 4.
-                // The numbers to say are 4 - remainder. e.g. if count is 1, remainder is 1, say 3 to get to 4.
-                // If count is 3, remainder is 3, say 1 to get to 4.
-                // If count is 0 (AI starts), remainder 0, say 4 (invalid), so say 1,2, or 3. It will just choose 1.
-                if (remainder === 0) return Math.floor(Math.random() * 3) + 1; // Player gave AI a multiple of 4, make a random move.
+                if (remainder === 0) return Math.floor(Math.random() * 3) + 1;
                 return 4 - remainder;
             };
             
             const isMultipleOfFour = (num) => num > 0 && num % 4 === 0;
-
-            const isPlayerMistake = () => {
-                // A mistake is when the player leaves a number where the AI can reach a multiple of 4.
-                // e.g., Player says 6,7. Current count is 7. AI can say 1 number (8) to win.
-                for (let i = 1; i <= 3; i++) {
-                    if (isMultipleOfFour(currentCount + i)) return true;
-                }
-                return false;
-            };
+            const isPlayerMistake = () => [1, 2, 3].some(i => isMultipleOfFour(currentCount + i));
 
             // --- UI and State Update Functions ---
             const updateGame = (numbers, actor) => {
-                currentCountDisplay.textContent = currentCount;
+                ui.currentCountDisplay.textContent = currentCount;
                 const moveEntry = document.createElement('div');
                 moveEntry.innerHTML = `<span class="${actor.toLowerCase()}-log">${actor}</span> played: ${numbers.join(', ')}`;
                 ui.moveHistoryLog.appendChild(moveEntry);
@@ -481,6 +481,7 @@
 
             const endGame = (winner) => {
                 gameOver = true;
+                ui.difficultySelect.disabled = false;
                 let title, message;
                 if (winner === 'AI') {
                     title = "You Lost";
@@ -500,14 +501,14 @@
                 ui.playerActionButtons.forEach(button => {
                     const moveCount = parseInt(button.dataset.move, 10);
                     const isPossible = currentCount + moveCount <= 20;
-                    
                     button.disabled = !playerTurn || gameOver || !isPossible;
 
-                    if (isPossible) {
+                    if (!gameOver && isPossible) {
                         const numbers = Array.from({ length: moveCount }, (_, i) => currentCount + i + 1);
                         button.textContent = `Say ${numbers.join(', ')}`;
                     } else {
-                         button.textContent = `Say ${moveCount} Number${moveCount > 1 ? 's' : ''}`;
+                        const defaultText = `Say ${moveCount} Number${moveCount > 1 ? 's' : ''}`;
+                        button.textContent = defaultText;
                     }
                 });
             };
@@ -529,23 +530,29 @@
             // --- Theme Management ---
             const setTheme = (theme) => {
                 document.body.classList.toggle('dark-mode', theme === 'dark');
-                localStorage.setItem('sudoku-theme', theme);
+                localStorage.setItem('game-theme', theme);
             };
             ui.themeToggleBtn.addEventListener('click', () => {
-                const newTheme = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
-                setTheme(newTheme);
+                setTheme(document.body.classList.contains('dark-mode') ? 'light' : 'dark');
             });
-            const savedTheme = localStorage.getItem('sudoku-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-            setTheme(savedTheme);
+            setTheme(localStorage.getItem('game-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
 
             // --- Event Listeners ---
             ui.playerActionButtons.forEach(button => {
                 button.addEventListener('click', () => playerMove(parseInt(button.dataset.move, 10)));
             });
-            ui.restartBtn.addEventListener('click', initGame);
-            ui.difficultySelect.addEventListener('change', initGame);
+            
+            ui.startRestartBtn.addEventListener('click', () => {
+                if (gameOver) {
+                    startGame();
+                } else {
+                    initGame();
+                }
+            });
 
-            // --- Initial Game Start ---
+            ui.playAgainBtn.addEventListener('click', initGame);
+
+            // --- Initial Game Load ---
             initGame();
         });
     </script>
