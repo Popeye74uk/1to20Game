@@ -59,7 +59,7 @@
             text-align: center;
         }
         
-        /* Header with Correctly Placed Buttons */
+        /* Corrected Header Layout */
         .game-header {
             display: flex;
             justify-content: space-between;
@@ -67,13 +67,14 @@
             margin-bottom: 20px;
         }
         .header-buttons { display: flex; justify-content: flex-end; gap: 10px; flex-basis: 100px; }
-        .header-spacer { flex-basis: 100px; } /* Matches width of buttons group */
+        .header-spacer { flex-basis: 100px; } /* This spacer forces the title to center */
         h1 {
             flex-grow: 1;
             text-align: center;
             color: var(--color-text-primary);
             font-size: 2.2rem;
             margin: 0;
+            white-space: nowrap;
         }
         
         #theme-toggle-btn, #fullscreen-btn {
@@ -100,8 +101,7 @@
         body.dark-mode .icon-sun { display: block; }
         body:not(.dark-mode) .icon-moon { display: block; }
 
-
-        /* Main Game Area & FULLSCREEN STYLES */
+        /* Corrected Fullscreen Styles */
         #game-container {
             background-color: var(--color-container-bg);
             border-radius: 16px;
@@ -114,9 +114,9 @@
         #game-container:fullscreen {
             width: 100%;
             height: 100%;
-            padding: 5vh;
+            padding: 2rem;
             justify-content: center;
-            gap: 3vh;
+            gap: 1.5rem;
         }
 
         /* AI Status Box */
@@ -135,8 +135,17 @@
         #game-container:fullscreen #ai-status-wrapper {
             margin-bottom: 0;
             padding: 1.5rem 2rem;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
         }
+        #ai-status {
+            font-style: italic;
+            font-size: 1.2rem;
+            color: var(--color-text-primary);
+            line-height: 1.5;
+        }
+
+        .typing-indicator { font-weight: bold; animation: blink 1.2s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
 
         /* Current Count Display */
         #current-count {
@@ -146,7 +155,7 @@
             margin-bottom: 2rem;
         }
         #game-container:fullscreen #current-count {
-            font-size: 20vh;
+            font-size: 12rem;
             margin-bottom: 0;
         }
 
@@ -170,15 +179,13 @@
             font-size: 2.5rem;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.2s, transform 0.2s, opacity 0.2s;
+            transition: all 0.2s;
             aspect-ratio: 1 / 1;
             display: flex;
             justify-content: center;
             align-items: center;
         }
-        #game-container:fullscreen .action-btn {
-             font-size: 8vh;
-        }
+        #game-container:fullscreen .action-btn { font-size: 4rem; }
         .action-btn:hover:not(:disabled) {
             background-color: var(--color-accent-dark);
             transform: translateY(-3px);
@@ -200,7 +207,8 @@
         }
         #game-container:fullscreen #game-controls { 
             display: grid;
-            width: 50%;
+            width: 60%;
+            max-width: 400px;
             margin: 0 auto;
         }
         .control-group {
@@ -220,10 +228,6 @@
             font-weight: bold;
             text-align: center;
         }
-        #game-container:fullscreen #difficulty-select {
-            padding: 1rem;
-            font-size: 1.2rem;
-        }
         #start-restart-btn {
             background-color: var(--color-primary-button);
             color: white;
@@ -235,11 +239,6 @@
             cursor: pointer;
             width: 100%;
             transition: background-color 0.2s;
-        }
-        #start-restart-btn:hover { background-color: var(--color-primary-button-hover); }
-        #game-container:fullscreen #start-restart-btn {
-             padding: 1.2rem;
-             font-size: 1.5rem;
         }
         
         /* Game Over Modal */
