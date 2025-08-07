@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v1.9</title>
+    <title>The 1 to 20 Game v2.0</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -307,6 +307,17 @@
                 aiWin: ["A logical conclusion. Victory is mine!", "A predictable outcome. Well played, though.", "Better luck next time, human.", "Checkmate."],
                 playerWin: ["You've bested me! I won't make that mistake again.", "A surprising victory! Well done.", "You have my congratulations.", "I'll get you next time!"]
             };
+            
+            const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+            const calculateReadingTime = (text) => {
+                const wordsPerMinute = 200; // Comfortable reading speed
+                const words = text.split(' ').filter(word => word.length > 0).length;
+                const time = Math.ceil((words / wordsPerMinute) * 60 * 1000);
+                const baseDelay = 400; // Minimum time to perceive any message
+                const randomFactor = Math.random() * 250; // Add a bit of natural variance
+                return baseDelay + time + randomFactor;
+            };
 
             const initGame = () => {
                 gameOver = true; currentCount = 0; playerTurn = true;
@@ -318,7 +329,7 @@
                 updatePlayerActionButtons();
             };
             
-            const startGame = () => {
+            const startGame = async () => {
                 gameOver = false;
                 aiDifficulty = ui.difficultySelect.value;
                 ui.difficultySelect.disabled = true;
@@ -326,68 +337,96 @@
                 
                 if (Math.random() > 0.5) {
                     playerTurn = true;
-                    displayAiMessage('start');
+                    const msg = getRandomMessage('start');
+                    displayAiMessage(msg);
+                    await sleep(calculateReadingTime(msg));
                 } else {
                     playerTurn = false;
-                    displayAiMessage('aiStart');
-                    setTimeout(aiTurn, 1200);
+                    const msg = getRandomMessage('aiStart');
+                    displayAiMessage(msg);
+                    await sleep(calculateReadingTime(msg));
+                    await aiTurn();
                 }
                 updatePlayerActionButtons();
             };
 
-            const playerMove = (numCount) => {
+            const playerMove = async (numCount) => {
                 if (!playerTurn || gameOver) return;
                 playerTurn = false;
                 updateGame(currentCount + numCount);
 
-                if (currentCount >= 20) { return endGame('Player'); }
+                if (currentCount >= 20) {
+                    await sleep(500); // Short pause before ending
+                    endGame('Player');
+                    return;
+                }
 
-                if(isPlayerMistake()) { 
-                    displayAiMessage('playerMistake'); 
-                } else if (isMultipleOfFour(currentCount)) { 
-                    displayAiMessage('playerGoodMove'); 
+                let reactionCategory = null;
+                if (isPlayerMistake()) {
+                    reactionCategory = 'playerMistake';
+                } else if (isMultipleOfFour(currentCount)) {
+                    reactionCategory = 'playerGoodMove';
+                }
+
+                if (reactionCategory) {
+                    const msg = getRandomMessage(reactionCategory);
+                    displayAiMessage(msg);
+                    await sleep(calculateReadingTime(msg));
                 }
                 
-                const randomDelay = Math.floor(Math.random() * 400) + 400;
-                setTimeout(aiTurn, randomDelay);
+                await aiTurn();
             };
             
-            const aiTurn = () => {
+            const aiTurn = async () => {
                 if (gameOver) return;
-                const thinkingTime = (aiDifficulty === 'hard') ? 1000 : 500;
-                displayAiMessage('thinking', true);
                 
-                setTimeout(() => {
-                    const { move, wasOptimal } = getAiMove();
-                    let numbersToSay = move;
-                    if (currentCount + numbersToSay > 20) { numbersToSay = 20 - currentCount; }
-                    
-                    const isWinningMove = isMultipleOfFour(currentCount + numbersToSay) && numbersToSay > 0 && wasOptimal;
+                // 1. Initial "Thinking" phase
+                const thinkingMsg = getRandomMessage('thinking');
+                displayAiMessage(thinkingMsg, true);
+                const thinkingTime = (aiDifficulty === 'hard') ? 1000 : 400;
+                await sleep(thinkingTime + Math.random() * 500);
 
-                    updateGame(currentCount + numbersToSay);
+                // 2. Decide move and pre-action dialogue
+                const { move, wasOptimal } = getAiMove();
+                let numbersToSay = move;
+                if (currentCount + numbersToSay > 20) {
+                    numbersToSay = 20 - currentCount;
+                }
+                const isWinningMove = isMultipleOfFour(currentCount + numbersToSay) && numbersToSay > 0 && wasOptimal;
 
-                    if (currentCount >= 20) { return endGame('AI'); }
-                    
-                    playerTurn = true;
+                let actionMsg = '';
+                if (isWinningMove) {
+                    actionMsg = getRandomMessage('winningMove');
+                } else if (wasOptimal === false && getOptimalMove().move !== 0) { // AI made a non-forced error
+                     actionMsg = getRandomMessage('tieBreaker');
+                }
 
-                    if (isWinningMove) {
-                        displayAiMessage('winningMove');
-                        setTimeout(() => {
-                            displayAiMessage('playerPrompt');
-                            updatePlayerActionButtons();
-                        }, 1200); // Longer pause to read the winning move message
-                    } else {
-                        displayAiMessage('playerPrompt');
-                        updatePlayerActionButtons();
-                    }
+                if(actionMsg){
+                    displayAiMessage(actionMsg);
+                    await sleep(calculateReadingTime(actionMsg));
+                }
 
-                }, thinkingTime);
+                // 3. Perform the action
+                updateGame(currentCount + numbersToSay);
+
+                if (currentCount >= 20) {
+                    await sleep(500); // Short pause before ending
+                    endGame('AI');
+                    return;
+                }
+                
+                // 4. Prompt player for next move
+                playerTurn = true;
+                const promptMsg = getRandomMessage('playerPrompt');
+                displayAiMessage(promptMsg);
+                updatePlayerActionButtons();
             };
 
             const getAiMove = () => {
                 const playOptimal = Math.random() < { 'easy': 0.2, 'medium': 0.6, 'hard': 0.95 }[aiDifficulty];
                 if (playOptimal) {
-                    return getOptimalMove();
+                    const optimalMove = getOptimalMove();
+                    if (optimalMove.move !== 0) return optimalMove;
                 }
                 return { move: getRandomMove(), wasOptimal: false };
             };
@@ -395,8 +434,7 @@
             const getOptimalMove = () => {
                 const remainder = currentCount % 4;
                 if (remainder === 0) {
-                    displayAiMessage('tieBreaker');
-                    return { move: getRandomMove(), wasOptimal: false };
+                    return { move: 0, wasOptimal: false }; // Indicates no optimal move
                 }
                 return { move: 4 - remainder, wasOptimal: true };
             };
@@ -433,8 +471,12 @@
                 });
             };
             
-            const displayAiMessage = (category, isThinking = false) => {
-                const message = getRandomMessage(category);
+            const displayAiMessage = (categoryOrMessage, isThinking = false) => {
+                let message = categoryOrMessage;
+                // Check if it's a category key or a direct message
+                if (aiDialogue[categoryOrMessage]) {
+                    message = getRandomMessage(categoryOrMessage);
+                }
                 ui.aiStatusBox.innerHTML = message + (isThinking ? `<span class="typing-indicator">...</span>` : '');
             };
             
@@ -442,9 +484,7 @@
 
             const toggleFullScreen = () => {
                 if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen().catch(err => {
-                        console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
-                    });
+                    document.documentElement.requestFullscreen().catch(err => {});
                 } else {
                     if (document.exitFullscreen) {
                         document.exitFullscreen();
