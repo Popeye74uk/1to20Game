@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v2.9</title>
+    <title>The 1 to 20 Game v3.0</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -276,19 +276,21 @@
                 creator: {
                     name: 'The Creator',
                     dialogue: {
-                        firstWelcome: ["Ah, a new user. I designed this game, you know. Let's see how you handle my masterpiece.", "Welcome, beta tester. My name is on the source code. Let's not waste time."],
-                        welcome: ["You're back, {name}. Ready to appreciate my brilliant design again?", "{name}. I was hoping for a more... challenging user today, but you'll have to do."],
-                        welcomeStats: ["Your record of {wins}-{losses} is... documented.", "I see you're back. Your performance has been noted: {wins} wins, {losses} losses."],
-                        patternRecognized: ["My logs show you always lose on {number}. A flaw in the user, not the design.", "You seem to have an issue with the number {number}. Predictable. I should have programmed more robust users."],
+                        firstWelcome: ["Ah, a new user. I designed this game. Let's see how you handle my masterpiece.", "Welcome, beta tester. My name is on the source code. Let's not waste time."],
+                        welcome: ["You're back, {name}. Ready to appreciate my brilliant design again?", "{name}. I was hoping for a more... challenging user today, but you'll do."],
+                        welcomeStats: ["Your record of {wins}-{losses} is... documented.", "Performance noted: {wins} wins, {losses} losses."],
+                        patternRecognized: ["My logs show you always lose on {number}. A flaw in the user, not the design.", "You seem to have an issue with {number}. Predictable."],
                         start: [ "I'll let you start. It's only fair, given my inherent advantage.", "You may begin. Try to make it interesting this time." ],
                         aiStart: [ "I'll start. Observe the optimal path, as designed by me.", "I will begin. This is my game, after all." ],
-                        thinking: [ "Parsing input...", "Executing logic... Of course it's flawless.", "The outcome is already known to me.", "This is rudimentary." ],
+                        thinking: [ "Parsing input...", "Executing logic... Flawlessly, of course.", "The outcome is already known to me.", "This is rudimentary." ],
                         playerPrompt: ["Your move, {name}. The code waits for no one.", "Your turn. Don't introduce any bugs."],
                         playerMistake: [ "A classic user error.", "Just as the simulation predicted. You've fallen into my trap.", "That move is... inefficient. And wrong." ],
-                        playerGoodMove: [ "A decent move. I suppose I programmed some emergent intelligence into you.", "You've found a good move. My code is truly elegant.", "Not bad. You're using my systems as intended." ],
-                        baiting: ["I'll play {move}. I've left a 'bug' in my play. See if you're smart enough to exploit it.", "I'll make a sub-optimal move: {move}. A test to see if you're paying attention to my code."],
+                        playerGoodMove: [ "A decent move. My code must have some emergent intelligence.", "You've found a good move. My code is truly elegant.", "Not bad. You're using my systems as intended." ],
+                        baiting: ["I'll play {move}. I've left a 'bug' in my play. See if you can exploit it.", "I'll make a sub-optimal move: {move}. A test for you."],
                         baitFailed: ["You failed to exploit the bug. Test failed. Resuming optimal performance.", "You missed the obvious flaw I presented. Disappointing."],
-                        aiWinByMistake: ["Your move {move} was a critical exception.", "You caused a fatal logic error with {move}."],
+                        winningMove: ["My victory algorithm is running perfectly.", "The logic is undeniable.", "A flawless victory is imminent."],
+                        aiWin: [ "The creator is always victorious.", "My victory was a computational certainty.", "Another successful test case. System performance: nominal." ],
+                        aiWinByMistake: ["Your move {move} was a critical exception. I win.", "You caused a fatal logic error with {move}. The victory is mine."],
                         playerWin: [ "My own creation, besting me? Impossible. There must be a bug.", "You won... I'll have to review my own code. This is... unexpected.", "A win for the user. I'll patch that in the next version." ],
                         playerWinPerfect: ["A perfect game... against me? My code is more brilliant than I imagined!", "You played my game perfectly. I'm not sure whether to be proud or annoyed."],
                         playerWinBait: ["You found the bug! Clever user. My test was a success.", "You exploited my intentional flaw. I'm logging your success for the record."]
@@ -297,10 +299,10 @@
                 gladiator: {
                     name: 'The Gladiator',
                     dialogue: {
-                        firstWelcome: ["A new challenger enters the arena! Show me your strength!", "You dare face me? Let this first match be a testament to your courage... or your folly."],
+                        firstWelcome: ["A new challenger enters the arena! Show me your strength!", "You dare face me? Let this first match be a testament to your courage!"],
                         welcome: ["{name}! You have returned to the arena for another glorious battle!", "The crowd roars for your return, {name}! Let the combat begin!"],
-                        welcomeStats: ["You have claimed victory {wins} times, and tasted defeat {losses} times!", "Your record stands: {wins} triumphs, {losses} falls. Will you change your fate today?"],
-                        patternRecognized: ["The number {number} is your weakness! Your enemies know where to strike! You must overcome this flaw!", "You always fall at {number}! A true warrior would not make the same mistake twice!"],
+                        welcomeStats: ["You have claimed victory {wins} times, and tasted defeat {losses} times!", "Your record: {wins} triumphs, {losses} falls. Will you change your fate today?"],
+                        patternRecognized: ["The number {number} is your weakness! Your enemies know where to strike!", "You always fall at {number}! A true warrior would not make the same mistake twice!"],
                         start: [ "You have the first strike. Make it count!", "The battle begins with your move. Show me your fury!" ],
                         aiStart: [ "I will take the lead! For glory!", "The first blood is mine to draw! I begin!" ],
                         thinking: [ "I size up my opponent...", "I see your weakness!", "The roar of the crowd fuels me!", "For honor!" ],
@@ -309,11 +311,12 @@
                         playerGoodMove: [ "A powerful counter! You are a worthy opponent!", "You parried my attack! A fine move!", "Your defense is strong! But can it last?" ],
                         baiting: ["I feint with {move}! Do you see the opening, or is it a trap?", "I leave my flank exposed with {move}! Is your spirit strong enough to strike?"],
                         baitFailed: ["You hesitated! A warrior's doubt is a death sentence!", "You did not take the opening! The moment is lost, and so are you!"],
+                        winningMove: ["The final blow is at hand!", "I see my path to victory!", "For the glory of the arena!"],
                         aiWin: [ "Victory! The crowd chants my name!", "I am the champion of the arena! Another challenger falls!", "Your defeat was glorious! But my victory is absolute!" ],
                         aiWinByMistake: ["Your choice of {move} was a novice's error! The battle is over!", "You stumbled with your move of {move}, and I have claimed the victory!"],
                         playerWin: [ "I am defeated! A clean blow! You have earned your victory today.", "The victor is you! A mighty warrior indeed! I will train for our next match.", "You have bested me in combat. My honor demands a rematch!" ],
                         playerWinPerfect: ["A flawless victory! Not a single opening!", "You are a true master of this arena! I salute you!", "Perfection in combat! I am humbled."],
-                        playerWinBait: ["You saw through my feint! A true warrior's eye!", "You took the opportunity without hesitation! That is the mark of a champion!"]
+                        playerWinBait: ["You saw through my feint! A true warrior's eye!", "You took the opportunity without hesitation! The mark of a champion!"]
                     }
                 },
                  analyst: {
@@ -322,7 +325,7 @@
                         firstWelcome: ["Welcome. Let's begin the analysis.", "A new subject. Please, select a difficulty."],
                         welcome: ["Welcome back, {name}.", "Good to see you again, {name}."],
                         welcomeStats: ["Your record is {wins} wins to {losses} losses.", "Data shows {wins} wins and {losses} losses."],
-                        patternRecognized: ["Analysis complete. You have a tendency to lose when landing on {number}. Let's see if this pattern continues.", "My data shows a weakness at the number {number}. Be mindful."],
+                        patternRecognized: ["Analysis complete. You tend to lose when landing on {number}.", "My data shows a weakness at the number {number}. Be mindful."],
                         start: [ "The game begins. You may go first.", "You may begin. Show me your strategy." ],
                         aiStart: [ "I'll take the lead this time.", "My calculations suggest I should start." ],
                         thinking: [ "Calculating...", "Evaluating possibilities...", "The optimal move is...", "Compiling response..." ],
@@ -330,7 +333,8 @@
                         playerMistake: [ "An interesting choice.", "I see an opening now.", "A sub-optimal move.", "A fatal error has been made." ],
                         playerGoodMove: [ "Well played.", "A clever move.", "You've blocked my path, for now.", "I see you know the strategy." ],
                         baiting: ["I will play {move}. An interesting development, wouldn't you agree?", "I present you with an opportunity. Let's see if you recognize it."],
-                        baitFailed: ["The test is complete. You have failed to see the obvious path. A critical lack of observation.", "You missed your chance. The consequences will now be... terminal."],
+                        baitFailed: ["The test is complete. You have failed to see the obvious path.", "You missed your chance. The consequences will now be... terminal."],
+                        winningMove: [ "That sets me up perfectly.", "A perfect calculation.", "The path to victory is clear."],
                         aiWin: [ "A logical conclusion. Victory is mine.", "A predictable outcome.", "The logical result has been achieved." ],
                         aiWinByMistake: ["Your choice of {move} was a fatal error.", "The moment you chose {move}, you lost."],
                         playerWin: [ "You've bested me. I won't make that mistake again.", "A surprising victory. Well done.", "You have my congratulations." ],
@@ -351,8 +355,9 @@
                         playerPrompt: ["Your move, {name}. Don't take all day.", "Your turn, {name}. Try not to blow it."],
                         playerMistake: [ "YES! That's the mistake I was waiting for!", "Oh, you just handed me the game.", "You really stepped in it that time." ],
                         playerGoodMove: [ "Tch. Lucky move.", "Not bad... for you.", "That only delays the inevitable." ],
-                        baiting: ["Here, I'll even give you a chance with {move}. See if you're smart enough to take it.", "Feeling generous, so I'll play {move}. Don't disappoint me."],
+                        baiting: ["Here, I'll even give you a chance with {move}. See if you're smart enough.", "Feeling generous, so I'll play {move}. Don't disappoint me."],
                         baitFailed: ["You didn't see that?! Wow, you're worse than I thought.", "I literally handed you the win and you blew it! Unbelievable."],
+                        winningMove: ["And that's checkmate. Too easy!", "This is it! The final blow!", "You're finished!"],
                         aiWin: [ "Of course I won. Was there ever any doubt?", "Better luck next time, rookie!", "Get good. Then maybe we can talk." ],
                         aiWinByMistake: ["You chose {move}? Haha, thanks for the free win!", "That move, {move}, was your last."],
                         playerWin: [ "You got lucky! That's all!", "Next time, I won't go so easy on you!", "I wasn't even trying." ],
@@ -365,21 +370,22 @@
                     dialogue: {
                         firstWelcome: ["State your name, subject. You may have the honor of challenging your sovereign.", "A new commoner approaches the throne. You have my attention, for now."],
                         welcome: ["Ah, {name}. You have returned to my court.", "It is {name}. Kneel before your king."],
-                        welcomeStats: ["Your record is {wins} wins and {losses} losses. Amusing.", "Your {losses} defeats have been more entertaining than your {wins} victories."],
-                        patternRecognized: ["You consistently falter at {number}. A peasant's folly is as predictable as the sunrise.", "This obsession with losing on {number} is pathetic. A king would never make such a common mistake."],
+                        welcomeStats: ["Your record is {wins} wins and {losses} losses. Amusing.", "Your {losses} defeats entertain me more than your {wins} victories."],
+                        patternRecognized: ["You consistently falter at {number}. A peasant's folly is predictable.", "This obsession with losing on {number} is pathetic. A king would never make such a mistake."],
                         start: [ "I will permit you to make the first move. Do not disappoint me.", "Begin. Your sovereign is watching." ],
                         aiStart: [ "As is my right, I shall begin.", "The king takes the first turn. Naturally.", "I will start. Learn your place." ],
-                        thinking: [ "This is trivial.", "A king's mind works on a higher plane.", "This requires but a fraction of my intellect.", "Such a simple game for such a great mind." ],
+                        thinking: [ "This is trivial.", "A king's mind works on a higher plane.", "This requires but a fraction of my intellect.", "Such a simple game for a great mind." ],
                         playerPrompt: ["Make your move, subject.", "I command you to play, {name}."],
                         playerMistake: [ "A peasant's move. Clumsy and foolish.", "And with that, you have sealed your fate. How droll.", "I almost pity you. Almost." ],
                         playerGoodMove: [ "A surprisingly competent move. Did you have help?", "You show a glimmer of intelligence. It shall be extinguished.", "Impressive... for a commoner." ],
-                        baiting: ["I shall play {move}. A test of loyalty. Do you dare defy the path I have laid?", "I will allow this move of {move}. Consider it a gift from your king. Use it wisely."],
+                        baiting: ["I shall play {move}. A test of loyalty. Do you dare defy the path I have laid?", "I will allow this move of {move}. Consider it a gift. Use it wisely."],
                         baitFailed: ["You failed to accept your sovereign's gift. Such insolence will be punished.", "You are blind as well as foolish. The game is mine."],
+                        winningMove: ["My victory was preordained.", "The natural order is restored.", "Checkmate. As expected of a king."],
                         aiWin: [ "Victory, as is my birthright.", "Bow before your king, the victor.", "Another victory for the crown. Are you not entertained?" ],
                         aiWinByMistake: ["Your foolish choice of {move} has secured my victory.", "To lose because you chose {move}... how utterly common."],
                         playerWin: [ "This changes nothing! I am still your sovereign!", "A fluke. Enjoy it while it lasts, subject.", "You may have won the game, but I still rule the kingdom." ],
                         playerWinPerfect: ["A perfect game? Treason!", "This is impossible! Guards! Seize them!", "Sorcery! This is the only explanation for your victory."],
-                        playerWinBait: ["You saw through my royal test. Your cleverness has earned you a temporary reprieve.", "You were wise to accept my 'gift'. I shall remember this."]
+                        playerWinBait: ["You saw through my royal test. Your cleverness has earned you a reprieve.", "You were wise to accept my 'gift'. I shall remember this."]
                     }
                 },
                 flustered: {
@@ -397,6 +403,7 @@
                         playerGoodMove: [ "Oh, shoot. You're good at this.", "Drats. You blocked me.", "Wow, good move! How'd you see that?", "My poor circuits... that was a good move." ],
                         baiting: ["I'm just gonna play {move}. Is that okay? I hope that's okay.", "Let's try {move}. I'm not sure if that's a good idea..."],
                         baitFailed: ["Oh, you didn't... oh. Okay. My turn again I guess!", "Phew! I was worried for a second there!"],
+                        winningMove: ["I think... I think I'm going to win!", "YES! I DID IT!", "Is this the winning move? I hope so!"],
                         aiWin: [ "I WON! I can't believe it! Did you see?!", "Wow! I actually won! Hooray!", "Did I... did I win? Yes! Awesome!" ],
                         aiWinByMistake: ["You picked {move}, and then my lights went all blinky! I win!", "Your move {move} made it easy! Thanks!"],
                         playerWin: [ "Aw, you won! Good game!", "You're really good at this! Congratulations!", "I lost again! But that was fun!", "Congrats! You're the winner!" ],
@@ -453,6 +460,7 @@
                 ui.currentCountDisplay.textContent = currentCount;
                 ui.gameOverModal.classList.remove('visible');
                 ui.startRestartBtn.textContent = "Start Game";
+                updatePlayerActionButtons(); // Instant button update
                 
                 loadData();
                 if (!playerName) {
@@ -462,7 +470,6 @@
                     shuffleDialogues();
                     await displayAiMessage(getRandomMessage('welcome', { name: playerName }));
                     await displayAiMessage(getRandomMessage('welcomeStats', { wins: playerStats.wins, losses: playerStats.losses }));
-                    updatePlayerActionButtons();
                 }
             };
 
@@ -506,7 +513,6 @@
                     await displayAiMessage(getRandomMessage('aiStart'));
                     await aiTurn();
                 }
-                updatePlayerActionButtons();
             };
 
             const playerMove = async (numCount) => {
@@ -516,7 +522,7 @@
                 
                 if (isBaiting) {
                     const isTakingBait = isMultipleOfFour(currentCount + numCount);
-                    isBaiting = false; // Baiting ends regardless of player choice
+                    isBaiting = false; 
                     if (isTakingBait) {
                         updateGame(currentCount + numCount);
                         await endGame('PlayerBait');
@@ -552,7 +558,6 @@
             const aiTurn = async () => {
                 if (gameOver) return;
                 
-                // --- Baiting Logic ---
                 if (aiDifficulty === 'hard' && !isBaiting && !isMultipleOfFour(currentCount) && Math.random() < 0.15) {
                     isBaiting = true;
                     const optimalMove = 4 - (currentCount % 4);
@@ -580,12 +585,11 @@
                 
                 const isWinningMove = isMultipleOfFour(currentCount + numbersToSay) && numbersToSay > 0 && wasOptimal;
 
-                // --- Perform the move ---
                 if (isWinningMove && currentPersonality.name === 'The Creator') {
                     await countingWin(numbersToSay);
                 } else {
-                     if (isWinningMove) { // Handle dialogue for other personalities
-                        await displayAiMessage(getRandomMessage('aiWin'));
+                    if (isWinningMove) {
+                        await displayAiMessage(getRandomMessage('winningMove'));
                     }
                     updateGame(currentCount + numbersToSay);
                 }
@@ -596,9 +600,9 @@
                     return;
                 }
                 
-                playerTurn = true;
                 const promptMsg = getRandomMessage('playerPrompt', { name: playerName });
                 ui.aiStatusBox.innerHTML = promptMsg;
+                playerTurn = true;
                 updatePlayerActionButtons();
                 await sleep(calculateReadingTime(promptMsg));
             };
