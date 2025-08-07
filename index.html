@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v2.0</title>
+    <title>The 1 to 20 Game v2.1</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -295,23 +295,45 @@
             let currentCount = 0, playerTurn = true, gameOver = true, aiDifficulty = 'hard';
 
             const aiDialogue = {
-                waiting: ["Select a difficulty and press Start.", "Ready when you are..."],
-                start: ["The game begins. You may go first.", "You may begin.", "Let's see what you've got."],
-                aiStart: ["I'll take the lead this time.", "My turn to start.", "Let's begin. I'll go first."],
-                thinking: ["Hmm...", "Let me see...", "Calculating...", "Interesting...", "Just a moment..."],
-                playerPrompt: ["Your move.", "Your turn.", "What will you do?", "Make your move.", "I'm waiting."],
-                playerMistake: ["An interesting choice...", "I see an opening!", "Are you sure about that?", "A bold move.", "Not what I would have done..."],
-                playerGoodMove: ["Well played.", "A clever move.", "You've blocked my path... for now.", "I see you know the trick.", "A formidable move."],
-                winningMove: ["That sets me up perfectly.", "A perfect calculation.", "The path to victory is clear.", "And that should be game.", "Precisely as I planned."],
-                tieBreaker: ["You've left it to chance, have you?", "A risky position. Let's see...", "This could go either way."],
-                aiWin: ["A logical conclusion. Victory is mine!", "A predictable outcome. Well played, though.", "Better luck next time, human.", "Checkmate."],
-                playerWin: ["You've bested me! I won't make that mistake again.", "A surprising victory! Well done.", "You have my congratulations.", "I'll get you next time!"]
+                waiting: [
+                    "Select a difficulty and press Start.", "Ready when you are...", "The path to 20 awaits.", "Choose your difficulty. Or are you afraid?", "I have all the time in the world... you don't.", "The board is set. The pieces are moving.", "Press Start when you're ready to lose.", "Still here? The game won't play itself."
+                ],
+                start: [
+                    "The game begins. You may go first.", "You may begin.", "Let's see what you've got.", "I'll allow you the first move.", "Show me your strategy."
+                ],
+                aiStart: [
+                    "I'll take the lead this time.", "My turn to start.", "Let's begin. I'll go first.", "I'll set the pace. Try to keep up.", "To ensure fairness, I will begin.", "The first move is mine. A sign of things to come.", "Let's get this over with. I'll start.", "Watch closely. This is how it's done.", "I'll begin. Don't blink.", "My calculations suggest I should start."
+                ],
+                thinking: [
+                    "Hmm...", "Let me see...", "Calculating...", "Interesting...", "Just a moment...", "Intriguing.", "Let's evaluate the possibilities.", "The optimal move is...", "A simple calculation, really.", "Compiling response..."
+                ],
+                playerPrompt: [
+                    "Your move.", "Your turn.", "What will you do?", "Make your move.", "I'm waiting.", "The board is yours.", "Don't keep me waiting.", "What's your next move?", "I await your input.", "Your decision?"
+                ],
+                playerMistake: [
+                    "An interesting choice...", "I see an opening!", "Are you sure about that?", "A bold move.", "Not what I would have done...", "Just as I predicted.", "A blunder. A costly one.", "Was that intentional?", "And with that, your fate is sealed.", "I believe that's what they call a 'mistake'."
+                ],
+                playerGoodMove: [
+                    "Well played.", "A clever move.", "You've blocked my path... for now.", "I see you know the trick.", "A formidable move.", "Not bad. Not bad at all.", "You've studied the game, I see.", "You've merely postponed the inevitable.", "A good move. But I have a better one."
+                ],
+                winningMove: [
+                    "That sets me up perfectly.", "A perfect calculation.", "The path to victory is clear.", "And that should be game.", "Precisely as I planned.", "And... scene.", "The final piece falls into place.", "This is the end of the line for you.", "The game is now concluded."
+                ],
+                tieBreaker: [
+                    "You've left it to chance, have you?", "A risky position. Let's see...", "This could go either way.", "You've forced my hand. So be it.", "An unpredictable state. How... inefficient.", "Down to pure chance. How very human."
+                ],
+                aiWin: [
+                    "A logical conclusion. Victory is mine!", "A predictable outcome. Well played, though.", "Better luck next time, human.", "Checkmate.", "The logical outcome has been achieved.", "Perhaps we can play again when you've practiced.", "Victory is not just a possibility, it is an inevitability.", "Game, set, and match. To me."
+                ],
+                playerWin: [
+                    "You've bested me! I won't make that mistake again.", "A surprising victory! Well done.", "You have my congratulations.", "I'll get you next time!", "A flaw in my logic. It will be corrected. Well done.", "You have earned this victory. Enjoy it.", "I will analyze this outcome for future encounters.", "Impossible... Recalculating... Congratulations."
+                ]
             };
             
             const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
             const calculateReadingTime = (text) => {
-                const wordsPerMinute = 200; // Comfortable reading speed
+                const wordsPerMinute = 240; // Increased from 200 for 20% faster pace
                 const words = text.split(' ').filter(word => word.length > 0).length;
                 const time = Math.ceil((words / wordsPerMinute) * 60 * 1000);
                 const baseDelay = 400; // Minimum time to perceive any message
