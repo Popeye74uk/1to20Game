@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v0.7</title>
+    <title>The 1 to 20 Game v0.8</title>
     <style>
         /* CSS Variables for Theming */
         :root {
@@ -61,18 +61,19 @@
         
         /* --- CORRECTED HEADER LAYOUT --- */
         .game-header {
-            position: relative; /* This is the anchor for the buttons */
+            position: relative; /* Anchor for the buttons */
             display: flex;
-            justify-content: center; /* This centers the H1 */
+            justify-content: center; /* Center the title */
             align-items: center;
+            width: 100%; /* FORCE the header to be full-width */
             margin-bottom: 20px;
-            height: 44px; /* Give header a defined height */
         }
         
         .header-buttons { 
-            position: absolute; /* Pulls the buttons out of the layout flow */
-            right: 0; /* Pins them to the right edge of the header */
-            top: 0;
+            position: absolute; /* Position relative to the header */
+            right: 0; /* Pin to the right of the full-width header */
+            top: 50%;
+            transform: translateY(-50%); /* Vertically center the buttons */
             display: flex; 
             gap: 10px; 
         }
@@ -469,7 +470,7 @@
                     const isPossible = currentCount + moveCount <= 20;
                     button.disabled = !playerTurn || gameOver || !isPossible;
                     
-                    const targetNumber = currentCount + moveCount;
+                    const targetNumber = currentCount + movecount;
                     button.textContent = targetNumber;
                     
                     if (!isPossible && !gameOver) {
