@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v1.1</title>
+    <title>The 1 to 20 Game v1.2</title>
     <style>
         /* CSS Variables for Theming */
         :root {
@@ -52,22 +52,33 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
-        /* --- CORRECTED LAYOUT --- */
         .container {
-            position: relative; /* This is the anchor for the icons */
             width: 100%;
             max-width: 420px;
-            margin: 0;
+            margin: 0 auto;
             text-align: center;
         }
         
+        /* --- STABLE HEADER LAYOUT --- */
         .game-header {
-            text-align: center;
-            margin-bottom: 20px;
-            height: 44px; /* Give it a consistent height */
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        .title-wrapper {
+            flex-grow: 1;
+            text-align: center;
+        }
+        .header-spacer {
+            flex-basis: 98px; /* Width of 2 buttons (44*2) + gap (10) */
+            flex-shrink: 0;
+        }
+        .header-buttons { 
+            display: flex; 
+            gap: 10px; 
+            flex-shrink: 0;
         }
         
         h1 {
@@ -75,18 +86,6 @@
             font-size: 2rem;
             margin: 0;
             white-space: nowrap;
-        }
-
-        /* Position the icons relative to the .container */
-        .header-buttons {
-            position: absolute;
-            top: 0; /* Align to the top of the .container */
-            left: 100%; /* Start at the right edge of the .container */
-            margin-left: 20px; /* Add a 20px gap */
-            display: flex;
-            gap: 10px;
-            height: 44px; /* Match header height for alignment */
-            align-items: center;
         }
         
         #theme-toggle-btn, #fullscreen-btn {
@@ -102,7 +101,6 @@
             justify-content: center;
             align-items: center;
             transition: all 0.2s;
-            flex-shrink: 0;
         }
         #theme-toggle-btn:hover, #fullscreen-btn:hover {
              border-color: var(--color-text-primary);
@@ -123,11 +121,7 @@
             flex-direction: column;
         }
         
-        /* In fullscreen, hide the header and the external buttons */
-        body:fullscreen .game-header,
-        body:fullscreen .header-buttons {
-            display: none;
-        }
+        body:fullscreen .game-header { display: none; }
         
         #ai-status-wrapper {
             background-color: var(--color-accent-light);
@@ -198,37 +192,8 @@
             align-items: center;
             gap: 1rem;
         }
-
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-        }
-        #difficulty-select {
-            padding: 0.8rem;
-            border-radius: 8px;
-            width: 100%;
-            border: 2px solid var(--color-accent-light);
-            background-color: var(--color-container-bg);
-            color: var(--color-text-primary);
-            font-size: 1rem;
-            font-weight: bold;
-            text-align: center;
-        }
-        #start-restart-btn {
-            background-color: var(--color-primary-button);
-            color: white;
-            border: none;
-            padding: 1rem;
-            border-radius: 12px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            transition: background-color 0.2s;
-        }
         
+        /* Game Over Modal */
         #game-over-modal {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background-color: rgba(0, 0, 0, 0.7);
@@ -243,45 +208,60 @@
         #game-over-modal.visible { opacity: 1; pointer-events: auto; }
         .modal-content {
             background-color: var(--color-container-bg);
-            padding: 3rem 4rem;
+            padding: 2rem;
             border-radius: 16px;
             text-align: center;
             box-shadow: 0 5px 15px var(--color-shadow);
             transform: scale(0.9);
             transition: transform 0.4s ease;
+            width: 90%;
+            max-width: 400px;
         }
         #game-over-modal.visible .modal-content { transform: scale(1); }
-        .modal-content h2 { font-size: 3rem; margin: 0 0 1rem 0; }
-        .modal-content p { font-size: 1.3rem; line-height: 1.6; color: var(--color-text-secondary); margin-bottom: 2rem; }
+        .modal-content h2 { font-size: 2.5rem; margin: 0 0 1rem 0; }
+        .modal-content p { font-size: 1.1rem; line-height: 1.6; color: var(--color-text-secondary); margin-bottom: 2rem; }
         #play-again-btn {
             background-color: var(--color-accent);
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 12px;
-            font-size: 1.2rem;
-            cursor: pointer;
+            color: white; border: none; padding: 1rem 2rem;
+            border-radius: 12px; font-size: 1.2rem; cursor: pointer;
             transition: background-color 0.2s;
         }
         #play-again-btn:hover { background-color: var(--color-accent-dark); }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 500px) {
+            body { padding: 10px; }
+            h1 { font-size: 1.6rem; }
+
+            /* Hide fullscreen button and its spacer on mobile */
+            #fullscreen-btn, .header-spacer {
+                display: none;
+            }
+
+            #game-container { padding: 1.5rem; }
+            #current-count { font-size: 6rem; }
+            .action-btn { font-size: 2rem; }
+            #ai-status { font-size: 1rem; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header class="game-header">
-            <h1>The 1 to 20 Game</h1>
+            <div class="header-spacer"></div>
+            <div class="title-wrapper">
+                <h1>The 1 to 20 Game</h1>
+            </div>
+            <div class="header-buttons">
+                 <button id="fullscreen-btn" title="Toggle Fullscreen (F)">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                </button>
+                <button id="theme-toggle-btn" title="Toggle Theme">
+                    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.64 5.64c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zm12.73 12.73c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zM5.64 18.36c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0zM18.36 5.64c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.38-1.03-.38-1.41 0z"/></svg>
+                    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.11-1.36c-0.98,1.37-2.58,2.26-4.39,2.26 c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.39C12.92,3.04,12.46,3,12,3z"/></svg>
+                </button>
+            </div>
         </header>
-
-        <!-- The buttons are now outside the header but still anchored to the container -->
-        <div class="header-buttons">
-            <button id="fullscreen-btn" title="Toggle Fullscreen (F)">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-            </button>
-            <button id="theme-toggle-btn" title="Toggle Theme">
-                <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.64 5.64c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zm12.73 12.73c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zM5.64 18.36c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0zM18.36 5.64c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.38-1.03-.38-1.41 0z"/></svg>
-                <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.11-1.36c-0.98,1.37-2.58,2.26-4.39,2.26 c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.39C12.92,3.04,12.46,3,12,3z"/></svg>
-            </button>
-        </div>
 
         <div id="game-container">
             <div id="ai-status-wrapper">
@@ -342,9 +322,10 @@
             // --- AI Psychological Dialogue ---
             const aiDialogue = {
                 waiting: ["Select a difficulty and press Start.", "Ready when you are. Hit Start."],
-                start: ["The game begins. You may go first.", "A good choice. Your move."],
+                start: ["The game begins. You may go first.", "You may begin."],
                 aiStart: ["I'll take the lead this time.", "Alright, my turn to start."],
                 thinking: ["Hmm...", "Let me see...", "Calculating...", "Interesting..."],
+                playerPrompt: ["Your move.", "Your turn.", "What will you do?"],
                 playerMistake: ["An interesting choice...", "I see an opening!", "Are you sure about that?"],
                 playerGoodMove: ["Well played.", "A clever move.", "You've blocked my path... for now."],
                 winningMove: ["That sets me up perfectly.", "A perfect calculation.", "The path to victory is clear."],
@@ -385,8 +366,7 @@
             const playerMove = (numCount) => {
                 if (!playerTurn || gameOver) return;
                 playerTurn = false;
-                currentCount += numCount;
-                updateGame();
+                updateGame(currentCount + numCount);
 
                 if (currentCount >= 20) {
                     endGame('Player');
@@ -398,7 +378,7 @@
                 } else if (isMultipleOfFour(currentCount)) {
                     displayAiMessage('playerGoodMove');
                 }
-                aiTurn();
+                setTimeout(aiTurn, 400); // Give player feedback a moment before AI plays
             };
             
             const aiTurn = () => {
@@ -406,48 +386,49 @@
                 const isStrategicPosition = (currentCount + 1) % 4 === 0 || (currentCount + 2) % 4 === 0;
                 const thinkingTime = (aiDifficulty === 'hard' && isStrategicPosition) ? 1200 : 600;
 
+                displayAiMessage('thinking', true);
+                
                 setTimeout(() => {
-                    displayAiMessage('thinking', true);
-                    
-                    setTimeout(() => {
-                        let numbersToSay;
-                        switch (aiDifficulty) {
-                            case 'easy': numbersToSay = Math.floor(Math.random() * 3) + 1; break;
-                            case 'medium': numbersToSay = (Math.random() < 0.4) ? Math.floor(Math.random() * 3) + 1 : getOptimalMove(); break;
-                            default: numbersToSay = getOptimalMove();
-                        }
-                        if (currentCount + numbersToSay > 20) numbersToSay = 20 - currentCount;
-                        if (isMultipleOfFour(currentCount + numbersToSay) && numbersToSay > 0) displayAiMessage('winningMove');
+                    let numbersToSay;
+                    switch (aiDifficulty) {
+                        case 'easy': numbersToSay = Math.floor(Math.random() * 3) + 1; break;
+                        case 'medium': numbersToSay = (Math.random() < 0.4) ? Math.floor(Math.random() * 3) + 1 : getOptimalMove(); break;
+                        default: numbersToSay = getOptimalMove();
+                    }
+                    if (currentCount + numbersToSay > 20) numbersToSay = 20 - currentCount;
+                    if (isMultipleOfFour(currentCount + numbersToSay) && numbersToSay > 0) displayAiMessage('winningMove');
 
-                        currentCount += numbersToSay;
-                        updateGame();
+                    updateGame(currentCount + numbersToSay);
 
-                        if (currentCount >= 20) {
-                            endGame('AI');
-                        } else {
-                            playerTurn = true;
-                            updatePlayerActionButtons();
-                        }
-                    }, thinkingTime);
-                }, 400);
+                    if (currentCount >= 20) {
+                        endGame('AI');
+                    } else {
+                        playerTurn = true;
+                        displayAiMessage('playerPrompt'); // AI finished, prompt player
+                        updatePlayerActionButtons();
+                    }
+                }, thinkingTime);
             };
 
             const getOptimalMove = () => {
                 const remainder = currentCount % 4;
-                return (remainder === 0) ? Math.floor(Math.random() * 3) + 1 : 4 - remainder;
+                return (remainder === 0) ? (Math.floor(Math.random() * 3) + 1) : 4 - remainder;
             };
             
             const isMultipleOfFour = (num) => num > 0 && num % 4 === 0;
             const isPlayerMistake = () => [1, 2, 3].some(i => isMultipleOfFour(currentCount + i) && currentCount + i <= 20);
 
             // --- UI and State Update Functions ---
-            const updateGame = () => {
+            const updateGame = (newCount) => {
+                currentCount = newCount;
                 ui.currentCountDisplay.textContent = currentCount;
                 updatePlayerActionButtons();
             };
 
             const endGame = (winner) => {
                 gameOver = true;
+                playerTurn = false; // Stop player from making moves after game ends
+                updatePlayerActionButtons();
                 ui.difficultySelect.disabled = false;
                 let title, message;
                 if (winner === 'AI') {
@@ -461,7 +442,7 @@
                 }
                 ui.modalTitle.textContent = title;
                 ui.modalMessage.textContent = message;
-                ui.gameOverModal.classList.add('visible');
+                setTimeout(() => ui.gameOverModal.classList.add('visible'), 500);
             };
 
             const updatePlayerActionButtons = () => {
@@ -472,13 +453,6 @@
                     
                     const targetNumber = currentCount + moveCount;
                     button.textContent = targetNumber;
-                    
-                    if (!isPossible && !gameOver) {
-                        button.style.opacity = '0.5';
-                        button.textContent = 'X';
-                    } else {
-                        button.style.opacity = '1';
-                    }
                 });
             };
             
@@ -510,7 +484,7 @@
                 const key = e.key.toLowerCase();
                 if (ui.gameOverModal.classList.contains('visible')) return;
 
-                if (key === 'f') {
+                if (key === 'f' && !e.ctrlKey && !e.metaKey) {
                     e.preventDefault();
                     toggleFullScreen();
                 }
@@ -527,4 +501,4 @@
         });
     </script>
 </body>
-</html>```
+</html>
