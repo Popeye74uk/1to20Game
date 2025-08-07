@@ -114,8 +114,9 @@
         #game-container:fullscreen {
             width: 100%;
             height: 100%;
+            padding: 5vh;
             justify-content: center;
-            gap: 2rem;
+            gap: 3vh;
         }
 
         /* AI Status Box */
@@ -134,19 +135,8 @@
         #game-container:fullscreen #ai-status-wrapper {
             margin-bottom: 0;
             padding: 1.5rem 2rem;
+            font-size: 1.5rem;
         }
-        #ai-status {
-            font-style: italic;
-            font-size: 1.2rem;
-            color: var(--color-text-primary);
-            line-height: 1.5;
-        }
-
-        .typing-indicator {
-            font-weight: bold;
-            animation: blink 1.2s infinite;
-        }
-        @keyframes blink { 50% { opacity: 0; } }
 
         /* Current Count Display */
         #current-count {
@@ -156,7 +146,7 @@
             margin-bottom: 2rem;
         }
         #game-container:fullscreen #current-count {
-            font-size: 15vh;
+            font-size: 20vh;
             margin-bottom: 0;
         }
 
@@ -186,6 +176,9 @@
             justify-content: center;
             align-items: center;
         }
+        #game-container:fullscreen .action-btn {
+             font-size: 8vh;
+        }
         .action-btn:hover:not(:disabled) {
             background-color: var(--color-accent-dark);
             transform: translateY(-3px);
@@ -205,7 +198,11 @@
             align-items: center;
             gap: 1rem;
         }
-        #game-container:fullscreen #game-controls { display: none; }
+        #game-container:fullscreen #game-controls { 
+            display: grid;
+            width: 50%;
+            margin: 0 auto;
+        }
         .control-group {
             display: flex;
             flex-direction: column;
@@ -223,6 +220,10 @@
             font-weight: bold;
             text-align: center;
         }
+        #game-container:fullscreen #difficulty-select {
+            padding: 1rem;
+            font-size: 1.2rem;
+        }
         #start-restart-btn {
             background-color: var(--color-primary-button);
             color: white;
@@ -236,6 +237,10 @@
             transition: background-color 0.2s;
         }
         #start-restart-btn:hover { background-color: var(--color-primary-button-hover); }
+        #game-container:fullscreen #start-restart-btn {
+             padding: 1.2rem;
+             font-size: 1.5rem;
+        }
         
         /* Game Over Modal */
         #game-over-modal {
@@ -518,7 +523,6 @@
                 const key = e.key.toLowerCase();
                 if (ui.gameOverModal.classList.contains('visible')) return;
 
-                // Bind 'f' key to fullscreen toggle
                 if (key === 'f') {
                     e.preventDefault();
                     toggleFullScreen();
