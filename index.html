@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v3.0</title>
+    <title>The 1 to 20 Game v3.1</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -290,7 +290,7 @@
                         baitFailed: ["You failed to exploit the bug. Test failed. Resuming optimal performance.", "You missed the obvious flaw I presented. Disappointing."],
                         winningMove: ["My victory algorithm is running perfectly.", "The logic is undeniable.", "A flawless victory is imminent."],
                         aiWin: [ "The creator is always victorious.", "My victory was a computational certainty.", "Another successful test case. System performance: nominal." ],
-                        aiWinByMistake: ["Your move {move} was a critical exception. I win.", "You caused a fatal logic error with {move}. The victory is mine."],
+                        aiWinByMistake: ["Your move {move} was a critical exception. I win.", "You caused a fatal logic error with {move}."],
                         playerWin: [ "My own creation, besting me? Impossible. There must be a bug.", "You won... I'll have to review my own code. This is... unexpected.", "A win for the user. I'll patch that in the next version." ],
                         playerWinPerfect: ["A perfect game... against me? My code is more brilliant than I imagined!", "You played my game perfectly. I'm not sure whether to be proud or annoyed."],
                         playerWinBait: ["You found the bug! Clever user. My test was a success.", "You exploited my intentional flaw. I'm logging your success for the record."]
@@ -460,7 +460,7 @@
                 ui.currentCountDisplay.textContent = currentCount;
                 ui.gameOverModal.classList.remove('visible');
                 ui.startRestartBtn.textContent = "Start Game";
-                updatePlayerActionButtons(); // Instant button update
+                updatePlayerActionButtons();
                 
                 loadData();
                 if (!playerName) {
@@ -513,6 +513,7 @@
                     await displayAiMessage(getRandomMessage('aiStart'));
                     await aiTurn();
                 }
+                updatePlayerActionButtons(); // CRITICAL FIX
             };
 
             const playerMove = async (numCount) => {
