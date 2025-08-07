@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v1.3</title>
+    <title>The 1 to 20 Game v1.4</title>
     <style>
         :root {
             --color-background: #f0f2f5; --color-container-bg: #ffffff; --color-text-primary: #212529; --color-text-secondary: #6c757d; --color-accent: #6f42c1; --color-accent-dark: #5a359a; --color-accent-light: #e9e5f5; --color-primary-button: #007bff; --color-primary-button-hover: #0069d9; --color-danger: #dc3545; --color-success: #28a745; --color-button-disabled-bg: #adb5bd; --color-shadow: rgba(0, 0, 0, 0.1); --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -64,6 +64,11 @@
             background-color: var(--color-button-disabled-bg); color: #ffffffc0; cursor: not-allowed; transform: none; opacity: 0.5;
         }
         #game-controls { display: grid; grid-template-columns: 1fr; align-items: center; gap: 1rem; }
+        .control-group { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        #difficulty-select { padding: 0.8rem; border-radius: 8px; width: 100%; border: 2px solid var(--color-accent-light); background-color: var(--color-container-bg); color: var(--color-text-primary); font-size: 1rem; font-weight: bold; text-align: center; }
+        #start-restart-btn {
+            background-color: var(--color-primary-button); color: white; border: none; padding: 1rem; border-radius: 12px; font-size: 1.2rem; font-weight: bold; cursor: pointer; width: 100%; transition: background-color 0.2s;
+        }
         #game-over-modal {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
         }
@@ -78,12 +83,14 @@
             background-color: var(--color-accent); color: white; border: none; padding: 1rem 2rem; border-radius: 12px; font-size: 1.2rem; cursor: pointer; transition: background-color 0.2s;
         }
         #play-again-btn:hover { background-color: var(--color-accent-dark); }
+        
         @media (max-width: 600px) {
-            .header-buttons { display: none; } /* Hide buttons on smaller screens */
+            #fullscreen-btn { display: none; } /* Hide only fullscreen button on mobile */
         }
         @media (max-width: 450px) {
             body { padding: 10px; }
             h1 { font-size: 1.6rem; }
+            .header-buttons { margin-left: 5px; }
             #game-container { padding: 1.5rem; }
             #current-count { font-size: 6rem; }
             .action-btn { font-size: 2rem; }
@@ -228,7 +235,7 @@
                     let numbersToSay = getAiMove();
                     if (currentCount + numbersToSay > 20) numbersToSay = 20 - currentCount;
                     
-                    if (!isThinking() && isMultipleOfFour(currentCount + numbersToSay) && numbersToSay > 0) {
+                    if (isMultipleOfFour(currentCount + numbersToSay) && numbersToSay > 0) {
                         displayAiMessage('winningMove');
                     }
 
@@ -238,8 +245,11 @@
                         endGame('AI');
                     } else {
                         playerTurn = true;
-                        if (!isThinking()) displayAiMessage('playerPrompt');
-                        updatePlayerActionButtons();
+                        // Use a brief delay before showing the next prompt to let the "winning move" message be seen
+                        setTimeout(() => {
+                            displayAiMessage('playerPrompt');
+                            updatePlayerActionButtons();
+                        }, 200);
                     }
                 }, thinkingTime);
             };
@@ -258,7 +268,6 @@
             
             const isMultipleOfFour = (num) => num > 0 && num % 4 === 0;
             const isPlayerMistake = () => [1, 2, 3].some(i => isMultipleOfFour(currentCount + i) && currentCount + i <= 20);
-            const isThinking = () => ui.aiStatusBox.innerHTML.includes('...');
 
             const updateGame = (newCount) => {
                 currentCount = newCount;
@@ -308,7 +317,7 @@
             };
             const toggleFullScreen = () => {
                 if (!document.fullscreenElement) {
-                    document.body.requestFullscreen().catch(err => alert(`Fullscreen error: ${err.message}`));
+                    document.body.requestFullscreen().catch(err => {});
                 } else { document.exitFullscreen(); }
             };
             ui.themeToggleBtn.addEventListener('click', () => setTheme(document.body.classList.contains('dark-mode') ? 'light' : 'dark'));
