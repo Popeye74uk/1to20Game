@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v0.8</title>
+    <title>The 1 to 20 Game v0.9</title>
     <style>
         /* CSS Variables for Theming */
         :root {
@@ -52,40 +52,47 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
+        /* --- NEW LAYOUT WRAPPER --- */
+        .page-wrapper {
+            position: relative; /* Anchor for the buttons */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
         .container {
             width: 100%;
             max-width: 420px;
-            margin: 0 auto;
             text-align: center;
         }
         
-        /* --- CORRECTED HEADER LAYOUT --- */
+        /* The header is now simpler, just for the title */
         .game-header {
-            position: relative; /* Anchor for the buttons */
-            display: flex;
-            justify-content: center; /* Center the title */
-            align-items: center;
-            width: 100%; /* FORCE the header to be full-width */
             margin-bottom: 20px;
         }
         
-        .header-buttons { 
-            position: absolute; /* Position relative to the header */
-            right: 0; /* Pin to the right of the full-width header */
-            top: 50%;
-            transform: translateY(-50%); /* Vertically center the buttons */
-            display: flex; 
-            gap: 10px; 
-        }
-        
         h1 {
-            text-align: center;
             color: var(--color-text-primary);
             font-size: 2rem;
             margin: 0;
             white-space: nowrap;
         }
-        
+
+        /* --- CORRECTED ICON POSITIONING --- */
+        .header-buttons {
+            position: absolute;
+            /* Start from the center of the page-wrapper */
+            left: 50%; 
+            /* 
+               Move left by half the width of the game container (420px / 2 = 210px) 
+               plus a gap of 20px to place the icons just to the right of the card.
+            */
+            margin-left: 230px; 
+            top: 15px; /* Manually align with title */
+            display: flex;
+            gap: 10px;
+        }
+
         #theme-toggle-btn, #fullscreen-btn {
             background: none;
             border: 2px solid var(--color-text-secondary);
@@ -110,7 +117,6 @@
         body.dark-mode .icon-sun { display: block; }
         body:not(.dark-mode) .icon-moon { display: block; }
 
-        /* --- Main Game Container --- */
         #game-container {
             background-color: var(--color-container-bg);
             border-radius: 16px;
@@ -121,12 +127,12 @@
             flex-direction: column;
         }
         
-        /* --- CORRECTED FULLSCREEN STYLE --- */
-        body:fullscreen .game-header {
+        /* --- FULLSCREEN HIDES ALL HEADER ELEMENTS --- */
+        body:fullscreen .game-header,
+        body:fullscreen .header-buttons {
             display: none;
         }
         
-        /* AI Status Box */
         #ai-status-wrapper {
             background-color: var(--color-accent-light);
             border-left: 5px solid var(--color-accent);
@@ -150,7 +156,6 @@
         .typing-indicator { font-weight: bold; animation: blink 1.2s infinite; }
         @keyframes blink { 50% { opacity: 0; } }
 
-        /* Current Count Display */
         #current-count {
             font-size: 7rem;
             font-weight: bold;
@@ -158,7 +163,6 @@
             margin-bottom: 2rem;
         }
 
-        /* Player Action Buttons */
         #player-actions {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -192,7 +196,6 @@
             opacity: 0.5;
         }
 
-        /* Game Controls */
         #game-controls {
             display: grid;
             grid-template-columns: 1fr;
@@ -230,7 +233,6 @@
             transition: background-color 0.2s;
         }
         
-        /* Game Over Modal */
         #game-over-modal {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background-color: rgba(0, 0, 0, 0.7);
@@ -269,42 +271,50 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <header class="game-header">
-            <h1>The 1 to 20 Game</h1>
-            <div class="header-buttons">
-                 <button id="fullscreen-btn" title="Toggle Fullscreen (F)">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-                </button>
-                <button id="theme-toggle-btn" title="Toggle Theme">
-                    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.64 5.64c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zm12.73 12.73c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zM5.64 18.36c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0zM18.36 5.64c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.38-1.03-.38-1.41 0z"/></svg>
-                    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.11-1.36c-0.98,1.37-2.58,2.26-4.39,2.26 c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.39C12.92,3.04,12.46,3,12,3z"/></svg>
-                </button>
-            </div>
-        </header>
-
-        <div id="game-container">
-            <div id="ai-status-wrapper">
-                <span id="ai-status"></span>
-            </div>
-            <div id="current-count">0</div>
-            <div id="player-actions">
-                <button class="action-btn" data-move="1">1</button>
-                <button class="action-btn" data-move="2">2</button>
-                <button class="action-btn" data-move="3">3</button>
-            </div>
-            <div id="game-controls">
-                <div class="control-group">
-                    <label for="difficulty-select">Difficulty</label>
-                    <select id="difficulty-select">
-                        <option value="easy">Easy</option>
-                        <option value="medium">Medium</option>
-                        <option value="hard" selected>Hard</option>
-                    </select>
+    <!-- New wrapper for the whole layout -->
+    <div class="page-wrapper">
+        
+        <!-- The main game card -->
+        <div class="container">
+            <header class="game-header">
+                <h1>The 1 to 20 Game</h1>
+            </header>
+            <div id="game-container">
+                <div id="ai-status-wrapper">
+                    <span id="ai-status"></span>
                 </div>
-                <button id="start-restart-btn">Start Game</button>
+                <div id="current-count">0</div>
+                <div id="player-actions">
+                    <button class="action-btn" data-move="1">1</button>
+                    <button class="action-btn" data-move="2">2</button>
+                    <button class="action-btn" data-move.
+                    ="3">3</button>
+                </div>
+                <div id="game-controls">
+                    <div class="control-group">
+                        <label for="difficulty-select">Difficulty</label>
+                        <select id="difficulty-select">
+                            <option value="easy">Easy</option>
+                            <option value="medium">Medium</option>
+                            <option value="hard" selected>Hard</option>
+                        </select>
+                    </div>
+                    <button id="start-restart-btn">Start Game</button>
+                </div>
             </div>
         </div>
+        
+        <!-- Icons are now outside the container, positioned relative to the wrapper -->
+        <div class="header-buttons">
+            <button id="fullscreen-btn" title="Toggle Fullscreen (F)">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            </button>
+            <button id="theme-toggle-btn" title="Toggle Theme">
+                <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.64 5.64c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zm12.73 12.73c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41zM5.64 18.36c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0zM18.36 5.64c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41-.39-.38-1.03-.38-1.41 0z"/></svg>
+                <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.11-1.36c-0.98,1.37-2.58,2.26-4.39,2.26 c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.39C12.92,3.04,12.46,3,12,3z"/></svg>
+            </button>
+        </div>
+
     </div>
     
     <div id="game-over-modal">
@@ -470,7 +480,7 @@
                     const isPossible = currentCount + moveCount <= 20;
                     button.disabled = !playerTurn || gameOver || !isPossible;
                     
-                    const targetNumber = currentCount + movecount;
+                    const targetNumber = currentCount + moveCount;
                     button.textContent = targetNumber;
                     
                     if (!isPossible && !gameOver) {
@@ -483,7 +493,8 @@
             };
             
             const displayAiMessage = (category, isThinking = false) => {
-                const message = getRandomMessage(category);
+                const message = getRandomMessage(.
+                category);
                 ui.aiStatusBox.innerHTML = message + (isThinking ? `<span class="typing-indicator">...</span>` : '');
             };
             
@@ -496,7 +507,7 @@
             };
             const toggleFullScreen = () => {
                 if (!document.fullscreenElement) {
-                    document.body.requestFullscreen().catch(err => alert(`Fullscreen error: ${err.message}`));
+                    document.documentElement.requestFullscreen().catch(err => alert(`Fullscreen error: ${err.message}`));
                 } else {
                     document.exitFullscreen();
                 }
