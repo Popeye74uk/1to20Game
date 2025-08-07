@@ -59,20 +59,24 @@
             text-align: center;
         }
         
-        /* Corrected Header Layout */
+        /* --- CORRECTED HEADER LAYOUT --- */
         .game-header {
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr; /* 3-column grid */
             align-items: center;
             margin-bottom: 20px;
         }
-        .header-buttons { display: flex; justify-content: flex-end; gap: 10px; flex-basis: 100px; }
-        .header-spacer { flex-basis: 100px; } /* This spacer forces the title to center */
+        .header-buttons { 
+            display: flex; 
+            justify-content: flex-end; 
+            gap: 10px; 
+            grid-column: 3 / 4; /* Place in the 3rd column */
+        }
         h1 {
-            flex-grow: 1;
+            grid-column: 2 / 3; /* Place in the 2nd (center) column */
             text-align: center;
             color: var(--color-text-primary);
-            font-size: 2.2rem;
+            font-size: 2rem;
             margin: 0;
             white-space: nowrap;
         }
@@ -101,7 +105,7 @@
         body.dark-mode .icon-sun { display: block; }
         body:not(.dark-mode) .icon-moon { display: block; }
 
-        /* Corrected Fullscreen Styles */
+        /* --- CORRECTED FULLSCREEN STYLES --- */
         #game-container {
             background-color: var(--color-container-bg);
             border-radius: 16px;
@@ -117,6 +121,7 @@
             padding: 2rem;
             justify-content: center;
             gap: 1.5rem;
+            overflow-y: auto; /* Allow scrolling if content overflows on small screens */
         }
 
         /* AI Status Box */
