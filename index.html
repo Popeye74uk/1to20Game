@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v3.2</title>
+    <title>The 1 to 20 Game v3.3</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -289,7 +289,7 @@
                         baiting: ["I'll play {move}. I've left a 'bug' in my play. See if you can exploit it.", "I'll make a sub-optimal move: {move}. A test for you."],
                         baitFailed: ["You failed to exploit the bug. Test failed. Resuming optimal performance.", "You missed the obvious flaw I presented. Disappointing."],
                         winningMove: ["My victory algorithm is running perfectly.", "The logic is undeniable.", "A flawless victory is imminent."],
-                        aiWin: [ "The creator is always victorious.", "My victory was a computational certainty.", "Another successful test case. System performance: nominal." ],
+                        aiWin: [ "I win. Of course.", "The creator is always victorious.", "My victory was a computational certainty.", "Another successful test case. System performance: nominal." ],
                         aiWinByMistake: ["Your move {move} was a critical exception. I win.", "You caused a fatal logic error with {move}."],
                         playerWin: [ "My own creation, besting me? Impossible. There must be a bug.", "You won... I'll have to review my own code. This is... unexpected.", "A win for the user. I'll patch that in the next version." ],
                         playerWinPerfect: ["A perfect game... against me? My code is more brilliant than I imagined!", "You played my game perfectly. I'm not sure whether to be proud or annoyed."],
@@ -393,7 +393,8 @@
                     dialogue: {
                         firstWelcome: ["Oh, um, hi! Ready when you are, I guess.", "Just pick a... a thingy. A difficulty. No pressure!"],
                         welcome: ["{name}! You're back!", "It's {name}! Hello again!"],
-                        welcomeStats: ["My memory says you have {wins} wins and {losses} losses. That's a lot!", "You have {wins} wins! Wow!"],
+                        welcomeStats_few: ["My memory says you have {wins} wins and {losses} losses.", "You have {wins} wins! Wow!"],
+                        welcomeStats_many: ["My memory says you have {wins} wins and {losses} losses. That's a lot!", "You've played a bunch! Your record is {wins} to {losses}!"],
                         patternRecognized: ["Eep! My logs show you have trouble with {number}. Me too sometimes!", "Oh! Be careful around {number}. It's a tricky one!"],
                         start: [ "Okay, you can go first. Phew.", "You start! I'm... still booting up.", "Here we go! Good luck! To both of us!" ],
                         aiStart: [ "ME?! Oh, okay, I'll start! Um... one!", "I'll go! Let's try... this one!", "Okay okay okay, my turn, here I go!" ],
@@ -469,7 +470,13 @@
                     chooseNewPersonality();
                     shuffleDialogues();
                     await displayAiMessage(getRandomMessage('welcome', { name: playerName }));
-                    await displayAiMessage(getRandomMessage('welcomeStats', { wins: playerStats.wins, losses: playerStats.losses }));
+
+                    let statsCategory = 'welcomeStats';
+                    if (currentPersonality.name === 'Flustered') {
+                        const totalGames = playerStats.wins + playerStats.losses;
+                        statsCategory = totalGames < 5 ? 'welcomeStats_few' : 'welcomeStats_many';
+                    }
+                    await displayAiMessage(getRandomMessage(statsCategory, { wins: playerStats.wins, losses: playerStats.losses }));
                 }
             };
 
@@ -480,7 +487,6 @@
                     playerName = name;
                     playerStats = { wins: 0, losses: 0 };
                     moveHistory = [];
-                    saveData();
                     ui.nameModal.classList.remove('visible');
                     chooseNewPersonality();
                     shuffleDialogues();
@@ -610,9 +616,11 @@
             
             const countingWin = async (numbersToSay) => {
                  for (let i = 1; i <= numbersToSay; i++) {
-                    updateGame(currentCount + 1);
+                    currentCount++;
+                    ui.currentCountDisplay.textContent = currentCount;
                     await sleep(600);
                 }
+                updatePlayerActionButtons();
             };
 
             // AI Logic
@@ -629,7 +637,6 @@
                 const personalityKeys = Object.keys(personalities).filter(p => p !== lastPersonalityName);
                 const chosenKey = personalityKeys[Math.floor(Math.random() * personalityKeys.length)];
                 currentPersonality = personalities[chosenKey];
-                lastPersonalityName = chosenKey;
             };
 
             const getOptimalMove = () => {
@@ -690,10 +697,10 @@
                         break;
                 }
                 
-                lastPersonalityName = currentPersonality.name; // Save personality at the end of the game
+                lastPersonalityName = currentPersonality.name; 
                 saveData();
                 ui.modalTitle.textContent = title; 
-                ui.modalMessage.textContent = message;
+                ui.modalMessage.innerHTML = message;
                 setTimeout(() => ui.gameOverModal.classList.add('visible'), 500);
             };
 
