@@ -3,20 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v1.8</title>
+    <title>The 1 to 20 Game v1.9</title>
     <style>
         :root {
-            --color-background: #f0f2f5; --color-container-bg: #ffffff; --color-text-primary: #212529; --color-text-secondary: #6c757d; --color-accent: #6f42c1; --color-accent-dark: #5a359a; --color-accent-light: #e9e5f5; --color-primary-button: #007bff; --color-primary-button-hover: #0069d9; --color-danger: #dc3545; --color-success: #28a745; --color-button-disabled-bg: #adb5bd; --color-shadow: rgba(0, 0, 0, 0.1); --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-        /* This is a basic dark mode setup. If the buttons are ever re-added, the functionality will need to be re-linked in the JS. */
-        body.dark-mode {
-            --color-background: #121212; --color-container-bg: #1e1e1e; --color-text-primary: #e0e0e0; --color-text-secondary: #888; --color-accent: #9b7de2; --color-accent-dark: #8166c1; --color-accent-light: #2a2536; --color-primary-button: #3685e0; --color-primary-button-hover: #58a6ff; --color-button-disabled-bg: #444; --color-shadow: rgba(0, 0, 0, 0.4);
+            --color-background: #121212; 
+            --color-container-bg: #1e1e1e; 
+            --color-text-primary: #e0e0e0; 
+            --color-text-secondary: #888; 
+            --color-accent: #9b7de2; 
+            --color-accent-dark: #8166c1; 
+            --color-accent-light: #2a2536; 
+            --color-primary-button: #3685e0; 
+            --color-primary-button-hover: #58a6ff; 
+            --color-danger: #dc3545; 
+            --color-success: #28a745; 
+            --color-button-disabled-bg: #444; 
+            --color-shadow: rgba(0, 0, 0, 0.4); 
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
         body {
-            font-family: var(--font-main); background-color: var(--color-background); color: var(--color-text-primary); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; transition: background-color 0.3s, color 0.3s;
+            font-family: var(--font-main); 
+            background-color: var(--color-background); 
+            color: var(--color-text-primary); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            padding: 20px; 
+            box-sizing: border-box; 
+            transition: background-color 0.3s, color 0.3s;
         }
         .container {
-            width: 100%; max-width: 420px; text-align: center;
+            width: 100%; 
+            max-width: 420px; 
+            text-align: center;
         }
         .game-header {
             display: flex;
@@ -26,62 +47,196 @@
             height: 44px; /* Maintain height for consistent spacing */
         }
         h1 {
-            color: var(--color-text-primary); font-size: 2rem; margin: 0; white-space: nowrap;
+            color: var(--color-text-primary); 
+            font-size: 2rem; 
+            margin: 0; 
+            white-space: nowrap;
         }
         #game-container {
-            background-color: var(--color-container-bg); border-radius: 16px; box-shadow: 0 8px 32px var(--color-shadow); padding: 2rem; transition: background-color 0.3s; display: flex; flex-direction: column;
+            background-color: var(--color-container-bg); 
+            border-radius: 16px; 
+            box-shadow: 0 8px 32px var(--color-shadow); 
+            padding: 2rem; 
+            transition: background-color 0.3s; 
+            display: flex; 
+            flex-direction: column;
+        }
+        body:fullscreen .game-header {
+            display: none;
         }
         #ai-status-wrapper {
-            background-color: var(--color-accent-light); border-left: 5px solid var(--color-accent); padding: 1rem 1.5rem; margin-bottom: 2rem; border-radius: 8px; min-height: 30px; display: flex; align-items: center; justify-content: center; gap: 10px;
+            background-color: var(--color-accent-light); 
+            border-left: 5px solid var(--color-accent); 
+            padding: 1rem 1.5rem; 
+            margin-bottom: 2rem; 
+            border-radius: 8px; 
+            min-height: 30px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px;
         }
         #ai-status {
-            font-style: italic; font-size: 1.2rem; color: var(--color-text-primary); line-height: 1.5;
+            font-style: italic; 
+            font-size: 1.2rem; 
+            color: var(--color-text-primary); 
+            line-height: 1.5;
         }
-        .typing-indicator { font-weight: bold; animation: blink 1.2s infinite; }
-        @keyframes blink { 50% { opacity: 0; } }
+        .typing-indicator { 
+            font-weight: bold; 
+            animation: blink 1.2s infinite; 
+        }
+        @keyframes blink { 
+            50% { opacity: 0; } 
+        }
         #current-count {
-            font-size: 7rem; font-weight: bold; color: var(--color-accent); margin-bottom: 2rem;
+            font-size: 7rem; 
+            font-weight: bold; 
+            color: var(--color-accent); 
+            margin-bottom: 2rem;
         }
         #player-actions {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 1rem; 
+            margin-bottom: 2rem;
         }
         .action-btn {
-            background-color: var(--color-accent); color: #ffffff; border: none; border-radius: 8px; font-size: 2.5rem; font-weight: bold; cursor: pointer; transition: all 0.2s; aspect-ratio: 1 / 1; display: flex; justify-content: center; align-items: center;
+            background-color: var(--color-accent); 
+            color: #ffffff; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 2.5rem; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            aspect-ratio: 1 / 1; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
         }
         .action-btn:hover:not(:disabled) {
-            background-color: var(--color-accent-dark); transform: translateY(-3px);
+            background-color: var(--color-accent-dark); 
+            transform: translateY(-3px);
         }
         .action-btn:disabled {
-            background-color: var(--color-button-disabled-bg); color: #ffffffc0; cursor: not-allowed; transform: none; opacity: 0.5;
+            background-color: var(--color-button-disabled-bg); 
+            color: #ffffffc0; 
+            cursor: not-allowed; 
+            transform: none; 
+            opacity: 0.5;
         }
-        #game-controls { display: grid; grid-template-columns: 1fr; align-items: center; gap: 1rem; }
-        .control-group { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        #difficulty-select { padding: 0.8rem; border-radius: 8px; width: 100%; border: 2px solid var(--color-accent-light); background-color: var(--color-container-bg); color: var(--color-text-primary); font-size: 1rem; font-weight: bold; text-align: center; }
+        #game-controls { 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            align-items: center; 
+            gap: 1rem; 
+        }
+        .control-group { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 5px; 
+        }
+        #difficulty-select { 
+            padding: 0.8rem; 
+            border-radius: 8px; 
+            width: 100%; 
+            border: 2px solid var(--color-accent-light); 
+            background-color: var(--color-container-bg); 
+            color: var(--color-text-primary); 
+            font-size: 1rem; 
+            font-weight: bold; 
+            text-align: center; 
+        }
         #start-restart-btn {
-            background-color: var(--color-primary-button); color: white; border: none; padding: 1rem; border-radius: 12px; font-size: 1.2rem; font-weight: bold; cursor: pointer; width: 100%; transition: background-color 0.2s;
+            background-color: var(--color-primary-button); 
+            color: white; 
+            border: none; 
+            padding: 1rem; 
+            border-radius: 12px; 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+            cursor: pointer; 
+            width: 100%; 
+            transition: background-color 0.2s;
         }
         #game-over-modal {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0; 
+            background-color: rgba(0, 0, 0, 0.7); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 20; 
+            opacity: 0; 
+            pointer-events: none; 
+            transition: opacity 0.4s ease;
         }
-        #game-over-modal.visible { opacity: 1; pointer-events: auto; }
+        #game-over-modal.visible { 
+            opacity: 1; 
+            pointer-events: auto; 
+        }
         .modal-content {
-            background-color: var(--color-container-bg); padding: 2rem; border-radius: 16px; text-align: center; box-shadow: 0 5px 15px var(--color-shadow); transform: scale(0.9); transition: transform 0.4s ease; width: 90%; max-width: 400px;
+            background-color: var(--color-container-bg); 
+            padding: 2rem; 
+            border-radius: 16px; 
+            text-align: center; 
+            box-shadow: 0 5px 15px var(--color-shadow); 
+            transform: scale(0.9); 
+            transition: transform 0.4s ease; 
+            width: 90%; 
+            max-width: 400px;
         }
-        #game-over-modal.visible .modal-content { transform: scale(1); }
-        .modal-content h2 { font-size: 2.5rem; margin: 0 0 1rem 0; }
-        .modal-content p { font-size: 1.1rem; line-height: 1.6; color: var(--color-text-secondary); margin-bottom: 2rem; }
+        #game-over-modal.visible .modal-content { 
+            transform: scale(1); 
+        }
+        .modal-content h2 { 
+            font-size: 2.5rem; 
+            margin: 0 0 1rem 0; 
+        }
+        .modal-content p { 
+            font-size: 1.1rem; 
+            line-height: 1.6; 
+            color: var(--color-text-secondary); 
+            margin-bottom: 2rem; 
+        }
         #play-again-btn {
-            background-color: var(--color-accent); color: white; border: none; padding: 1rem 2rem; border-radius: 12px; font-size: 1.2rem; cursor: pointer; transition: background-color 0.2s;
+            background-color: var(--color-accent); 
+            color: white; 
+            border: none; 
+            padding: 1rem 2rem; 
+            border-radius: 12px; 
+            font-size: 1.2rem; 
+            cursor: pointer; 
+            transition: background-color 0.2s;
         }
-        #play-again-btn:hover { background-color: var(--color-accent-dark); }
+        #play-again-btn:hover { 
+            background-color: var(--color-accent-dark); 
+        }
         
         @media (max-width: 500px) {
-            body { padding: 10px; }
-            h1 { font-size: 1.6rem; }
-            #game-container { padding: 1.5rem; }
-            #current-count { font-size: 6rem; }
-            .action-btn { font-size: 2rem; }
-            #ai-status { font-size: 1rem; }
+            body { 
+                padding: 10px; 
+            }
+            h1 { 
+                font-size: 1.6rem; 
+            }
+            #game-container { 
+                padding: 1.5rem; 
+            }
+            #current-count { 
+                font-size: 6rem; 
+            }
+            .action-btn { 
+                font-size: 2rem; 
+            }
+            #ai-status { 
+                font-size: 1rem; 
+            }
         }
     </style>
 </head>
@@ -187,8 +342,11 @@
 
                 if (currentCount >= 20) { return endGame('Player'); }
 
-                if(isPlayerMistake()) { displayAiMessage('playerMistake'); } 
-                else if (isMultipleOfFour(currentCount)) { displayAiMessage('playerGood.get(getRandomMessage('playerGoodMove')); }
+                if(isPlayerMistake()) { 
+                    displayAiMessage('playerMistake'); 
+                } else if (isMultipleOfFour(currentCount)) { 
+                    displayAiMessage('playerGoodMove'); 
+                }
                 
                 const randomDelay = Math.floor(Math.random() * 400) + 400;
                 setTimeout(aiTurn, randomDelay);
@@ -281,6 +439,26 @@
             };
             
             const getRandomMessage = (category) => aiDialogue[category][Math.floor(Math.random() * aiDialogue[category].length)];
+
+            const toggleFullScreen = () => {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(err => {
+                        console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                    });
+                } else {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    }
+                }
+            };
+
+            document.addEventListener('keydown', (e) => {
+                if (ui.gameOverModal.classList.contains('visible')) return;
+                if (e.key.toLowerCase() === 'f' && !e.ctrlKey && !e.metaKey) {
+                    e.preventDefault();
+                    toggleFullScreen();
+                }
+            });
 
             ui.playerActionButtons.forEach(button => {
                 button.addEventListener('click', () => playerMove(parseInt(button.dataset.move, 10)));
