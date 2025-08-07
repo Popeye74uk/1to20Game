@@ -19,17 +19,29 @@
         }
         /* --- DEFINITIVE HEADER LAYOUT --- */
         .game-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; width: 100%;
+            position: relative; /* Establish positioning context */
+            display: flex;
+            justify-content: center; /* Center the title */
+            align-items: center;
+            margin-bottom: 20px;
+            width: 100%;
+            height: 44px; /* Give header a defined height */
         }
-        .title-wrapper { flex-grow: 1; text-align: center; }
+        .title-wrapper {
+            text-align: center;
+        }
         h1 {
             color: var(--color-text-primary); font-size: 2rem; margin: 0; white-space: nowrap;
         }
-        .header-spacer, .header-buttons {
-            flex-basis: 98px; /* 44px*2 + 10px gap */
-            flex-shrink: 0;
+        .header-buttons {
+            position: absolute; /* Position relative to .game-header */
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 10px;
+            align-items: center;
         }
-        .header-buttons { display: flex; gap: 10px; justify-content: flex-end; }
         #theme-toggle-btn, #fullscreen-btn {
             background: none; border: 2px solid var(--color-text-secondary); color: var(--color-text-secondary); width: 44px; height: 44px; padding: 0; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: all 0.2s;
         }
@@ -92,8 +104,10 @@
         @media (max-width: 500px) {
             body { padding: 10px; }
             h1 { font-size: 1.6rem; }
+            .game-header { justify-content: space-between; }
+            .title-wrapper { text-align: left; }
             #fullscreen-btn { display: none; }
-            .header-spacer, .header-buttons { flex-basis: 44px; }
+            .header-buttons { position: static; transform: none; }
             #game-container { padding: 1.5rem; }
             #current-count { font-size: 6rem; }
             .action-btn { font-size: 2rem; }
@@ -104,7 +118,6 @@
 <body>
     <div class="container">
         <header class="game-header">
-            <div class="header-spacer"></div>
             <div class="title-wrapper">
                 <h1>The 1 to 20 Game</h1>
             </div>
@@ -297,7 +310,7 @@
                 if (winner === 'AI') {
                     title = "You Lost"; message = getRandomMessage('aiWin'); ui.modalTitle.style.color = 'var(--color-danger)';
                 } else {
-                    title = "You Win!"; message = getRandomMessage('playerWin'); ui.modalTitle.style.color = 'var(--color-success)';
+                    title = "You Win!"; message = getRandom.get(getRandomMessage('playerWin')); ui.modalTitle.style.color = 'var(--color-success)';
                 }
                 ui.modalTitle.textContent = title; ui.modalMessage.textContent = message;
                 setTimeout(() => ui.gameOverModal.classList.add('visible'), 500);
