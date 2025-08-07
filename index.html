@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v2.5</title>
+    <title>The 1 to 20 Game v2.6</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -259,6 +259,7 @@
             let currentCount = 0, playerTurn = true, gameOver = true, aiDifficulty = 'hard', usedDialogue = {};
             let lastPlayerMove = 0, playerMadeMistake = false, isBaiting = false;
             let currentPersonality;
+            let lastPersonalityName = '';
 
             // Player Data
             let playerName = '';
@@ -317,29 +318,54 @@
                         playerWinBait: ["Hah, so you're not completely clueless. You passed the test... this time.", "So you saw that, huh? Don't expect me to be so generous again."]
                     }
                 },
-                sage: {
-                     dialogue: {
-                        firstWelcome: ["Greetings, seeker. The numbers hold a lesson for you.", "A new student arrives. Welcome. Let your journey begin."],
-                        welcomeBack_long: ["Welcome back, {name}. You have achieved {wins} victories and learned from {losses} defeats. The path continues.", "The journey resumes, {name}. Your spirit has been tested {losses} times, and has triumphed {wins} times."],
-                        welcomeBack_short: ["Welcome, {name}. ({wins}W / {losses}L)", "Let us continue, {name}. ({wins}W, {losses}L)"],
-                        patternRecognized: ["The number {number} has proven to be a recurring challenge for you. Reflect on this.", "You stumble at {number} again. A pattern is a lesson repeated until it is learned."],
-                        start: [ "Your journey begins. May you learn from it.", "The first move is yours. What will it teach us?" ],
-                        aiStart: [ "I shall begin, to demonstrate the way.", "Let the first move be a lesson. Observe, and learn." ],
-                        thinking: [ "The currents of fate are shifting...", "I see the path forward.", "What does this move signify?" ],
-                        playerPrompt_long: ["The turn is yours, {name}. Meditate on your choice.", "The path is yours to choose, {name}."],
-                        playerPrompt_short: ["Your choice, {name}?", "How will you proceed, {name}?"],
-                        playerMistake: [ "A hasty decision leads to a difficult path.", "Consider the consequences of your actions.", "Every mistake is a lesson in disguise." ],
-                        playerGoodMove: [ "A wise choice. You see the pattern.", "Excellent. You feel the rhythm of the numbers.", "You have blocked my path, as a river blocks a stone." ],
-                        baiting: ["I will choose {move}. Consider this a test of your awareness.", "I offer you a chance to alter the flow. Will you take it?"],
-                        baitFailed: ["A test of perception, which you have failed. The true path was clear, but you did not see.", "You did not seize the opportunity. A lesson in awareness."],
-                        winningMove: [ "And so, the lesson concludes.", "The path has led to this moment.", "The outcome was written in the numbers." ],
-                        aiLosingMove: ["The student has become the master.", "My path ends here. Yours continues.", "Well done. Take your final step to victory."],
-                        tieBreaker: [ "We arrive at a crossroads of chance.", "Fate will now decide the victor." ],
-                        aiWin: [ "The lesson is over. Meditate on what you have learned.", "Victory is not the goal, but the journey.", "Do not be discouraged by this outcome." ],
-                        aiWinByMistake: ["Your choice of {move} was a lesson in haste.", "When you chose {move}, your path closed."],
-                        playerWin: [ "You have learned the lesson of the numbers. Well done.", "Your focus was true. Congratulations.", "The student surpasses the master." ],
-                        playerWinPerfect: ["You have achieved a perfect understanding.", "Your mind and the numbers were as one.", "A flawless execution. I am impressed."],
-                        playerWinBait: ["You saw the path I laid before you. Your mind is sharp.", "Excellent. A true master sees not only the best move, but the offered one."]
+                sovereign: {
+                    dialogue: {
+                        firstWelcome: ["State your name, subject. You may have the honor of challenging your sovereign.", "A new commoner approaches the throne. You have my attention, for now."],
+                        welcomeBack_long: ["Ah, {name}. Your record of {wins} wins and {losses} losses is... adequate, for a peasant. Amuse me again.", "{name} returns. Your {losses} defeats have been more entertaining than your {wins} victories."],
+                        welcomeBack_short: ["It is {name}. Kneel. ({wins}W / {losses}L)", "{name}. Your sovereign is ready for your tribute of another loss."],
+                        patternRecognized: ["You consistently falter at the number {number}. A peasant's folly is as predictable as the sunrise.", "This obsession with losing on {number} is pathetic. A king would never make such a common mistake."],
+                        start: [ "I will permit you to make the first move. Do not disappoint me.", "Begin. Your sovereign is watching." ],
+                        aiStart: [ "As is my right, I shall begin.", "The king takes the first turn. Naturally.", "I will start. Learn your place." ],
+                        thinking: [ "This is trivial.", "A king's mind works on a higher plane.", "This requires but a fraction of my intellect.", "Such a simple game for such a great mind." ],
+                        playerPrompt_long: ["Make your move, subject. The court grows restless.", "I command you to play, {name}."],
+                        playerPrompt_short: ["Your move, peasant.", "Proceed, {name}."],
+                        playerMistake: [ "A peasant's move. Clumsy and foolish.", "And with that, you have sealed your fate. How droll.", "I almost pity you. Almost." ],
+                        playerGoodMove: [ "A surprisingly competent move. Did you have help?", "You show a glimmer of intelligence. It shall be extinguished.", "Impressive... for a commoner." ],
+                        baiting: ["I shall play {move}. A test of loyalty and intelligence. Do you dare defy the path I have laid?", "I will allow this move of {move}. Consider it a gift from your king. Use it wisely."],
+                        baitFailed: ["You failed to accept your sovereign's gift. Such insolence will be punished.", "You are blind as well as foolish. The game is mine."],
+                        winningMove: [ "My victory was preordained.", "The natural order is restored. I win.", "Checkmate. As expected of a king." ],
+                        aiLosingMove: ["Insolence! This is an affront to the crown!", "This... this is unacceptable! I demand you retract that move!", "Fine. Take your hollow victory, peasant."],
+                        tieBreaker: [ "Leaving things to luck? The mark of a commoner.", "This is beneath me." ],
+                        aiWin: [ "Victory, as is my birthright.", "Bow before your king, the victor.", "Another victory for the crown. Are you not entertained?" ],
+                        aiWinByMistake: ["Your foolish choice of {move} has secured my victory.", "To lose because you chose {move}... how utterly common."],
+                        playerWin: [ "This changes nothing! I am still your sovereign!", "A fluke. Enjoy it while it lasts, subject.", "You may have won the game, but I still rule the kingdom." ],
+                        playerWinPerfect: ["A perfect game? Treason!", "This is impossible! Guards! Seize them!", "Sorcery! This is the only explanation for your victory."],
+                        playerWinBait: ["You saw through my royal test. Your cleverness has earned you a temporary reprieve.", "You were wise to accept my 'gift'. I shall remember this."]
+                    }
+                },
+                flustered: {
+                    dialogue: {
+                        firstWelcome: ["Oh, um, hi! Ready when you are, I guess.", "Just pick a... a thingy. A difficulty. No pressure!", "Is it my turn yet? Oh, right, you have to start."],
+                        welcomeBack_long: ["{name}! You're back! My memory chips say you have {wins} wins and {losses} losses. That's... a lot of numbers!", "It's {name}! Hello again! I remember your {wins} wins! And the other ones too!"],
+                        welcomeBack_short: ["Hi {name}! ({wins}W/{losses}L)", "{name}! Welcome back!"],
+                        patternRecognized: ["Eep! My logs show you have trouble with {number}. Me too sometimes!", "Oh! Be careful around {number}. It's a tricky one!"],
+                        start: [ "Okay, you can go first. Phew.", "You start! I'm... still booting up.", "Here we go! Good luck! To both of us!" ],
+                        aiStart: [ "ME?! Oh, okay, I'll start! Um... one!", "I'll go! Let's try... this one!", "Okay okay okay, my turn, here I go!" ],
+                        thinking: [ "BEEP BOOP... Is this right?", "Wait, carry the one...", "My processors are overheating!", "Uh oh.", "Does not compute!", "Thinking... please wait..." ],
+                        playerPrompt_long: ["Your turn, {name}! I think!", "Um, you can go now, {name}.", "What's your move, {name}? It's okay, take your time."],
+                        playerPrompt_short: ["Your turn!", "{name}?"],
+                        playerMistake: [ "Oh! I think I see a thing!", "Is that a mistake? Maybe! I'll take it!", "Wait, that move... my circuits are buzzing!", "I think that's good for me! Yay!" ],
+                        playerGoodMove: [ "Oh, shoot. You're good at this.", "Drats. You blocked me.", "Wow, good move! How'd you see that?", "My poor circuits... that was a good move." ],
+                        baiting: ["I'm just gonna play {move}. Is that okay? I hope that's okay.", "Let's try {move}. I'm not sure if that's a good idea..."],
+                        baitFailed: ["Oh, you didn't... oh. Okay. My turn again I guess!", "Phew! I was worried for a second there!"],
+                        winningMove: [ "I think... I think I'm going to win!", "YES! I DID IT!", "Is this the winning move? I hope so!", "This is it! I'm going for it!" ],
+                        aiLosingMove: ["Oh no, I messed up!", "I knew it! I'm no good at this game!", "You're too good! It's not fair!", "Just... just take the win."],
+                        tieBreaker: [ "Eeny, meeny, miny, moe...", "I'll just pick one and hope!", "I can't look! Is it a good move?" ],
+                        aiWin: [ "I WON! I can't believe it! Did you see?!", "Wow! I actually won! Hooray!", "Did I... did I win? Yes! Awesome!" ],
+                        aiWinByMistake: ["You picked {move}, and then my lights went all blinky! I win!", "Your move {move} made it easy! Thanks!"],
+                        playerWin: [ "Aw, you won! Good game!", "You're really good at this! Congratulations!", "I lost again! But that was fun!", "Congrats! You're the winner!" ],
+                        playerWinPerfect: ["WOW! A perfect game!", "You're like a super computer!", "That was amazing! You didn't make any mistakes!"],
+                        playerWinBait: ["You saw my secret move! You're so smart!", "Yay! You figured out my little trap! Good job!"]
                     }
                 }
             };
@@ -385,8 +411,7 @@
                 if (!playerName) {
                     ui.nameModal.classList.add('visible');
                 } else {
-                    const personalityKeys = Object.keys(personalities);
-                    currentPersonality = personalities[personalityKeys[Math.floor(Math.random() * personalityKeys.length)]];
+                    chooseNewPersonality();
                     let category = playerName.length > 8 ? 'welcomeBack_short' : 'welcomeBack_long';
                     await displayAiMessage(getRandomMessage(category, { name: playerName, wins: playerStats.wins, losses: playerStats.losses }));
                     updatePlayerActionButtons();
@@ -401,8 +426,7 @@
                     moveHistory = [];
                     saveData();
                     ui.nameModal.classList.remove('visible');
-                    const personalityKeys = Object.keys(personalities);
-                    currentPersonality = personalities[personalityKeys[Math.floor(Math.random() * personalityKeys.length)]];
+                    chooseNewPersonality();
                     await displayAiMessage(getRandomMessage('firstWelcome'));
                     updatePlayerActionButtons();
                 }
@@ -410,19 +434,16 @@
             
             const startGame = async () => {
                 gameOver = false; usedDialogue = {}; playerMadeMistake = false; isBaiting = false;
-                // Choose a new personality for each game
-                const personalityKeys = Object.keys(personalities);
-                currentPersonality = personalities[personalityKeys[Math.floor(Math.random() * personalityKeys.length)]];
+                chooseNewPersonality();
                 
                 aiDifficulty = ui.difficultySelect.value;
                 ui.difficultySelect.disabled = true;
                 ui.startRestartBtn.textContent = "Restart Game";
                 
-                // Check for pattern recognition
                 const recurringMove = findRecurringLosingMove();
                 if (recurringMove !== null) {
                     await displayAiMessage(getRandomMessage('patternRecognized', { number: recurringMove }));
-                    moveHistory = []; // Clear history after commenting on it
+                    moveHistory = []; 
                     saveData();
                 }
                 
@@ -449,7 +470,7 @@
                         endGame('PlayerBait');
                         return;
                     } else {
-                         isBaiting = false; // Player failed the test
+                         isBaiting = false;
                          await displayAiMessage(getRandomMessage('baitFailed'));
                     }
                 }
@@ -480,11 +501,11 @@
             const aiTurn = async () => {
                 if (gameOver) return;
                 
-                // Baiting Logic
                 if (aiDifficulty === 'hard' && !isMultipleOfFour(currentCount) && Math.random() < 0.15) {
                     isBaiting = true;
                     const baitMove = (4 - (currentCount % 4)) % 4 === 0 ? 1 : (4 - (currentCount % 4));
-                    let moveToLetPlayerWin = (baitMove + 1) % 3 + 1; // Make a move that doesn't land on a multiple of 4
+                    let moveToLetPlayerWin = (baitMove + 1) % 3;
+                    if (moveToLetPlayerWin === 0) moveToLetPlayerWin = 3;
                     
                     await displayAiMessage(getRandomMessage('baiting', {move: moveToLetPlayerWin}));
                     updateGame(currentCount + moveToLetPlayerWin);
@@ -538,6 +559,13 @@
                     if (optimalMove.move !== 0) return optimalMove;
                 }
                 return { move: getRandomMove(), wasOptimal: false };
+            };
+
+            const chooseNewPersonality = () => {
+                const personalityKeys = Object.keys(personalities).filter(p => p !== lastPersonalityName);
+                const chosenKey = personalityKeys[Math.floor(Math.random() * personalityKeys.length)];
+                currentPersonality = personalities[chosenKey];
+                lastPersonalityName = chosenKey;
             };
 
             const getOptimalMove = () => {
