@@ -59,21 +59,23 @@
             text-align: center;
         }
         
-        /* --- HEADER LAYOUT --- */
+        /* --- CORRECTED HEADER LAYOUT --- */
         .game-header {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr; /* 3-column grid */
+            position: relative; /* Anchor for the absolutely positioned buttons */
+            display: flex;
+            justify-content: center; /* Center the title */
             align-items: center;
             margin-bottom: 20px;
+            height: 44px; /* Match button height for alignment */
         }
         .header-buttons { 
+            position: absolute; /* Position relative to the header */
+            right: 0;
+            top: 0;
             display: flex; 
-            justify-content: flex-end; 
             gap: 10px; 
-            grid-column: 3 / 4; /* Place in the 3rd column */
         }
         h1 {
-            grid-column: 2 / 3; /* Place in the 2nd (center) column */
             text-align: center;
             color: var(--color-text-primary);
             font-size: 2rem;
@@ -117,7 +119,6 @@
         }
         
         /* --- CORRECTED FULLSCREEN STYLE --- */
-        /* Only hide the header when the BODY is the fullscreen element */
         body:fullscreen .game-header {
             display: none;
         }
@@ -267,8 +268,6 @@
 <body>
     <div class="container">
         <header class="game-header">
-            <!-- First column of the grid is empty, acting as a spacer -->
-            <div></div>
             <h1>The 1 to 20 Game</h1>
             <div class="header-buttons">
                  <button id="fullscreen-btn" title="Toggle Fullscreen (F)">
@@ -494,7 +493,7 @@
             };
             const toggleFullScreen = () => {
                 if (!document.fullscreenElement) {
-                    document.body.requestFullscreen().catch(err => alert(`Fullscreen error: ${err.message}`));
+                    document.documentElement.requestFullscreen().catch(err => alert(`Fullscreen error: ${err.message}`));
                 } else {
                     document.exitFullscreen();
                 }
