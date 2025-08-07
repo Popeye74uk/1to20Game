@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v1.23</title>
+    <title>The 1 to 20 Game v1.24</title>
     <style>
         :root {
             --color-background: #f0f2f5; --color-container-bg: #ffffff; --color-text-primary: #212529; --color-text-secondary: #6c757d; --color-accent: #6f42c1; --color-accent-dark: #5a359a; --color-accent-light: #e9e5f5; --color-primary-button: #007bff; --color-primary-button-hover: #0069d9; --color-danger: #dc3545; --color-success: #28a745; --color-button-disabled-bg: #adb5bd; --color-shadow: rgba(0, 0, 0, 0.1); --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -17,6 +17,7 @@
         .container {
             width: 100%; max-width: 420px; margin: 0 auto; text-align: center;
         }
+        /* --- DEFINITIVE HEADER LAYOUT --- */
         .game-header {
             display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; width: 100%;
         }
@@ -90,8 +91,10 @@
         @media (max-width: 500px) {
             body { padding: 10px; }
             h1 { font-size: 1.6rem; }
-            #fullscreen-btn { display: none; }
-            .header-spacer, .header-buttons { flex-basis: 44px; }
+            /* Hide icons and spacer on mobile to ensure title centers correctly */
+            .header-buttons, .header-spacer {
+                display: none;
+            }
             #game-container { padding: 1.5rem; }
             #current-count { font-size: 6rem; }
             .action-btn { font-size: 2rem; }
