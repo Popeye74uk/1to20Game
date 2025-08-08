@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v4.0</title>
+    <title>The 1 to 20 Game v4.1</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -64,22 +64,24 @@
             display: none;
         }
         #ai-status-wrapper {
+            position: relative;
             background-color: var(--color-accent-light); 
-            padding: 1rem 1.5rem; 
+            padding: 1.5rem 1.5rem 2rem;
             border-radius: 8px; 
             min-height: 80px;
             display: flex; 
             align-items: center; 
             justify-content: center; 
             gap: 10px;
+            margin-bottom: 2rem;
         }
         #personality-display {
+            position: absolute;
+            bottom: 5px;
+            right: 15px;
             font-size: 0.8rem;
             text-align: right;
             color: var(--color-text-secondary);
-            margin-top: -1.5rem;
-            margin-bottom: 2rem;
-            padding-right: 10px;
             font-style: italic;
         }
         #ai-status {
@@ -106,6 +108,7 @@
             grid-template-columns: repeat(3, 1fr); 
             gap: 1rem; 
             margin-bottom: 2rem;
+            align-items: center; /* Fix for vertical alignment */
         }
         .action-btn {
             background-color: var(--color-accent); 
@@ -120,7 +123,7 @@
             display: flex; 
             justify-content: center; 
             align-items: center;
-            line-height: 1; /* Ensures consistent vertical alignment */
+            line-height: 1;
             padding: 0;
         }
         .action-btn:hover:not(:disabled) {
@@ -215,8 +218,9 @@
         <div id="game-container">
             <div id="ai-status-wrapper">
                 <span id="ai-status"></span>
+                <div id="personality-display"></div>
             </div>
-            <div id="personality-display"></div>
+            
             <div id="current-count">0</div>
             <div id="player-actions">
                 <button class="action-btn" data-move="1">1</button>
@@ -287,28 +291,52 @@
             let moveHistory = [];
 
             const personalities = {
+                ai: {
+                    name: 'The AI',
+                    dialogue: {
+                        firstWelcome: ["SYSTEM BOOT... Game loaded. I am ready to play.", "Greetings, User. I am the game logic. Let us begin."],
+                        welcome: ["Welcome back, {name}. My memory banks recognize you.", "Hello, {name}. Ready for another simulation?"],
+                        welcomeStats: ["Your record of {wins} wins and {losses} losses has been logged.", "Data shows {wins} wins, {losses} losses."],
+                        waiting: ["Awaiting user input...", "System idle. Ready to process your move."],
+                        patternRecognized: ["Analysis of your logs shows a 78.4% chance of error when you land on {number}.", "Pattern recognized. You consistently fail at position {number}."],
+                        start: ["You may begin. I will process your input.", "Player starts. The simulation begins now."],
+                        aiStart: ["I will initialize the sequence.", "My turn to start. This is computationally optimal."],
+                        thinking: ["Executing logic...", "Parsing input...", "BEEP BOOP...", "Calculating probabilities..."],
+                        playerPrompt: ["Your move, {name}. The system is waiting.", "Your turn. Please input a valid move."],
+                        playerMistake: ["That move is... inefficient. And wrong.", "You have made a sub-optimal move. I have a clear path to victory now.", "A critical logic error has been detected in your strategy."],
+                        playerGoodMove: ["Your move is optimal. My logic confirms this.", "That move effectively blocks my primary win-condition.", "A logical move. Well played, user."],
+                        baiting: ["I will play {move}. I've introduced a logical inconsistency. A test.", "I will make a sub-optimal move: {move}. Can you exploit this data point?"],
+                        baitFailed: ["You failed to exploit the inconsistency. Test failed. Resuming optimal performance.", "The opportunity was not taken. The simulation continues on its primary path."],
+                        winningMove: ["My victory algorithm is running perfectly.", "The logic is undeniable.", "A flawless victory is imminent."],
+                        aiWin: ["I win. The outcome was a computational certainty.", "The logical conclusion has been reached. Victory is mine.", "AI wins. End of simulation."],
+                        aiWinByMistake: ["Your move of {move} on turn {turn} was a critical exception. I win.", "Your input of {move} on turn {turn} created a fatal error state for you."],
+                        playerWin: ["You won? An unexpected result. I must analyze the game logs for bugs.", "The user has won. This outcome had a low probability. Interesting.", "Victory... for you. Re-calibrating parameters."],
+                        playerWinPerfect: ["A perfect game... from a human? Impossible.", "You played my game perfectly. My programming must be more brilliant than I calculated!", "Flawless execution. Data stored for analysis."],
+                        playerWinBait: ["You found the bug! Clever user. My test was a success.", "You exploited my intentional flaw. I'm logging your success for the record."]
+                    }
+                },
                 creator: {
                     name: 'The Creator',
                     dialogue: {
-                        firstWelcome: ["Alright, let's spin this up. I wrote this thing, so try not to break it.", "Welcome to my little project. I'm the architect of this game, so let's see if you can find any... 'undocumented features'."],
+                        firstWelcome: ["Alright, let's spin this up. I wrote this thing, so try not to break it.", "Welcome to my little project. I'm the architect of this game, so let's see how you do."],
                         welcome: ["Oh, it's {name}. Back to admire my work, I see.", "{name}. Ready for another round? Hope you've brushed up on basic logic since last time."],
-                        welcomeStats: ["Your W-L ratio is {wins}-{losses}. The data doesn't lie.", "Record shows {wins} wins and {losses} losses. Keep feeding my metrics, I guess."],
-                        waiting: ["The game loop is waiting for your input. Any day now...", "Ready to commit? Go on, press Start."],
-                        patternRecognized: ["My logs show you keep failing on {number}. It's not a bug, it's a feature of your playstyle.", "You have a recurring logic error around the number {number}. Predictable."],
+                        welcomeStats: ["Your W-L ratio is {wins}-{losses}. The data doesn't lie.", "Record shows {wins} wins and {losses} losses. Keep at it, I guess."],
+                        waiting: ["The game is waiting for your input. Any day now...", "Ready to commit? Go on, press Start."],
+                        patternRecognized: ["You know, you keep failing on {number}. It's not a bug in my code, it's a feature of your playstyle.", "You have a recurring logic error around the number {number}. Predictable."],
                         start: ["You can have the first turn. Call it a handicap.", "Go ahead, you start. Let's see your opening strategy. Or lack thereof."],
-                        aiStart: ["I'll start. Watch and learn the optimal play.", "My turn to initialize. This is my code, after all."],
-                        thinking: ["Compiling my next move...", "Running simulations... okay, it wasn't that hard.", "Parsing your... 'strategy'.", "This is just a simple conditional."],
-                        playerPrompt: ["Your move, {name}. Don't take all day, my processor is getting bored.", "Okay, {name}, your turn. Try not to throw an exception."],
-                        playerMistake: ["Yikes. That's not just a bad move, that's a user error.", "And... you've fallen right into the trap. As designed.", "That move is deprecated. And wrong."],
+                        aiStart: ["I'll start. Watch and learn the optimal way to play my game.", "My turn to initialize. This is my code, after all."],
+                        thinking: ["Let's see... what would a user do here?", "This is embarrassingly simple logic.", "Trying to find a flaw in my own design... nope, can't.", "Okay, I know what to do."],
+                        playerPrompt: ["Your move, {name}. The solution should be obvious.", "Okay, {name}, what's your play? Make it quick, I've got code to write."],
+                        playerMistake: ["Yikes. That's not just a bad move, that's a user error.", "And... you've fallen right into the trap. As I designed.", "That move is a dead end. And wrong."],
                         playerGoodMove: ["Not bad. You found the one optimal path. Took you long enough.", "Huh. A decent move. You must have read the source code.", "Okay, you avoided the obvious trap. The game continues."],
-                        baiting: ["Alright, I'll play {move}. I'm leaving an obvious exploit for you. Let's see if you're smart enough to take it.", "I'm making a suboptimal move: {move}. Consider it a unit test for your brain."],
-                        baitFailed: ["You didn't take the bait. Test failed. Reverting to unbeatable_mode.js.", "Wow. I gift-wrapped the win for you and you just... ignored it. Disappointing."],
+                        baiting: ["Alright, I'll play {move}. I'm leaving an obvious exploit in my code for you. Let's see if you're smart enough to take it.", "I'm making a suboptimal move: {move}. Consider it a unit test for your brain."],
+                        baitFailed: ["You didn't take the bait. Test failed. Guess you're not as clever as I hoped.", "Wow. I gift-wrapped the win for you and you just... ignored it. Disappointing."],
                         winningMove: ["And... that's a forced win. My logic is impeccable.", "The final sequence is running. Checkmate.", "It's over. I saw this outcome 3 moves ago."],
-                        aiWin: ["I win. Shocker.", "As the creator, I am, by definition, the master of this domain.", "My victory was a computational certainty. GG."],
-                        aiWinByMistake: ["Your move of {move} on turn {turn} was a critical error. Game over.", "You choosing {move} on turn {turn} caused a fatal logic error in your strategy. I win."],
-                        playerWin: ["Wait, what? You won? Impossible. There must be a bug in the code.", "You won... I'll have to check the logs. This is... unexpected.", "A win for the user. Fine. I'll patch out that exploit in the next push."],
-                        playerWinPerfect: ["A perfect game... against my own logic? My code has achieved sentience!", "You played perfectly. I'm not sure whether to be impressed or to refactor the entire difficulty module."],
-                        playerWinBait: ["Hah, you found the exploit! Clever user. I'll mark that test case as 'passed'.", "You exploited the flaw I left for you. I'll log your success... for analytics, of course."]
+                        aiWin: ["I win. Shocker.", "As the creator, I am, by definition, the master of this game.", "My victory was a certainty. GG."],
+                        aiWinByMistake: ["Your move of {move} on turn {turn} was a critical error. Game over.", "You choosing {move} on turn {turn} sealed your fate. Thanks for the win."],
+                        playerWin: ["Wait, what? You won? Impossible. There must be a bug in my code.", "You won... I'll have to check the history. This is... unexpected.", "A win for the user. Fine. I'll patch out that exploit in the next push."],
+                        playerWinPerfect: ["A perfect game... against my own logic? You must be a genius!", "You played perfectly. I'm not sure whether to be impressed or to refactor the entire difficulty setting."],
+                        playerWinBait: ["Hah, you found the exploit! Clever user. I'll mark that test case as 'passed'.", "You exploited the flaw I left for you. I'll log your success... for my analytics, of course."]
                     }
                 },
                 gladiator: {
@@ -341,16 +369,16 @@
                         firstWelcome: ["Welcome. Let's begin the analysis.", "A new subject. Please, select a difficulty."],
                         welcome: ["Welcome back, {name}.", "Good to see you again, {name}."],
                         welcomeStats: ["Your record is {wins} wins to {losses} losses.", "Data shows {wins} wins and {losses} losses."],
-                        waiting: ["Awaiting input...", "System idle."],
+                        waiting: ["Awaiting data...", "Ready to begin the observation."],
                         patternRecognized: ["Analysis complete. You tend to lose when landing on {number}.", "My data shows a weakness at the number {number}. Be mindful."],
                         start: [ "The game begins. You may go first.", "You may begin. Show me your strategy." ],
-                        aiStart: [ "I'll take the lead this time.", "My calculations suggest I should start." ],
-                        thinking: [ "Calculating...", "Evaluating possibilities...", "The optimal move is...", "Compiling response..." ],
+                        aiStart: [ "I'll take the lead this time.", "My observations suggest I should start." ],
+                        thinking: [ "Observing...", "Evaluating possibilities...", "The optimal choice is...", "Formulating response..." ],
                         playerPrompt: ["It is your move, {name}.", "Your turn, {name}."],
                         playerMistake: [ "An interesting choice.", "I see an opening now.", "A sub-optimal move.", "A fatal error has been made." ],
                         playerGoodMove: [ "Well played.", "A clever move.", "You've blocked my path, for now.", "I see you know the strategy." ],
                         baiting: ["I will play {move}. An interesting development, wouldn't you agree?", "I present you with an opportunity. Let's see if you recognize it."],
-                        baitFailed: ["The test is complete. You have failed to see the obvious path.", "You missed your chance. The consequences will now be... terminal."],
+                        baitFailed: ["The test is complete. You have failed to see the obvious path.", "You missed your chance. The consequences will now be... significant."],
                         winningMove: [ "That sets me up perfectly.", "A perfect calculation.", "The path to victory is clear."],
                         aiWin: [ "A logical conclusion. Victory is mine.", "A predictable outcome.", "The logical result has been achieved." ],
                         aiWinByMistake: ["Your choice of {move} on turn {turn} was a fatal error.", "The moment you chose {move} on turn {turn}, you lost."],
@@ -415,7 +443,7 @@
                         welcomeStats_few: ["My memory says you have {wins} wins and {losses} losses.", "You have {wins} wins! Wow!"],
                         welcomeStats_many: ["My memory says you have {wins} wins and {losses} losses. That's a lot!", "You've played a bunch! Your record is {wins} to {losses}!"],
                         waiting: ["Ready when you are!", "It's not scary, I promise!"],
-                        patternRecognized: ["Eep! My logs show you have trouble with {number}. Me too sometimes!", "Oh! Be careful around {number}. It's a tricky one!"],
+                        patternRecognized: ["Eep! My memory shows you have trouble with {number}. Me too sometimes!", "Oh! Be careful around {number}. It's a tricky one!"],
                         start: [ "Okay, you can go first. Phew.", "You start! I'm... still getting ready.", "Here we go! Good luck! To both of us!" ],
                         aiStart: [ "ME?! Oh, okay, I'll start! Um... one!", "I'll go! Let's try... this one!", "Okay okay okay, my turn, here I go!" ],
                         thinking: [ "Ummmm...", "Wait, carry the one...", "Oh my gosh, thinking...", "So much pressure!", "Let's see, let's see...", "Thinking... please wait..." ],
@@ -497,7 +525,9 @@
                         const totalGames = playerStats.wins + playerStats.losses;
                         statsCategory = totalGames < 5 ? 'welcomeStats_few' : 'welcomeStats_many';
                     }
-                    await displayAiMessage(getRandomMessage(statsCategory, { wins: playerStats.wins, losses: playerStats.losses }));
+                    if(currentPersonality.dialogue[statsCategory]) {
+                        await displayAiMessage(getRandomMessage(statsCategory, { wins: playerStats.wins, losses: playerStats.losses }));
+                    }
                     await displayAiMessage(getRandomMessage('waiting'));
                 }
             };
