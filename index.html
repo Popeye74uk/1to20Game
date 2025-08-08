@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v3.9</title>
+    <title>The 1 to 20 Game v4.0</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -281,7 +281,8 @@
             };
 
             // Game State
-            let currentCount = 0, playerTurn = true, gameOver = true, turnCount = 0, isInitializing = false;
+            let gameState = 'booting'; // booting, waiting, playerTurn, aiTurn, gameOver
+            let currentCount = 0, turnCount = 0;
             let lastPlayerMove = 0, playerMadeMistake = false, isBaiting = false;
             let currentPersonality, lastPersonalityName = '';
             let shuffledDialogue = {};
@@ -478,20 +479,45 @@
                 localStorage.setItem('lastPersonality_1to20_v3', lastPersonalityName);
             };
 
+            // Game State Management
+            const setGameState = (newState) => {
+                gameState = newState;
+                switch (newState) {
+                    case 'waiting':
+                    case 'gameOver':
+                        ui.startRestartBtn.disabled = false;
+                        ui.difficultySelect.disabled = false;
+                        updatePlayerActionButtons(false);
+                        ui.startRestartBtn.textContent = "Start Game";
+                        break;
+                    case 'playerTurn':
+                        ui.startRestartBtn.disabled = false;
+                        ui.difficultySelect.disabled = true;
+                        updatePlayerActionButtons(true);
+                        ui.startRestartBtn.textContent = "Restart Game";
+                        break;
+                    case 'aiTurn':
+                        ui.startRestartBtn.disabled = true;
+                        ui.difficultySelect.disabled = true;
+                        updatePlayerActionButtons(false);
+                        break;
+                }
+            };
+            
             // Game Flow
             const initGame = async () => {
-                gameOver = true; currentCount = 0; playerTurn = true; turnCount = 0;
-                isBaiting = false; playerMadeMistake = false; isInitializing = true;
-                ui.difficultySelect.disabled = false;
+                ui.startRestartBtn.disabled = true;
+                currentCount = 0;
+                turnCount = 0;
+                isBaiting = false; 
+                playerMadeMistake = false;
                 ui.currentCountDisplay.textContent = currentCount;
                 ui.gameOverModal.classList.remove('visible');
-                ui.startRestartBtn.textContent = "Start Game";
-                ui.startRestartBtn.disabled = true;
                 ui.personalityDisplay.innerHTML = '';
-                updatePlayerActionButtons();
                 
                 loadData();
                 if (!playerName) {
+                    setGameState('booting');
                     ui.nameModal.classList.add('visible');
                 } else {
                     chooseNewPersonality();
@@ -505,9 +531,8 @@
                     }
                     await displayAiMessage(getRandomMessage(statsCategory, { wins: playerStats.wins, losses: playerStats.losses }));
                     await displayAiMessage(getRandomMessage('waiting'));
+                    setGameState('waiting');
                 }
-                isInitializing = false;
-                ui.startRestartBtn.disabled = false;
             };
 
             const handleNameConfirmation = async (event) => {
@@ -521,19 +546,20 @@
                     chooseNewPersonality();
                     shuffleDialogues();
                     await displayAiMessage(getRandomMessage('firstWelcome'));
-                    updatePlayerActionButtons();
+                    setGameState('waiting');
                 }
             };
             
             const startGame = async () => {
-                if (isInitializing) return;
-                gameOver = false; playerMadeMistake = false; isBaiting = false; turnCount = 1;
+                if (gameState !== 'waiting') return;
+                setGameState('aiTurn'); // Lock controls immediately
+                turnCount = 1;
+                playerMadeMistake = false; 
+                isBaiting = false;
                 chooseNewPersonality();
                 shuffleDialogues();
                 
                 aiDifficulty = ui.difficultySelect.value;
-                ui.difficultySelect.disabled = true;
-                ui.startRestartBtn.textContent = "Restart Game";
                 
                 const recurringMove = findRecurringLosingMove();
                 if (recurringMove !== null) {
@@ -543,21 +569,19 @@
                 }
                 
                 if (Math.random() > 0.5) {
-                    playerTurn = true;
                     const msg = getRandomMessage('start');
                     ui.aiStatusBox.innerHTML = msg;
-                    updatePlayerActionButtons();
+                    setGameState('playerTurn');
                     await sleep(calculateReadingTime(msg));
                 } else {
-                    playerTurn = false;
                     await displayAiMessage(getRandomMessage('aiStart'));
                     await aiTurn();
                 }
             };
 
             const playerMove = async (numCount) => {
-                if (!playerTurn || gameOver) return;
-                playerTurn = false;
+                if (gameState !== 'playerTurn') return;
+                setGameState('aiTurn');
                 turnCount++;
                 lastPlayerMove = numCount;
                 
@@ -597,7 +621,7 @@
             };
             
             const aiTurn = async () => {
-                if (gameOver) return;
+                if (gameState === 'gameOver') return;
                 turnCount++;
                 
                 if (aiDifficulty === 'hard' && !isBaiting && !isMultipleOfFour(currentCount) && Math.random() < 0.15) {
@@ -607,8 +631,7 @@
                     
                     await displayAiMessage(getRandomMessage('baiting', {move: baitMove}));
                     updateGame(currentCount + baitMove);
-                    playerTurn = true;
-                    updatePlayerActionButtons();
+                    setGameState('playerTurn');
                     return;
                 }
 
@@ -639,8 +662,7 @@
                 
                 const promptMsg = getRandomMessage('playerPrompt', { name: playerName });
                 ui.aiStatusBox.innerHTML = promptMsg;
-                playerTurn = true;
-                updatePlayerActionButtons();
+                setGameState('playerTurn');
                 await sleep(calculateReadingTime(promptMsg));
             };
             
@@ -695,13 +717,11 @@
             const updateGame = (newCount) => {
                 currentCount = newCount;
                 ui.currentCountDisplay.textContent = newCount;
-                updatePlayerActionButtons();
+                updatePlayerActionButtons(gameState === 'playerTurn');
             };
 
             const endGame = async (winner) => {
-                gameOver = true; playerTurn = false;
-                updatePlayerActionButtons();
-                ui.difficultySelect.disabled = false;
+                setGameState('gameOver');
                 let title, message, category;
 
                 switch(winner) {
@@ -735,17 +755,17 @@
                 setTimeout(() => ui.gameOverModal.classList.add('visible'), 500);
             };
 
-            const updatePlayerActionButtons = () => {
+            const updatePlayerActionButtons = (isPlayerTurn) => {
                 ui.playerActionButtons.forEach(button => {
                     const moveCount = parseInt(button.dataset.move, 10);
                     const potentialCount = currentCount + moveCount;
                     
-                    if (potentialCount > 20 || gameOver) {
+                    if (potentialCount > 20 || gameState === 'gameOver' || gameState === 'waiting' || gameState === 'booting') {
                         button.textContent = 'X';
                         button.disabled = true;
                     } else {
                         button.textContent = potentialCount;
-                        button.disabled = !playerTurn;
+                        button.disabled = !isPlayerTurn;
                     }
                 });
             };
@@ -802,7 +822,13 @@
             ui.playerActionButtons.forEach(button => {
                 button.addEventListener('click', () => playerMove(parseInt(button.dataset.move, 10)));
             });
-            ui.startRestartBtn.addEventListener('click', () => { if(!isInitializing) gameOver ? startGame() : initGame(); });
+            ui.startRestartBtn.addEventListener('click', () => {
+                if (gameState === 'waiting' || gameState === 'gameOver') {
+                    startGame();
+                } else {
+                    initGame();
+                }
+            });
             ui.playAgainBtn.addEventListener('click', initGame);
             ui.nameForm.addEventListener('submit', handleNameConfirmation);
 
