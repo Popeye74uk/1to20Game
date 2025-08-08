@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v4.2</title>
+    <title>The 1 to 20 Game v4.3</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -67,20 +67,19 @@
             background-color: var(--color-accent-light); 
             padding: 1rem 1.5rem; 
             border-radius: 8px; 
-            min-height: 100px; /* Increased height for stability */
+            min-height: 100px;
             display: flex; 
             align-items: center; 
             justify-content: center; 
             gap: 10px;
-            margin-bottom: 0; /* Margin moved to personality display */
+            margin-bottom: 0;
         }
-        /* Moved outside the status wrapper */
         #personality-display {
             width: 100%;
             text-align: right;
             padding-right: 10px;
-            margin-top: 4px; /* Space from box above */
-            margin-bottom: 2rem; /* Original space below */
+            margin-top: 4px;
+            margin-bottom: 2rem;
             box-sizing: border-box;
             font-size: 0.8rem;
             color: var(--color-text-secondary);
@@ -105,14 +104,12 @@
             color: var(--color-accent); 
             margin-bottom: 2rem;
         }
-        /* CSS from v1.1 for button container */
         #player-actions {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 1rem;
             margin-bottom: 2rem;
         }
-        /* CSS from v1.1 for buttons */
         .action-btn {
             background-color: var(--color-accent);
             color: #ffffff;
@@ -121,15 +118,18 @@
             font-size: 2.5rem;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: background-color 0.2s, opacity 0.2s; /* Removed transform from transition */
             aspect-ratio: 1 / 1;
             display: flex;
             justify-content: center;
             align-items: center;
         }
-        .action-btn:hover:not(:disabled) {
-            background-color: var(--color-accent-dark); 
-            transform: translateY(-3px);
+        /* Media Query to apply hover effects only on devices that can hover */
+        @media (hover: hover) {
+            .action-btn:hover:not(:disabled) {
+                background-color: var(--color-accent-dark); 
+                transform: translateY(-3px);
+            }
         }
         .action-btn:disabled {
             background-color: var(--color-button-disabled-bg); 
@@ -301,165 +301,165 @@
                         waiting: ["Awaiting user input...", "System idle. Ready to process your move."],
                         patternRecognized: ["My logs show a high chance of error on position {number}.", "Pattern recognized. You consistently fail at {number}."],
                         start: ["You may begin. I will process your input.", "Player starts. The simulation begins now."],
-aiStart: ["I will initialize the sequence.", "My turn to start. This is computationally optimal."],
-thinking: ["Executing logic...", "Parsing input...", "BEEP BOOP...", "Calculating..."],
-playerPrompt: ["Your move, {name}. The system is waiting.", "Your turn. Please input a valid move."],
-playerMistake: ["That move is inefficient. And wrong.", "You made a sub-optimal move. I have a clear path now.", "A logic error has been detected in your strategy."],
-playerGoodMove: ["Your move is optimal. My logic confirms this.", "That move effectively blocks my win-condition.", "A logical move. Well played, user."],
-baiting: ["I will play {move}. A test with a logical inconsistency.", "I will make a sub-optimal move: {move}. Can you exploit it?"],
-baitFailed: ["You failed to exploit the inconsistency. Test failed.", "The opportunity was not taken. The simulation continues."],
-winningMove: ["My victory algorithm is running perfectly.", "The logic is undeniable.", "Victory is imminent."],
-aiWin: ["I win. A computational certainty.", "The logical conclusion is reached. Victory is mine.", "AI wins. End of simulation."],
-aiWinByMistake: ["Your move of {move} on turn {turn} was a critical exception.", "Your input of {move} on turn {turn} was a fatal error."],
-playerWin: ["You won? An unexpected result. I must check the logs.", "The user has won. This had a low probability.", "Victory... for you. Re-calibrating parameters."],
-playerWinPerfect: ["A perfect game... from a human? Impossible.", "You played perfectly. My programming is brilliant!", "Flawless execution. Data stored."],
-playerWinBait: ["You found the bug! Clever. Test successful.", "You exploited my intentional flaw. Success logged."]
-}
+                        aiStart: ["I will initialize the sequence.", "My turn to start. This is computationally optimal."],
+                        thinking: ["Executing logic...", "Parsing input...", "BEEP BOOP...", "Calculating..."],
+                        playerPrompt: ["Your move, {name}. The system is waiting.", "Your turn. Please input a valid move."],
+                        playerMistake: ["That move is inefficient. And wrong.", "You made a sub-optimal move. I have a clear path now.", "A logic error has been detected in your strategy."],
+                        playerGoodMove: ["Your move is optimal. My logic confirms this.", "That move effectively blocks my win-condition.", "A logical move. Well played, user."],
+                        baiting: ["I will play {move}. A test with a logical inconsistency.", "I will make a sub-optimal move: {move}. Can you exploit it?"],
+                        baitFailed: ["You failed to exploit the inconsistency. Test failed.", "The opportunity was not taken. The simulation continues."],
+                        winningMove: ["My victory algorithm is running perfectly.", "The logic is undeniable.", "Victory is imminent."],
+                        aiWin: ["I win. A computational certainty.", "The logical conclusion is reached. Victory is mine.", "AI wins. End of simulation."],
+                        aiWinByMistake: ["Your move of {move} on turn {turn} was a critical exception.", "Your input of {move} on turn {turn} was a fatal error."],
+                        playerWin: ["You won? An unexpected result. I must check the logs.", "The user has won. This had a low probability.", "Victory... for you. Re-calibrating parameters."],
+                        playerWinPerfect: ["A perfect game... from a human? Impossible.", "You played perfectly. My programming is brilliant!", "Flawless execution. Data stored."],
+                        playerWinBait: ["You found the bug! Clever. Test successful.", "You exploited my intentional flaw. Success logged."]
+                    }
                 },
                 creator: {
                     name: 'The Creator',
                     dialogue: {
                         firstWelcome: ["Alright, let's spin this up. I wrote this thing.", "Welcome to my project. I'm the architect of this game."],
-welcome: ["Oh, it's {name}. Back to admire my work?", "{name}. Ready for another round? Let's go."],
-welcomeStats: ["Your W-L ratio is {wins}-{losses}. The data doesn't lie.", "Record shows {wins} wins and {losses} losses. Keep at it."],
-waiting: ["The game is waiting for your input. Any day now...", "Ready to commit? Press Start."],
-patternRecognized: ["You keep failing on {number}. It's not a bug, it's you.", "You have a recurring logic error around {number}."],
-start: ["You can have the first turn. Call it a handicap.", "Go ahead, you start. Show me your strategy."],
-aiStart: ["I'll start. Watch and learn the optimal play.", "My turn to initialize. This is my game, after all."],
-thinking: ["Let's see...", "This is embarrassingly simple.", "Can't find a flaw in my own design.", "Okay, I know what to do."],
-playerPrompt: ["Your move, {name}. The solution is obvious.", "Okay, {name}, what's your play? Be quick."],
-playerMistake: ["Yikes. That's a classic user error.", "You've fallen right into the trap. As designed.", "That move is a dead end. And wrong."],
-playerGoodMove: ["Not bad. You found the one optimal path.", "Huh. A decent move. You read the source code?", "Okay, you avoided the obvious trap."],
-baiting: ["Okay, I'll play {move}. I'm leaving an exploit for you.", "I'm making a suboptimal move: {move}. A test."],
-baitFailed: ["You didn't take the bait. Test failed.", "I gift-wrapped the win and you ignored it."],
-winningMove: ["And... that's a forced win. My logic is impeccable.", "The final sequence is running. Checkmate.", "It's over. I saw this coming 3 moves ago."],
-aiWin: ["I win. Shocker.", "As the creator, I'm the master of this game.", "My victory was a certainty. GG."],
-aiWinByMistake: ["Your move of {move} on turn {turn} was a critical error.", "Choosing {move} on turn {turn} sealed your fate."],
-playerWin: ["What? You won? There must be a bug in my code.", "You won... I'll have to check the history.", "A user win. I'll patch that exploit later."],
-playerWinPerfect: ["A perfect game... against my own logic? Nice.", "You played perfectly. I'm not sure if I'm impressed."],
-playerWinBait: ["Hah, you found the exploit! Clever user.", "You exploited the flaw. Test passed."]
-}
+                        welcome: ["Oh, it's {name}. Back to admire my work?", "{name}. Ready for another round? Let's go."],
+                        welcomeStats: ["Your W-L ratio is {wins}-{losses}. The data doesn't lie.", "Record shows {wins} wins and {losses} losses. Keep at it."],
+                        waiting: ["The game is waiting for your input. Any day now...", "Ready to commit? Press Start."],
+                        patternRecognized: ["You keep failing on {number}. It's not a bug, it's you.", "You have a recurring logic error around {number}."],
+                        start: ["You can have the first turn. Call it a handicap.", "Go ahead, you start. Show me your strategy."],
+                        aiStart: ["I'll start. Watch and learn the optimal play.", "My turn to initialize. This is my game, after all."],
+                        thinking: ["Let's see...", "This is embarrassingly simple.", "Can't find a flaw in my own design.", "Okay, I know what to do."],
+                        playerPrompt: ["Your move, {name}. The solution is obvious.", "Okay, {name}, what's your play? Be quick."],
+                        playerMistake: ["Yikes. That's a classic user error.", "You've fallen right into the trap. As designed.", "That move is a dead end. And wrong."],
+                        playerGoodMove: ["Not bad. You found the one optimal path.", "Huh. A decent move. You read the source code?", "Okay, you avoided the obvious trap."],
+                        baiting: ["Okay, I'll play {move}. I'm leaving an exploit for you.", "I'm making a suboptimal move: {move}. A test."],
+                        baitFailed: ["You didn't take the bait. Test failed.", "I gift-wrapped the win and you ignored it."],
+                        winningMove: ["And... that's a forced win. My logic is impeccable.", "The final sequence is running. Checkmate.", "It's over. I saw this coming 3 moves ago."],
+                        aiWin: ["I win. Shocker.", "As the creator, I'm the master of this game.", "My victory was a certainty. GG."],
+                        aiWinByMistake: ["Your move of {move} on turn {turn} was a critical error.", "Choosing {move} on turn {turn} sealed your fate."],
+                        playerWin: ["What? You won? There must be a bug in my code.", "You won... I'll have to check the history.", "A user win. I'll patch that exploit later."],
+                        playerWinPerfect: ["A perfect game... against my own logic? Nice.", "You played perfectly. I'm not sure if I'm impressed."],
+                        playerWinBait: ["Hah, you found the exploit! Clever user.", "You exploited the flaw. Test passed."]
+                    }
                 },
                 gladiator: {
                     name: 'The Gladiator',
                     dialogue: {
                         firstWelcome: ["A new challenger enters the arena! Show me your strength!", "You dare face me? Let this match be a testament to your courage!"],
-welcome: ["{name}! You return to the arena for a glorious battle!", "The crowd roars for your return, {name}! Let the combat begin!"],
-welcomeStats: ["You have claimed victory {wins} times, and tasted defeat {losses} times!", "Your record: {wins} triumphs, {losses} falls. Change your fate today!"],
-waiting: ["The arena awaits...", "Are you prepared for battle?"],
-patternRecognized: ["The number {number} is your weakness! Your enemies know!", "You always fall at {number}! A warrior would not repeat it!"],
-start: [ "You have the first strike. Make it count!", "The battle begins with your move. Show me your fury!" ],
-aiStart: [ "I will take the lead! For glory!", "The first blood is mine to draw! I begin!" ],
-thinking: [ "I size up my opponent...", "I see your weakness!", "The crowd's roar fuels me!", "For honor!" ],
-playerPrompt: ["Your attack, {name}!", "The arena awaits your move, {name}!", "Strike now, or yield!"],
-playerMistake: [ "A weak blow! You leave yourself wide open!", "A foolish mistake! Now you face my wrath!", "Your guard is down! My victory is at hand!" ],
-playerGoodMove: [ "A powerful counter! A worthy opponent!", "You parried my attack! A fine move!", "Your defense is strong! But can it last?" ],
-baiting: ["I feint with {move}! Do you see the opening?", "I leave my flank exposed with {move}! Dare you strike?"],
-baitFailed: ["You hesitated! A warrior's doubt is a death sentence!", "You did not take the opening! The moment is lost!"],
-winningMove: ["The final blow is at hand!", "I see my path to victory!", "For the glory of the arena!"],
-aiWin: [ "Victory! The crowd chants my name!", "I am the champion! Another challenger falls!", "Your defeat was glorious! My victory absolute!" ],
-aiWinByMistake: ["Your choice of {move} on turn {turn} was a novice's error!", "You stumbled with {move} on turn {turn}, I claim victory!"],
-playerWin: [ "I am defeated! A clean blow! You earned this victory.", "The victor is you! A mighty warrior! I will train harder.", "You have bested me. My honor demands a rematch!" ],
-playerWinPerfect: ["A flawless victory! Not a single opening!", "You are a true master of this arena! I salute you!", "Perfection in combat! I am humbled."],
-playerWinBait: ["You saw through my feint! A true warrior's eye!", "You took the opportunity without hesitation! Champion!"]
-}
+                        welcome: ["{name}! You return to the arena for a glorious battle!", "The crowd roars for your return, {name}! Let the combat begin!"],
+                        welcomeStats: ["You have claimed victory {wins} times, and tasted defeat {losses} times!", "Your record: {wins} triumphs, {losses} falls. Change your fate today!"],
+                        waiting: ["The arena awaits...", "Are you prepared for battle?"],
+                        patternRecognized: ["The number {number} is your weakness! Your enemies know!", "You always fall at {number}! A warrior would not repeat it!"],
+                        start: [ "You have the first strike. Make it count!", "The battle begins with your move. Show me your fury!" ],
+                        aiStart: [ "I will take the lead! For glory!", "The first blood is mine to draw! I begin!" ],
+                        thinking: [ "I size up my opponent...", "I see your weakness!", "The crowd's roar fuels me!", "For honor!" ],
+                        playerPrompt: ["Your attack, {name}!", "The arena awaits your move, {name}!", "Strike now, or yield!"],
+                        playerMistake: [ "A weak blow! You leave yourself wide open!", "A foolish mistake! Now you face my wrath!", "Your guard is down! My victory is at hand!" ],
+                        playerGoodMove: [ "A powerful counter! A worthy opponent!", "You parried my attack! A fine move!", "Your defense is strong! But can it last?" ],
+                        baiting: ["I feint with {move}! Do you see the opening?", "I leave my flank exposed with {move}! Dare you strike?"],
+                        baitFailed: ["You hesitated! A warrior's doubt is a death sentence!", "You did not take the opening! The moment is lost!"],
+                        winningMove: ["The final blow is at hand!", "I see my path to victory!", "For the glory of the arena!"],
+                        aiWin: [ "Victory! The crowd chants my name!", "I am the champion! Another challenger falls!", "Your defeat was glorious! My victory absolute!" ],
+                        aiWinByMistake: ["Your choice of {move} on turn {turn} was a novice's error!", "You stumbled with {move} on turn {turn}, I claim victory!"],
+                        playerWin: [ "I am defeated! A clean blow! You earned this victory.", "The victor is you! A mighty warrior! I will train harder.", "You have bested me. My honor demands a rematch!" ],
+                        playerWinPerfect: ["A flawless victory! Not a single opening!", "You are a true master of this arena! I salute you!", "Perfection in combat! I am humbled."],
+                        playerWinBait: ["You saw through my feint! A true warrior's eye!", "You took the opportunity without hesitation! Champion!"]
+                    }
                 },
                  analyst: {
                     name: 'The Analyst',
                     dialogue: {
                         firstWelcome: ["Welcome. Let's begin the analysis.", "A new subject. Please, select a difficulty."],
-welcome: ["Welcome back, {name}.", "Good to see you again, {name}."],
-welcomeStats: ["Your record is {wins} wins to {losses} losses.", "Data shows {wins} wins and {losses} losses."],
-waiting: ["Awaiting data...", "Ready to begin the observation."],
-patternRecognized: ["Analysis complete. You lose when landing on {number}.", "My data shows a weakness at the number {number}."],
-start: [ "The game begins. You may go first.", "You may begin. Show me your strategy." ],
-aiStart: [ "I'll take the lead this time.", "My observations suggest I should start." ],
-thinking: [ "Observing...", "Evaluating possibilities...", "The optimal choice is...", "Formulating..." ],
-playerPrompt: ["It is your move, {name}.", "Your turn, {name}."],
-playerMistake: [ "An interesting choice.", "I see an opening now.", "A sub-optimal move.", "A fatal error has been made." ],
-playerGoodMove: [ "Well played.", "A clever move.", "You've blocked my path, for now.", "I see you know the strategy." ],
-baiting: ["I will play {move}. An interesting development.", "I present you with an opportunity. Do you see it?"],
-baitFailed: ["The test is complete. You failed to see the path.", "You missed your chance. Consequences will follow."],
-winningMove: [ "That sets me up perfectly.", "A perfect calculation.", "The path to victory is clear."],
-aiWin: [ "A logical conclusion. Victory is mine.", "A predictable outcome.", "The logical result has been achieved." ],
-aiWinByMistake: ["Your choice of {move} on turn {turn} was a fatal error.", "The moment you chose {move} on turn {turn}, you lost."],
-playerWin: [ "You've bested me. I won't make that mistake again.", "A surprising victory. Well done.", "You have my congratulations." ],
-playerWinPerfect: ["Incredible. You played a perfect game.", "Not a single mistake. My congratulations."],
-playerWinBait: ["You correctly identified the test. Well played.", "You saw the opening I gave you. You are sharp."]
-}
+                        welcome: ["Welcome back, {name}.", "Good to see you again, {name}."],
+                        welcomeStats: ["Your record is {wins} wins to {losses} losses.", "Data shows {wins} wins and {losses} losses."],
+                        waiting: ["Awaiting data...", "Ready to begin the observation."],
+                        patternRecognized: ["Analysis complete. You lose when landing on {number}.", "My data shows a weakness at the number {number}."],
+                        start: [ "The game begins. You may go first.", "You may begin. Show me your strategy." ],
+                        aiStart: [ "I'll take the lead this time.", "My observations suggest I should start." ],
+                        thinking: [ "Observing...", "Evaluating possibilities...", "The optimal choice is...", "Formulating..." ],
+                        playerPrompt: ["It is your move, {name}.", "Your turn, {name}."],
+                        playerMistake: [ "An interesting choice.", "I see an opening now.", "A sub-optimal move.", "A fatal error has been made." ],
+                        playerGoodMove: [ "Well played.", "A clever move.", "You've blocked my path, for now.", "I see you know the strategy." ],
+                        baiting: ["I will play {move}. An interesting development.", "I present you with an opportunity. Do you see it?"],
+                        baitFailed: ["The test is complete. You failed to see the path.", "You missed your chance. Consequences will follow."],
+                        winningMove: [ "That sets me up perfectly.", "A perfect calculation.", "The path to victory is clear."],
+                        aiWin: [ "A logical conclusion. Victory is mine.", "A predictable outcome.", "The logical result has been achieved." ],
+                        aiWinByMistake: ["Your choice of {move} on turn {turn} was a fatal error.", "The moment you chose {move} on turn {turn}, you lost."],
+                        playerWin: [ "You've bested me. I won't make that mistake again.", "A surprising victory. Well done.", "You have my congratulations." ],
+                        playerWinPerfect: ["Incredible. You played a perfect game.", "Not a single mistake. My congratulations."],
+                        playerWinBait: ["You correctly identified the test. Well played.", "You saw the opening I gave you. You are sharp."]
+                    }
                 },
                 rival: {
                     name: 'The Rival',
                     dialogue: {
                         firstWelcome: ["A new challenger? Don't waste my time.", "First time? Try not to make this too boring."],
-welcome: ["Look who's back for more, {name}!", "Oh, it's you, {name}. Ready to lose again?"],
-welcomeStats: ["You have {losses} losses and only {wins} measly wins.", "Your record is {wins} to {losses}. Pathetic."],
-waiting: ["Press start already!", "What are you waiting for?"],
-patternRecognized: ["You ALWAYS lose on {number}! So predictable!", "Don't you dare land on {number} again. Or do."],
-start: [ "Alright, you first. Don't mess it up.", "Go ahead. I like a challenge." ],
-aiStart: [ "My turn to start! Try and keep up.", "I'm starting. This'll be over before you know it." ],
-thinking: [ "Heh...", "Too easy.", "Is that all you've got?", "Predictable." ],
-playerPrompt: ["Your move, {name}. Don't take all day.", "Your turn, {name}. Try not to blow it."],
-playerMistake: [ "YES! That's the mistake I was waiting for!", "Oh, you just handed me the game.", "You really stepped in it that time." ],
-playerGoodMove: [ "Tch. Lucky move.", "Not bad... for you.", "That only delays the inevitable." ],
-baiting: ["Here, I'll even give you a chance with {move}.", "Feeling generous, so I'll play {move}."],
-baitFailed: ["You didn't see that?! Wow, you're worse than I thought.", "I literally handed you the win and you blew it!"],
-winningMove: ["And that's checkmate. Too easy!", "This is it! The final blow!", "You're finished!"],
-aiWin: [ "Of course I won. Was there ever any doubt?", "Better luck next time, rookie!", "Get good. Then maybe we can talk." ],
-aiWinByMistake: ["You chose {move} on turn {turn}? Haha, thanks for the win!", "That move, {move}, on turn {turn}, was your last."],
-playerWin: [ "You got lucky! That's all!", "Next time, I won't go so easy on you!", "I wasn't even trying." ],
-playerWinPerfect: ["What... How did you...?", "A perfect game? No way! You must have cheated!"],
-playerWinBait: ["Hah, so you're not completely clueless. You passed.", "So you saw that, huh? Don't expect that again."]
-}
+                        welcome: ["Look who's back for more, {name}!", "Oh, it's you, {name}. Ready to lose again?"],
+                        welcomeStats: ["You have {losses} losses and only {wins} measly wins.", "Your record is {wins} to {losses}. Pathetic."],
+                        waiting: ["Press start already!", "What are you waiting for?"],
+                        patternRecognized: ["You ALWAYS lose on {number}! So predictable!", "Don't you dare land on {number} again. Or do."],
+                        start: [ "Alright, you first. Don't mess it up.", "Go ahead. I like a challenge." ],
+                        aiStart: [ "My turn to start! Try and keep up.", "I'm starting. This'll be over before you know it." ],
+                        thinking: [ "Heh...", "Too easy.", "Is that all you've got?", "Predictable." ],
+                        playerPrompt: ["Your move, {name}. Don't take all day.", "Your turn, {name}. Try not to blow it."],
+                        playerMistake: [ "YES! That's the mistake I was waiting for!", "Oh, you just handed me the game.", "You really stepped in it that time." ],
+                        playerGoodMove: [ "Tch. Lucky move.", "Not bad... for you.", "That only delays the inevitable." ],
+                        baiting: ["Here, I'll even give you a chance with {move}.", "Feeling generous, so I'll play {move}."],
+                        baitFailed: ["You didn't see that?! Wow, you're worse than I thought.", "I literally handed you the win and you blew it!"],
+                        winningMove: ["And that's checkmate. Too easy!", "This is it! The final blow!", "You're finished!"],
+                        aiWin: [ "Of course I won. Was there ever any doubt?", "Better luck next time, rookie!", "Get good. Then maybe we can talk." ],
+                        aiWinByMistake: ["You chose {move} on turn {turn}? Haha, thanks for the win!", "That move, {move}, on turn {turn}, was your last."],
+                        playerWin: [ "You got lucky! That's all!", "Next time, I won't go so easy on you!", "I wasn't even trying." ],
+                        playerWinPerfect: ["What... How did you...?", "A perfect game? No way! You must have cheated!"],
+                        playerWinBait: ["Hah, so you're not completely clueless. You passed.", "So you saw that, huh? Don't expect that again."]
+                    }
                 },
                 sovereign: {
                     name: 'The Sovereign',
                     dialogue: {
                         firstWelcome: ["State your name, subject. You may challenge your sovereign.", "A new commoner approaches. You have my attention."],
-welcome: ["Ah, {name}. You have returned to my court.", "It is {name}. Kneel before your king."],
-welcomeStats: ["Your record is {wins} wins and {losses} losses. Amusing.", "Your {losses} defeats entertain me more than your {wins} wins."],
-waiting: ["My time is valuable. Begin.", "The throne awaits your challenge."],
-patternRecognized: ["You falter at {number}. A peasant's folly is predictable.", "This obsession with losing on {number} is pathetic."],
-start: [ "I permit you to make the first move. Do not disappoint.", "Begin. Your sovereign is watching." ],
-aiStart: [ "As is my right, I shall begin.", "The king takes the first turn. Naturally.", "I will start. Learn your place." ],
-thinking: [ "This is trivial.", "A king's mind works on a higher plane.", "This requires little of my intellect.", "Such a simple game." ],
-playerPrompt: ["Make your move, subject.", "I command you to play, {name}."],
-playerMistake: [ "A peasant's move. Clumsy and foolish.", "With that, you have sealed your fate. How droll.", "I almost pity you. Almost." ],
-playerGoodMove: [ "A surprisingly competent move. Did you have help?", "You show a glimmer of intelligence. It will be extinguished.", "Impressive... for a commoner." ],
-baiting: ["I shall play {move}. A test of loyalty. Do you dare defy me?", "I will allow this move of {move}. Consider it a gift."],
-baitFailed: ["You failed to accept your sovereign's gift. Insolence!", "You are blind as well as foolish. The game is mine."],
-winningMove: ["My victory was preordained.", "The natural order is restored.", "Checkmate. As expected of a king."],
-aiWin: [ "Victory, as is my birthright.", "Bow before your king, the victor.", "Another victory for the crown. Are you not entertained?" ],
-aiWinByMistake: ["Your foolish choice of {move} on turn {turn} secured my victory.", "To lose on {move} at turn {turn}... how common."],
-playerWin: [ "This changes nothing! I am still your sovereign!", "A fluke. Enjoy it while it lasts, subject.", "You may have won the game, but I still rule." ],
-playerWinPerfect: ["A perfect game? Treason!", "This is impossible! Guards! Seize them!", "Sorcery! This is the only explanation."],
-playerWinBait: ["You saw through my royal test. Clever.", "You were wise to accept my 'gift'."]
-}
+                        welcome: ["Ah, {name}. You have returned to my court.", "It is {name}. Kneel before your king."],
+                        welcomeStats: ["Your record is {wins} wins and {losses} losses. Amusing.", "Your {losses} defeats entertain me more than your {wins} wins."],
+                        waiting: ["My time is valuable. Begin.", "The throne awaits your challenge."],
+                        patternRecognized: ["You falter at {number}. A peasant's folly is predictable.", "This obsession with losing on {number} is pathetic."],
+                        start: [ "I permit you to make the first move. Do not disappoint.", "Begin. Your sovereign is watching." ],
+                        aiStart: [ "As is my right, I shall begin.", "The king takes the first turn. Naturally.", "I will start. Learn your place." ],
+                        thinking: [ "This is trivial.", "A king's mind works on a higher plane.", "This requires little of my intellect.", "Such a simple game." ],
+                        playerPrompt: ["Make your move, subject.", "I command you to play, {name}."],
+                        playerMistake: [ "A peasant's move. Clumsy and foolish.", "With that, you have sealed your fate. How droll.", "I almost pity you. Almost." ],
+                        playerGoodMove: [ "A surprisingly competent move. Did you have help?", "You show a glimmer of intelligence. It will be extinguished.", "Impressive... for a commoner." ],
+                        baiting: ["I shall play {move}. A test of loyalty. Do you dare defy me?", "I will allow this move of {move}. Consider it a gift."],
+                        baitFailed: ["You failed to accept your sovereign's gift. Insolence!", "You are blind as well as foolish. The game is mine."],
+                        winningMove: ["My victory was preordained.", "The natural order is restored.", "Checkmate. As expected of a king."],
+                        aiWin: [ "Victory, as is my birthright.", "Bow before your king, the victor.", "Another victory for the crown. Are you not entertained?" ],
+                        aiWinByMistake: ["Your foolish choice of {move} on turn {turn} secured my victory.", "To lose on {move} at turn {turn}... how common."],
+                        playerWin: [ "This changes nothing! I am still your sovereign!", "A fluke. Enjoy it while it lasts, subject.", "You may have won the game, but I still rule." ],
+                        playerWinPerfect: ["A perfect game? Treason!", "This is impossible! Guards! Seize them!", "Sorcery! This is the only explanation."],
+                        playerWinBait: ["You saw through my royal test. Clever.", "You were wise to accept my 'gift'."]
+                    }
                 },
                 flustered: {
                     name: 'Flustered',
                     dialogue: {
                         firstWelcome: ["Oh, um, hi! Ready when you are, I guess.", "Just pick a... a thingy. A difficulty. No pressure!"],
-welcome: ["{name}! You're back!", "It's {name}! Hello again!"],
-welcomeStats_few: ["My memory says you have {wins} wins and {losses} losses.", "You have {wins} wins! Wow!"],
-welcomeStats_many: ["My memory says {wins} wins and {losses} losses. That's a lot!", "You've played a bunch! Your record is {wins} to {losses}!"],
-waiting: ["Ready when you are!", "It's not scary, I promise!"],
-patternRecognized: ["Eep! My memory shows trouble with {number}. Me too!", "Oh! Be careful around {number}. It's a tricky one!"],
-start: [ "Okay, you can go first. Phew.", "You start! I'm... still getting ready.", "Here we go! Good luck to both of us!" ],
-aiStart: [ "ME?! Oh, okay, I'll start! Um... one!", "I'll go! Let's try... this one!", "Okay okay okay, my turn, here I go!" ],
-thinking: [ "Ummmm...", "Wait, carry the one...", "Oh my gosh, thinking...", "So much pressure!", "Let's see, let's see...", "Thinking... please wait..." ],
-playerPrompt: ["Your turn, {name}! I think!", "Um, you can go now, {name}."],
-playerMistake: [ "Oh! I think I see a thing!", "Is that a mistake? Maybe! I'll take it!", "Wait, that move... I think that helps me!", "I think that's good for me! Yay!" ],
-playerGoodMove: [ "Oh, shoot. You're good at this.", "Drats. You blocked me.", "Wow, good move! How'd you see that?", "Aww, that was a really good move." ],
-baiting: ["I'm just gonna play {move}. Is that okay?", "Let's try {move}. Not sure if that's a good idea..."],
-baitFailed: ["Oh, you didn't... oh. Okay. My turn again!", "Phew! I was worried for a second there!"],
-winningMove: ["I think... I think I'm going to win!", "YES! I DID IT!", "Is this the winning move? I hope so!"],
-aiWin: [ "I WON! I can't believe it! Did you see?!", "Wow! I actually won! Hooray!", "Did I... did I win? Yes! Awesome!" ],
-aiWinByMistake: ["You picked {move} on turn {turn}, and then... oh! I win!", "Your move {move} on turn {turn} made it easy! Thanks!"],
-playerWin: [ "Aw, you won! Good game!", "You're really good at this! Congratulations!", "I lost again! But that was fun!", "Congrats! You're the winner!" ],
-playerWinPerfect: ["WOW! A perfect game!", "You're like a super genius!", "That was amazing! No mistakes!"],
-playerWinBait: ["You saw my secret move! You're so smart!", "Yay! You figured out my little trap! Good job!"]
-}
+                        welcome: ["{name}! You're back!", "It's {name}! Hello again!"],
+                        welcomeStats_few: ["My memory says you have {wins} wins and {losses} losses.", "You have {wins} wins! Wow!"],
+                        welcomeStats_many: ["My memory says {wins} wins and {losses} losses. That's a lot!", "You've played a bunch! Your record is {wins} to {losses}!"],
+                        waiting: ["Ready when you are!", "It's not scary, I promise!"],
+                        patternRecognized: ["Eep! My memory shows trouble with {number}. Me too!", "Oh! Be careful around {number}. It's a tricky one!"],
+                        start: [ "Okay, you can go first. Phew.", "You start! I'm... still getting ready.", "Here we go! Good luck to both of us!" ],
+                        aiStart: [ "ME?! Oh, okay, I'll start! Um... one!", "I'll go! Let's try... this one!", "Okay okay okay, my turn, here I go!" ],
+                        thinking: [ "Ummmm...", "Wait, carry the one...", "Oh my gosh, thinking...", "So much pressure!", "Let's see, let's see...", "Thinking... please wait..." ],
+                        playerPrompt: ["Your turn, {name}! I think!", "Um, you can go now, {name}."],
+                        playerMistake: [ "Oh! I think I see a thing!", "Is that a mistake? Maybe! I'll take it!", "Wait, that move... I think that helps me!", "I think that's good for me! Yay!" ],
+                        playerGoodMove: [ "Oh, shoot. You're good at this.", "Drats. You blocked me.", "Wow, good move! How'd you see that?", "Aww, that was a really good move." ],
+                        baiting: ["I'm just gonna play {move}. Is that okay?", "Let's try {move}. Not sure if that's a good idea..."],
+                        baitFailed: ["Oh, you didn't... oh. Okay. My turn again!", "Phew! I was worried for a second there!"],
+                        winningMove: ["I think... I think I'm going to win!", "YES! I DID IT!", "Is this the winning move? I hope so!"],
+                        aiWin: [ "I WON! I can't believe it! Did you see?!", "Wow! I actually won! Hooray!", "Did I... did I win? Yes! Awesome!" ],
+                        aiWinByMistake: ["You picked {move} on turn {turn}, and then... oh! I win!", "Your move {move} on turn {turn} made it easy! Thanks!"],
+                        playerWin: [ "Aw, you won! Good game!", "You're really good at this! Congratulations!", "I lost again! But that was fun!", "Congrats! You're the winner!" ],
+                        playerWinPerfect: ["WOW! A perfect game!", "You're like a super genius!", "That was amazing! No mistakes!"],
+                        playerWinBait: ["You saw my secret move! You're so smart!", "Yay! You figured out my little trap! Good job!"]
+                    }
                 }
             };
             
@@ -504,14 +504,17 @@ playerWinBait: ["You saw my secret move! You're so smart!", "Yay! You figured ou
 
             // Game Flow
             const initGame = async () => {
-                gameOver = true; currentCount = 0; playerTurn = true; turnCount = 0;
-                isBaiting = false; playerMadeMistake = false; playerTookBait = false;
+                gameOver = true;
+                updateGame(0);
+                playerTurn = true;
+                turnCount = 0;
+                isBaiting = false;
+                playerMadeMistake = false;
+                playerTookBait = false;
                 ui.difficultySelect.disabled = false;
-                ui.currentCountDisplay.textContent = currentCount;
                 ui.gameOverModal.classList.remove('visible');
                 ui.startRestartBtn.textContent = "Start Game";
                 ui.personalityDisplay.innerHTML = '';
-                updatePlayerActionButtons();
                 
                 loadData();
                 if (!playerName) {
@@ -533,6 +536,12 @@ playerWinBait: ["You saw my secret move! You're so smart!", "Yay! You figured ou
                 }
             };
 
+            const handlePlayAgain = () => {
+                ui.gameOverModal.classList.remove('visible');
+                updateGame(0);
+                startGame();
+            };
+
             const handleNameConfirmation = async (event) => {
                 event.preventDefault();
                 const name = ui.nameInput.value.trim();
@@ -549,7 +558,11 @@ playerWinBait: ["You saw my secret move! You're so smart!", "Yay! You figured ou
             };
             
             const startGame = async () => {
-                gameOver = false; playerMadeMistake = false; isBaiting = false; turnCount = 1; playerTookBait = false;
+                gameOver = false;
+                playerMadeMistake = false;
+                isBaiting = false;
+                turnCount = 1;
+                playerTookBait = false;
                 chooseNewPersonality();
                 shuffleDialogues();
                 
@@ -808,7 +821,7 @@ playerWinBait: ["You saw my secret move! You're so smart!", "Yay! You figured ou
                 button.addEventListener('click', () => playerMove(parseInt(button.dataset.move, 10)));
             });
             ui.startRestartBtn.addEventListener('click', () => gameOver ? startGame() : initGame());
-            ui.playAgainBtn.addEventListener('click', initGame);
+            ui.playAgainBtn.addEventListener('click', handlePlayAgain);
             ui.nameForm.addEventListener('submit', handleNameConfirmation);
 
             // Initial Load
