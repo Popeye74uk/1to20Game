@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v4.6</title>
+    <title>The 1 to 20 Game v4.7</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -261,7 +261,6 @@
         </div>
     </div>
 
-    <!-- The personality data is now loaded from an external file -->
     <script src="personalities.js"></script>
 
     <script>
@@ -292,6 +291,7 @@
             // Player Data
             let playerName = '';
             let playerStats = { wins: 0, losses: 0 };
+            let streakData = { winStreak: 0, lossStreak: 0};
             let moveHistory = [];
 
             // Core Functions
@@ -307,12 +307,14 @@
             const shuffleDialogues = () => {
                 shuffledDialogue = {};
                 for (const category in currentPersonality.dialogue) {
-                    const messages = [...currentPersonality.dialogue[category]];
-                    for (let i = messages.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1));
-                        [messages[i], messages[j]] = [messages[j], messages[i]];
+                    if (Array.isArray(currentPersonality.dialogue[category])) {
+                        const messages = [...currentPersonality.dialogue[category]];
+                        for (let i = messages.length - 1; i > 0; i--) {
+                            const j = Math.floor(Math.random() * (i + 1));
+                            [messages[i], messages[j]] = [messages[j], messages[i]];
+                        }
+                        shuffledDialogue[category] = messages;
                     }
-                    shuffledDialogue[category] = messages;
                 }
             };
             
@@ -321,6 +323,8 @@
                 playerName = localStorage.getItem('playerName_1to20_v3') || '';
                 const stats = localStorage.getItem('playerStats_1to20_v3');
                 playerStats = stats ? JSON.parse(stats) : { wins: 0, losses: 0 };
+                const streak = localStorage.getItem('streakData_1to20_v3');
+                streakData = streak ? JSON.parse(streak) : { winStreak: 0, lossStreak: 0 };
                 const history = localStorage.getItem('moveHistory_1to20_v3');
                 moveHistory = history ? JSON.parse(history) : [];
                 lastPersonalityName = localStorage.getItem('lastPersonality_1to20_v3') || '';
@@ -329,6 +333,7 @@
             const saveData = () => {
                 localStorage.setItem('playerName_1to20_v3', playerName);
                 localStorage.setItem('playerStats_1to20_v3', JSON.stringify(playerStats));
+                localStorage.setItem('streakData_1to20_v3', JSON.stringify(streakData));
                 localStorage.setItem('moveHistory_1to20_v3', JSON.stringify(moveHistory));
                 localStorage.setItem('lastPersonality_1to20_v3', lastPersonalityName);
             };
@@ -349,7 +354,12 @@
                 } else {
                     chooseNewPersonality();
                     shuffleDialogues();
-                    await displayAiMessage(getRandomMessage('welcome', { name: playerName }));
+
+                    let welcomeCategory = 'welcome';
+                    if (streakData.winStreak >= 2) welcomeCategory = 'welcome_winStreak';
+                    else if (streakData.lossStreak >= 2) welcomeCategory = 'welcome_lossStreak';
+
+                    await displayAiMessage(getRandomMessage(welcomeCategory, { name: playerName }));
 
                     let statsCategory = 'welcomeStats';
                     if (currentPersonality.name === 'Flustered') {
@@ -374,6 +384,7 @@
                 if (name) {
                     playerName = name;
                     playerStats = { wins: 0, losses: 0 };
+                    streakData = { winStreak: 0, lossStreak: 0 };
                     moveHistory = [];
                     ui.nameModal.classList.remove('visible');
                     chooseNewPersonality();
@@ -442,6 +453,11 @@
                     return;
                 }
 
+                if (Math.random() < 0.3) {
+                    const reactCategory = { 1: 'react_addOne', 2: 'react_addTwo', 3: 'react_addThree'}[lastPlayerMove];
+                    if(reactCategory) await displayAiMessage(getRandomMessage(reactCategory));
+                }
+
                 let reactionCategory = null;
                 if (isPlayerMistake()) {
                     reactionCategory = 'playerMistake';
@@ -459,7 +475,6 @@
             
             const aiTurn = async () => {
                 if (gameOver) return;
-                turnCount++;
                 
                 if (aiDifficulty === 'hard' && !isBaiting && !isMultipleOfFour(currentCount) && Math.random() < 0.15) {
                     const optimalMove = 4 - (currentCount % 4);
@@ -474,8 +489,19 @@
                         return;
                     }
                 }
+                
+                let thinkingCategory = 'thinking';
+                if(turnCount === 1) {
+                    thinkingCategory = 'aiStartThinking';
+                } else if (currentCount <= 7) {
+                    thinkingCategory = 'thinking_earlyGame';
+                } else if (currentCount >= 16) {
+                    thinkingCategory = 'thinking_lateGame';
+                }
 
-                await displayAiMessage(getRandomMessage('thinking'), true, null, 700 + Math.random() * 500);
+                await displayAiMessage(getRandomMessage(thinkingCategory), true, null, 700 + Math.random() * 500);
+                
+                turnCount++;
 
                 const { move, wasOptimal } = getAiMove();
                 let numbersToSay = move;
@@ -497,7 +523,14 @@
                     return;
                 }
                 
-                const promptMsg = getRandomMessage('playerPrompt', { name: playerName });
+                let promptCategory = 'playerPrompt';
+                 if (currentCount <= 7) {
+                    promptCategory = 'playerPrompt_earlyGame';
+                } else if (currentCount >= 15) {
+                    promptCategory = 'playerPrompt_lateGame';
+                }
+                const promptMsg = getRandomMessage(promptCategory, { name: playerName });
+                
                 ui.aiStatusBox.innerHTML = promptMsg;
                 playerTurn = true;
                 updatePlayerActionButtons();
@@ -559,6 +592,8 @@
                     case 'AI':
                         title = "You Lost";
                         playerStats.losses++;
+                        streakData.lossStreak++;
+                        streakData.winStreak = 0;
                         moveHistory.push({move: lastPlayerMove, turn: Math.floor(turnCount/2)});
                         category = playerMadeMistake ? 'aiWinByMistake' : 'aiWin';
                         message = getRandomMessage(category, { move: lastPlayerMove, turn: Math.floor(turnCount/2) });
@@ -567,6 +602,8 @@
                     case 'Player':
                         title = "You Win!";
                         playerStats.wins++;
+                        streakData.winStreak++;
+                        streakData.lossStreak = 0;
                         if (playerTookBait) {
                             category = 'playerWinBait';
                         } else {
@@ -611,6 +648,7 @@
                 }
 
                 if (!shuffledDialogue[category] || shuffledDialogue[category].length === 0) {
+                    if (!currentPersonality.dialogue[category]) return ""; // Category doesn't exist
                     const messages = [...currentPersonality.dialogue[category]];
                      for (let i = messages.length - 1; i > 0; i--) {
                         const j = Math.floor(Math.random() * (i + 1));
@@ -627,27 +665,7 @@
                 return message;
             };
 
-            const toggleFullScreen = () => {
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen().catch(() => {});
-                } else if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                }
-            };
-
             // Event Listeners
-            document.addEventListener('keydown', (e) => {
-                if (ui.nameModal.classList.contains('visible') && e.key === 'Enter') {
-                    e.preventDefault();
-                    ui.nameForm.dispatchEvent(new Event('submit'));
-                }
-                if (ui.gameOverModal.classList.contains('visible')) return;
-                if (e.key.toLowerCase() === 'f' && !e.ctrlKey && !e.metaKey) {
-                    e.preventDefault();
-                    toggleFullScreen();
-                }
-            });
-
             ui.playerActionButtons.forEach(button => {
                 button.addEventListener('click', () => playerMove(parseInt(button.dataset.move, 10)));
             });
