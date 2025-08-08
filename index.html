@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v3.5</title>
+    <title>The 1 to 20 Game v3.6</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -120,7 +120,7 @@
             display: flex; 
             justify-content: center; 
             align-items: center;
-            line-height: 1; /* BUG FIX: Prevents font vertical alignment issues */
+            line-height: 1;
         }
         .action-btn:hover:not(:disabled) {
             background-color: var(--color-accent-dark); 
@@ -299,11 +299,10 @@
                         thinking: [ "Parsing input...", "Executing logic... Flawlessly, of course.", "The outcome is already known to me.", "This is rudimentary." ],
                         playerPrompt: ["Your move, {name}. The code waits for no one.", "Your turn. Don't introduce any bugs."],
                         playerMistake: [ "A classic user error.", "Just as the simulation predicted. You've fallen into my trap.", "That move is... inefficient. And wrong." ],
-                        playerGoodMove: [ "A decent move. I suppose I programmed some emergent intelligence into you.", "You've found a good move. My code is truly elegant.", "Not bad. You're using my systems as intended." ],
+                        playerGoodMove: [ "A decent move. My code must have some emergent intelligence.", "You've found a good move. My code is truly elegant.", "Not bad. You're using my systems as intended." ],
                         baiting: ["I'll play {move}. I've left a 'bug' in my play. See if you can exploit it.", "I'll make a sub-optimal move: {move}. A test for you."],
                         baitFailed: ["You failed to exploit the bug. Test failed. Resuming optimal performance.", "You missed the obvious flaw I presented. Disappointing."],
-                        winningMove: ["My victory algorithm is running perfectly.", "The logic is undeniable.", "A flawless victory is imminent."],
-                        aiWin: [ "I win. Of course.", "The creator is always victorious.", "My victory was a computational certainty.", "Another successful test case. System performance: nominal." ],
+                        aiWin: ["I win. Of course.", "The creator is always victorious.", "My victory was a computational certainty."],
                         aiWinByMistake: ["Your move {move} was a critical exception. I win.", "You caused a fatal logic error with {move}."],
                         playerWin: [ "My own creation, besting me? Impossible. There must be a bug.", "You won... I'll have to review my own code. This is... unexpected.", "A win for the user. I'll patch that in the next version." ],
                         playerWinPerfect: ["A perfect game... against me? My code is more brilliant than I imagined!", "You played my game perfectly. I'm not sure whether to be proud or annoyed."],
@@ -605,11 +604,6 @@
                 if (currentCount + numbersToSay > 20) {
                     numbersToSay = 20 - currentCount;
                 }
-
-                if(numbersToSay <= 0) {
-                    await endGame('Player');
-                    return;
-                }
                 
                 const isWinningMove = isMultipleOfFour(currentCount + numbersToSay) && numbersToSay > 0 && wasOptimal;
 
@@ -637,7 +631,7 @@
             
             const countingWin = async (numbersToSay) => {
                 const finalCount = currentCount + numbersToSay;
-                updateGame(finalCount); // Update main counter instantly
+                updateGame(finalCount);
                  for (let i = 1; i <= numbersToSay; i++) {
                     ui.aiStatusBox.innerHTML = `<em>${currentCount - numbersToSay + i}...</em>`;
                     await sleep(600);
@@ -648,8 +642,10 @@
             const getAiMove = () => {
                 const playOptimal = Math.random() < { 'easy': 0.2, 'medium': 0.6, 'hard': 0.95 }[aiDifficulty];
                 if (playOptimal) {
-                    const optimalMove = getOptimalMove();
-                    if (optimalMove.move !== 0) return optimalMove;
+                    const optimalMoveResult = getOptimalMove();
+                    if (optimalMoveResult.move !== 0) {
+                        return optimalMoveResult;
+                    }
                 }
                 return { move: getRandomMove(), wasOptimal: false };
             };
