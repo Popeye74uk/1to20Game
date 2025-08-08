@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v4.0</title>
+    <title>The 1 to 20 Game v4.1</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -281,7 +281,7 @@
             };
 
             // Game State
-            let gameState = 'booting'; // booting, waiting, playerTurn, aiTurn, gameOver
+            let gameState = 'booting';
             let currentCount = 0, turnCount = 0;
             let lastPlayerMove = 0, playerMadeMistake = false, isBaiting = false;
             let currentPersonality, lastPersonalityName = '';
@@ -313,7 +313,7 @@
                         aiWin: [ "I win. Of course.", "The creator is always victorious.", "My victory was a computational certainty."],
                         aiWinByMistake: ["Your move of {move} on turn {turn} was the bug in your playthrough. I win.", "You made a fatal error with {move} on turn {turn}. Game over."],
                         playerWin: [ "You won? Impossible. There must be a bug in my code.", "You beat me? I'll have to push a hotfix for that 'feature'.", "A win for the user. I guess even a broken clock is right twice a day." ],
-                        playerWinPerfect: ["A perfect game... you beat my system flawlessly. I'm... impressed.", "You didn't make a single mistake. Okay, that's actually pretty good."],
+                        playerWinPerfect: ["A perfect game... against me? My code is more brilliant than I imagined!", "You played my game perfectly. I'm not sure whether to be proud or annoyed."],
                         playerWinBait: ["You found the exploit! Clever. I was just testing you, of course.", "You passed my little test. Don't expect me to be so generous again."]
                     }
                 },
@@ -483,9 +483,10 @@
             const setGameState = (newState) => {
                 gameState = newState;
                 switch (newState) {
+                    case 'booting':
                     case 'waiting':
                     case 'gameOver':
-                        ui.startRestartBtn.disabled = false;
+                        ui.startRestartBtn.disabled = (newState === 'booting');
                         ui.difficultySelect.disabled = false;
                         updatePlayerActionButtons(false);
                         ui.startRestartBtn.textContent = "Start Game";
@@ -506,7 +507,7 @@
             
             // Game Flow
             const initGame = async () => {
-                ui.startRestartBtn.disabled = true;
+                setGameState('booting');
                 currentCount = 0;
                 turnCount = 0;
                 isBaiting = false; 
@@ -517,7 +518,6 @@
                 
                 loadData();
                 if (!playerName) {
-                    setGameState('booting');
                     ui.nameModal.classList.add('visible');
                 } else {
                     chooseNewPersonality();
@@ -552,7 +552,7 @@
             
             const startGame = async () => {
                 if (gameState !== 'waiting') return;
-                setGameState('aiTurn'); // Lock controls immediately
+                setGameState('aiTurn');
                 turnCount = 1;
                 playerMadeMistake = false; 
                 isBaiting = false;
@@ -823,7 +823,7 @@
                 button.addEventListener('click', () => playerMove(parseInt(button.dataset.move, 10)));
             });
             ui.startRestartBtn.addEventListener('click', () => {
-                if (gameState === 'waiting' || gameState === 'gameOver') {
+                 if (gameState === 'waiting' || gameState === 'gameOver') {
                     startGame();
                 } else {
                     initGame();
