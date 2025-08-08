@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v5.1</title>
+    <title>The 1 to 20 Game v5.2</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -21,6 +21,11 @@
             --color-shadow: rgba(0, 0, 0, 0.4); 
             --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
         body {
             font-family: var(--font-main); 
             background-color: var(--color-background); 
@@ -28,8 +33,6 @@
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            min-height: 100vh; 
-            margin: 0; 
             padding: 20px; 
             box-sizing: border-box; 
             transition: background-color 0.3s, color 0.3s;
@@ -59,17 +62,30 @@
             padding: 2rem; 
             display: flex; 
             flex-direction: column;
+            width: 100%;
+            max-width: 420px;
         }
         
         /* --- Fullscreen Mode Styles --- */
         #game-container:fullscreen {
-            width: 100%;
+            max-width: none;
             height: 100%;
             border-radius: 0;
-            padding: 2rem; /* Add vertical and horizontal breathing room */
+            padding: 2rem;
             box-sizing: border-box;
         }
 
+        #fullscreen-center-group {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        #game-container:fullscreen #fullscreen-center-group {
+            flex-grow: 1; /* This is the key fix */
+            min-height: 0; /* Prevents overflow issues in flex children */
+        }
+        
         #ai-status-wrapper {
             background-color: var(--color-accent-light); 
             padding: 1rem 1.5rem; 
@@ -92,15 +108,6 @@
             color: var(--color-text-secondary);
             font-style: italic;
         }
-        
-        /* --- Fullscreen Layout Fix --- */
-        #game-container:fullscreen #personality-display {
-            margin-bottom: auto; /* Pushes content below it down */
-        }
-        #game-container:fullscreen #game-controls {
-            margin-top: auto; /* Pushes itself to the bottom */
-        }
-
         #ai-status {
             font-style: italic; 
             font-size: 1.2rem; 
@@ -238,12 +245,15 @@
             </div>
             <div id="personality-display"></div>
             
-            <div id="current-count">0</div>
-            <div id="player-actions">
-                <button class="action-btn" data-move="1">1</button>
-                <button class="action-btn" data-move="2">2</button>
-                <button class="action-btn" data-move="3">3</button>
+            <div id="fullscreen-center-group">
+                <div id="current-count">0</div>
+                <div id="player-actions">
+                    <button class="action-btn" data-move="1">1</button>
+                    <button class="action-btn" data-move="2">2</button>
+                    <button class="action-btn" data-move="3">3</button>
+                </div>
             </div>
+
             <div id="game-controls">
                 <div class="control-group">
                     <label for="difficulty-select">Difficulty</label>
