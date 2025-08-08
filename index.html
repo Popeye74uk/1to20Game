@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v4.7</title>
+    <title>The 1 to 20 Game v4.8</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -291,7 +291,7 @@
             // Player Data
             let playerName = '';
             let playerStats = { wins: 0, losses: 0 };
-            let streakData = { winStreak: 0, lossStreak: 0};
+            let streakData = { winStreak: 0, lossStreak: 0 };
             let moveHistory = [];
 
             // Core Functions
@@ -524,7 +524,9 @@
                 }
                 
                 let promptCategory = 'playerPrompt';
-                 if (currentCount <= 7) {
+                if (currentCount === 19) {
+                    promptCategory = 'playerPrompt_forcedWin';
+                } else if (currentCount <= 7) {
                     promptCategory = 'playerPrompt_earlyGame';
                 } else if (currentCount >= 15) {
                     promptCategory = 'playerPrompt_lateGame';
@@ -648,7 +650,7 @@
                 }
 
                 if (!shuffledDialogue[category] || shuffledDialogue[category].length === 0) {
-                    if (!currentPersonality.dialogue[category]) return ""; // Category doesn't exist
+                    if (!currentPersonality.dialogue[category]) return "";
                     const messages = [...currentPersonality.dialogue[category]];
                      for (let i = messages.length - 1; i > 0; i--) {
                         const j = Math.floor(Math.random() * (i + 1));
