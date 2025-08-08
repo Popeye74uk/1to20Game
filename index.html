@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v3.3</title>
+    <title>The 1 to 20 Game v3.4</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -66,13 +66,21 @@
         #ai-status-wrapper {
             background-color: var(--color-accent-light); 
             padding: 1rem 1.5rem; 
-            margin-bottom: 2rem; 
             border-radius: 8px; 
             min-height: 80px;
             display: flex; 
             align-items: center; 
             justify-content: center; 
             gap: 10px;
+        }
+        #personality-display {
+            font-size: 0.8rem;
+            text-align: right;
+            color: var(--color-text-secondary);
+            margin-top: -1.5rem;
+            margin-bottom: 2rem;
+            padding-right: 10px;
+            font-style: italic;
         }
         #ai-status {
             font-style: italic; 
@@ -174,10 +182,12 @@
             display: flex; flex-direction: column; gap: 1rem; align-items: center;
         }
         #name-input {
-             width: 80%; padding: 1rem; border-radius: 8px; border: 2px solid var(--color-accent-light); background-color: var(--color-background); color: var(--color-text-primary); font-size: 1.2rem; text-align: center; box-sizing: border-box;
+             width: 80%; padding: 1rem; border-radius: 12px; border: 2px solid var(--color-accent-light); background-color: var(--color-background); color: var(--color-text-primary); font-size: 1.2rem; text-align: center; box-sizing: border-box;
+             text-transform: capitalize;
         }
         #name-input::placeholder {
             text-align: center;
+            text-transform: none;
         }
         #confirm-name-btn, #play-again-btn {
             background-color: var(--color-accent); color: white; border: none; padding: 1rem 2rem; border-radius: 12px; font-size: 1.2rem; cursor: pointer; transition: background-color 0.2s; width: 80%; box-sizing: border-box;
@@ -204,6 +214,7 @@
             <div id="ai-status-wrapper">
                 <span id="ai-status"></span>
             </div>
+            <div id="personality-display"></div>
             <div id="current-count">0</div>
             <div id="player-actions">
                 <button class="action-btn" data-move="1">1</button>
@@ -248,6 +259,7 @@
             // UI Elements
             const ui = {
                 aiStatusBox: document.getElementById('ai-status'),
+                personalityDisplay: document.getElementById('personality-display'),
                 currentCountDisplay: document.getElementById('current-count'),
                 playerActionButtons: document.querySelectorAll('.action-btn'),
                 difficultySelect: document.getElementById('difficulty-select'),
@@ -279,17 +291,17 @@
                         firstWelcome: ["Ah, a new user. I designed this game. Let's see how you handle my masterpiece.", "Welcome, beta tester. My name is on the source code. Let's not waste time."],
                         welcome: ["You're back, {name}. Ready to appreciate my brilliant design again?", "{name}. I was hoping for a more... challenging user today, but you'll do."],
                         welcomeStats: ["Your record of {wins}-{losses} is... documented.", "Performance noted: {wins} wins, {losses} losses."],
+                        waiting: ["Awaiting user input...", "System idle. Ready to begin."],
                         patternRecognized: ["My logs show you always lose on {number}. A flaw in the user, not the design.", "You seem to have an issue with {number}. Predictable."],
                         start: [ "I'll let you start. It's only fair, given my inherent advantage.", "You may begin. Try to make it interesting this time." ],
                         aiStart: [ "I'll start. Observe the optimal path, as designed by me.", "I will begin. This is my game, after all." ],
                         thinking: [ "Parsing input...", "Executing logic... Flawlessly, of course.", "The outcome is already known to me.", "This is rudimentary." ],
                         playerPrompt: ["Your move, {name}. The code waits for no one.", "Your turn. Don't introduce any bugs."],
                         playerMistake: [ "A classic user error.", "Just as the simulation predicted. You've fallen into my trap.", "That move is... inefficient. And wrong." ],
-                        playerGoodMove: [ "A decent move. My code must have some emergent intelligence.", "You've found a good move. My code is truly elegant.", "Not bad. You're using my systems as intended." ],
+                        playerGoodMove: [ "A decent move. I suppose I programmed some emergent intelligence into you.", "You've found a good move. My code is truly elegant.", "Not bad. You're using my systems as intended." ],
                         baiting: ["I'll play {move}. I've left a 'bug' in my play. See if you can exploit it.", "I'll make a sub-optimal move: {move}. A test for you."],
                         baitFailed: ["You failed to exploit the bug. Test failed. Resuming optimal performance.", "You missed the obvious flaw I presented. Disappointing."],
-                        winningMove: ["My victory algorithm is running perfectly.", "The logic is undeniable.", "A flawless victory is imminent."],
-                        aiWin: [ "I win. Of course.", "The creator is always victorious.", "My victory was a computational certainty.", "Another successful test case. System performance: nominal." ],
+                        aiWin: ["I win. Of course.", "The creator is always victorious.", "My victory was a computational certainty."],
                         aiWinByMistake: ["Your move {move} was a critical exception. I win.", "You caused a fatal logic error with {move}."],
                         playerWin: [ "My own creation, besting me? Impossible. There must be a bug.", "You won... I'll have to review my own code. This is... unexpected.", "A win for the user. I'll patch that in the next version." ],
                         playerWinPerfect: ["A perfect game... against me? My code is more brilliant than I imagined!", "You played my game perfectly. I'm not sure whether to be proud or annoyed."],
@@ -302,6 +314,7 @@
                         firstWelcome: ["A new challenger enters the arena! Show me your strength!", "You dare face me? Let this first match be a testament to your courage!"],
                         welcome: ["{name}! You have returned to the arena for another glorious battle!", "The crowd roars for your return, {name}! Let the combat begin!"],
                         welcomeStats: ["You have claimed victory {wins} times, and tasted defeat {losses} times!", "Your record: {wins} triumphs, {losses} falls. Will you change your fate today?"],
+                        waiting: ["The arena awaits...", "Are you prepared for battle?"],
                         patternRecognized: ["The number {number} is your weakness! Your enemies know where to strike!", "You always fall at {number}! A true warrior would not make the same mistake twice!"],
                         start: [ "You have the first strike. Make it count!", "The battle begins with your move. Show me your fury!" ],
                         aiStart: [ "I will take the lead! For glory!", "The first blood is mine to draw! I begin!" ],
@@ -325,6 +338,7 @@
                         firstWelcome: ["Welcome. Let's begin the analysis.", "A new subject. Please, select a difficulty."],
                         welcome: ["Welcome back, {name}.", "Good to see you again, {name}."],
                         welcomeStats: ["Your record is {wins} wins to {losses} losses.", "Data shows {wins} wins and {losses} losses."],
+                        waiting: ["Awaiting input...", "System idle."],
                         patternRecognized: ["Analysis complete. You tend to lose when landing on {number}.", "My data shows a weakness at the number {number}. Be mindful."],
                         start: [ "The game begins. You may go first.", "You may begin. Show me your strategy." ],
                         aiStart: [ "I'll take the lead this time.", "My calculations suggest I should start." ],
@@ -348,6 +362,7 @@
                         firstWelcome: ["A new challenger? Don't waste my time.", "First time? Try not to make this too boring."],
                         welcome: ["Look who's back for more, {name}!", "Oh, it's you, {name}. Ready to lose again?"],
                         welcomeStats: ["You have {losses} losses and only {wins} measly wins.", "Your record is {wins} to {losses}. Pathetic."],
+                        waiting: ["Press start already!", "What are you waiting for?"],
                         patternRecognized: ["You ALWAYS lose on {number}! So predictable!", "Don't you dare land on {number} again. Or do, I could use an easy win."],
                         start: [ "Alright, you first. Don't mess it up.", "Go ahead. I like a challenge." ],
                         aiStart: [ "My turn to start! Try and keep up.", "I'm starting. This'll be over before you know it." ],
@@ -371,6 +386,7 @@
                         firstWelcome: ["State your name, subject. You may have the honor of challenging your sovereign.", "A new commoner approaches the throne. You have my attention, for now."],
                         welcome: ["Ah, {name}. You have returned to my court.", "It is {name}. Kneel before your king."],
                         welcomeStats: ["Your record is {wins} wins and {losses} losses. Amusing.", "Your {losses} defeats entertain me more than your {wins} victories."],
+                        waiting: ["My time is valuable. Begin.", "The throne awaits your challenge."],
                         patternRecognized: ["You consistently falter at {number}. A peasant's folly is predictable.", "This obsession with losing on {number} is pathetic. A king would never make such a mistake."],
                         start: [ "I will permit you to make the first move. Do not disappoint me.", "Begin. Your sovereign is watching." ],
                         aiStart: [ "As is my right, I shall begin.", "The king takes the first turn. Naturally.", "I will start. Learn your place." ],
@@ -395,6 +411,7 @@
                         welcome: ["{name}! You're back!", "It's {name}! Hello again!"],
                         welcomeStats_few: ["My memory says you have {wins} wins and {losses} losses.", "You have {wins} wins! Wow!"],
                         welcomeStats_many: ["My memory says you have {wins} wins and {losses} losses. That's a lot!", "You've played a bunch! Your record is {wins} to {losses}!"],
+                        waiting: ["Ready when you are!", "It's not scary, I promise!"],
                         patternRecognized: ["Eep! My logs show you have trouble with {number}. Me too sometimes!", "Oh! Be careful around {number}. It's a tricky one!"],
                         start: [ "Okay, you can go first. Phew.", "You start! I'm... still booting up.", "Here we go! Good luck! To both of us!" ],
                         aiStart: [ "ME?! Oh, okay, I'll start! Um... one!", "I'll go! Let's try... this one!", "Okay okay okay, my turn, here I go!" ],
@@ -461,6 +478,7 @@
                 ui.currentCountDisplay.textContent = currentCount;
                 ui.gameOverModal.classList.remove('visible');
                 ui.startRestartBtn.textContent = "Start Game";
+                ui.personalityDisplay.innerHTML = '';
                 updatePlayerActionButtons();
                 
                 loadData();
@@ -477,6 +495,7 @@
                         statsCategory = totalGames < 5 ? 'welcomeStats_few' : 'welcomeStats_many';
                     }
                     await displayAiMessage(getRandomMessage(statsCategory, { wins: playerStats.wins, losses: playerStats.losses }));
+                    await displayAiMessage(getRandomMessage('waiting'));
                 }
             };
 
@@ -615,11 +634,13 @@
             };
             
             const countingWin = async (numbersToSay) => {
+                const finalCount = currentCount + numbersToSay;
+                ui.currentCountDisplay.textContent = finalCount; // Update main counter instantly
                  for (let i = 1; i <= numbersToSay; i++) {
-                    currentCount++;
-                    ui.currentCountDisplay.textContent = currentCount;
+                    ui.aiStatusBox.innerHTML = `<em>${currentCount + i}...</em>`;
                     await sleep(600);
                 }
+                currentCount = finalCount;
                 updatePlayerActionButtons();
             };
 
@@ -637,6 +658,7 @@
                 const personalityKeys = Object.keys(personalities).filter(p => p !== lastPersonalityName);
                 const chosenKey = personalityKeys[Math.floor(Math.random() * personalityKeys.length)];
                 currentPersonality = personalities[chosenKey];
+                ui.personalityDisplay.innerHTML = `&mdash; ${currentPersonality.name}`;
             };
 
             const getOptimalMove = () => {
@@ -739,7 +761,7 @@
                     shuffledDialogue[category] = messages;
                 }
                 
-                let message = shuffledDialogue[category].pop();
+                let message = shuffledDialogue[category].pop() || "";
 
                 if (context) {
                     message = message.replace(/\{(\w+)\}/g, (placeholder, key) => context[key] !== undefined ? `<strong>${context[key]}</strong>` : placeholder);
