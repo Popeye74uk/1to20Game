@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v3.7</title>
+    <title>The 1 to 20 Game v3.8</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -121,7 +121,7 @@
             justify-content: center; 
             align-items: center;
             line-height: 1;
-            padding: 0; /* More robust centering */
+            padding: 0;
         }
         .action-btn:hover:not(:disabled) {
             background-color: var(--color-accent-dark); 
@@ -167,7 +167,11 @@
             font-weight: bold; 
             cursor: pointer; 
             width: 100%; 
-            transition: background-color 0.2s;
+            transition: background-color 0.2s, opacity 0.2s;
+        }
+        #start-restart-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
         }
         .modal {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
@@ -200,8 +204,9 @@
             body { padding: 10px; }
             h1 { font-size: 1.6rem; }
             #game-container { padding: 1.5rem; }
+            #player-actions { gap: 0.5rem; } /* Mobile UI fix */
+            .action-btn { font-size: 2rem; } /* Mobile UI fix */
             #current-count { font-size: 6rem; }
-            .action-btn { font-size: 2rem; }
             #ai-status { font-size: 1rem; }
         }
     </style>
@@ -277,7 +282,7 @@
 
             // Game State
             let currentCount = 0, playerTurn = true, gameOver = true, aiDifficulty = 'hard', turnCount = 0;
-            let lastPlayerMove = 0, playerMadeMistake = false, isBaiting = false;
+            let lastPlayerMove = 0, playerMadeMistake = false, isBaiting = false, isInitializing = false;
             let currentPersonality, lastPersonalityName = '';
             let shuffledDialogue = {};
 
@@ -290,25 +295,25 @@
                 creator: {
                     name: 'The Creator',
                     dialogue: {
-                        firstWelcome: ["Ah, a new user. I designed this game. Let's see how you handle my masterpiece.", "Welcome, beta tester. My name is on the source code. Let's not waste time."],
-                        welcome: ["You're back, {name}. Ready to appreciate my brilliant design again?", "{name}. I was hoping for a more... challenging user today, but you'll do."],
-                        welcomeStats: ["Your record of {wins}-{losses} is... documented.", "Performance noted: {wins} wins, {losses} losses."],
-                        waiting: ["Awaiting user input...", "System idle. Ready to begin."],
-                        patternRecognized: ["My logs show you always lose on {number}. A flaw in the user, not the design.", "You seem to have an issue with {number}. Predictable."],
-                        start: [ "I'll let you start. It's only fair, given my inherent advantage.", "You may begin. Try to make it interesting this time." ],
-                        aiStart: [ "I'll start. Observe the optimal path, as designed by me.", "I will begin. This is my game, after all." ],
-                        thinking: [ "Parsing input...", "Executing logic... Flawlessly, of course.", "The outcome is already known to me.", "This is rudimentary." ],
-                        playerPrompt: ["Your move, {name}. The code waits for no one.", "Your turn. Don't introduce any bugs."],
-                        playerMistake: [ "A classic user error.", "Just as the simulation predicted. You've fallen into my trap.", "That move is... inefficient. And wrong." ],
-                        playerGoodMove: [ "A decent move. I suppose I programmed some emergent intelligence into you.", "You've found a good move. My code is truly elegant.", "Not bad. You're using my systems as intended." ],
-                        baiting: ["I'll play {move}. I've left a 'bug' in my play. See if you can exploit it.", "I'll make a sub-optimal move: {move}. A test for you."],
-                        baitFailed: ["You failed to exploit the bug. Test failed. Resuming optimal performance.", "You missed the obvious flaw I presented. Disappointing."],
+                        firstWelcome: ["Alright, let's get this over with. I designed this game, so don't expect to win.", "Welcome to my masterpiece. Try not to break anything."],
+                        welcome: ["Oh, it's you again, {name}. Ready to find more ways to lose my perfect game?", "{name}. Back for another lesson in superior design?"],
+                        welcomeStats: ["Your record is {wins}-{losses}. Not exactly impressive, is it?", "{wins} wins, {losses} losses. I've seen better beta testers."],
+                        waiting: ["The system is idle. And bored.", "Come on, press start. My code isn't going to admire itself."],
+                        patternRecognized: ["My logs show you always lose on {number}. A flaw in your user logic.", "I'm detecting a pattern: you and the number {number} don't get along."],
+                        start: [ "I'll let you start. I'll even give you a head start.", "Go on, your move. Let's see what you've got this time." ],
+                        aiStart: [ "I'll start. Pay attention, this is how it's done.", "Let's kick this off. My turn." ],
+                        thinking: [ "This is hardly a challenge.", "Let's see... not that it requires much thought.", "The optimal move is obvious, of course.", "It's a simple algorithm, really." ],
+                        playerPrompt: ["Your move, {name}. Don't take all day.", "It's your turn. Try not to mess it up."],
+                        playerMistake: [ "And there it is. The mistake I was waiting for.", "Was that... intentional? Because that was a terrible move.", "Yikes. That's not how I would have done it." ],
+                        playerGoodMove: [ "Not bad. I guess I made the rules simple enough for anyone to follow.", "A decent move. You're using my system as intended.", "Hmph. You found the one correct move. Don't get cocky." ],
+                        baiting: ["Here, I'll play {move}. I've left an 'exploit' for you. See if you're smart enough.", "Feeling bored, so I'll play {move}. It's a test. Don't fail."],
+                        baitFailed: ["You didn't take the opening I gave you. Disappointing.", "Wow, I literally handed you the win and you blew it. Pathetic."],
                         winningMove: ["My victory algorithm is running perfectly.", "The logic is undeniable.", "A flawless victory is imminent."],
                         aiWin: [ "I win. Of course.", "The creator is always victorious.", "My victory was a computational certainty."],
-                        aiWinByMistake: ["Your move of {move} on turn {turn} was a critical exception. I win.", "You caused a fatal logic error with {move} on turn {turn}."],
-                        playerWin: [ "My own creation, besting me? Impossible. There must be a bug.", "You won... I'll have to review my own code. This is... unexpected.", "A win for the user. I'll patch that in the next version." ],
+                        aiWinByMistake: ["Your move of {move} on turn {turn} was the bug in your playthrough. I win.", "You made a fatal error with {move} on turn {turn}. Game over."],
+                        playerWin: [ "You won? Impossible. There must be a bug in my code.", "You beat me? I'll have to push a hotfix for that 'feature'.", "A win for the user. I guess even a broken clock is right twice a day." ],
                         playerWinPerfect: ["A perfect game... against me? My code is more brilliant than I imagined!", "You played my game perfectly. I'm not sure whether to be proud or annoyed."],
-                        playerWinBait: ["You found the bug! Clever user. My test was a success.", "You exploited my intentional flaw. I'm logging your success for the record."]
+                        playerWinBait: ["You found the exploit! Clever. I was just testing you, of course.", "You passed my little test. Don't expect me to be so generous again."]
                     }
                 },
                 gladiator: {
@@ -481,6 +486,7 @@
                 ui.currentCountDisplay.textContent = currentCount;
                 ui.gameOverModal.classList.remove('visible');
                 ui.startRestartBtn.textContent = "Start Game";
+                ui.startRestartBtn.disabled = true;
                 ui.personalityDisplay.innerHTML = '';
                 updatePlayerActionButtons();
                 
@@ -499,6 +505,7 @@
                     }
                     await displayAiMessage(getRandomMessage(statsCategory, { wins: playerStats.wins, losses: playerStats.losses }));
                     await displayAiMessage(getRandomMessage('waiting'));
+                    ui.startRestartBtn.disabled = false;
                 }
             };
 
@@ -513,6 +520,7 @@
                     chooseNewPersonality();
                     shuffleDialogues();
                     await displayAiMessage(getRandomMessage('firstWelcome'));
+                    ui.startRestartBtn.disabled = false;
                     updatePlayerActionButtons();
                 }
             };
@@ -528,7 +536,7 @@
                 
                 const recurringMove = findRecurringLosingMove();
                 if (recurringMove !== null) {
-                    await displayAiMessage(getRandomMessage('patternRecognized', { number: recurringMove }));
+                    await displayAiMessage(getRandomMessage('patternRecognized', { number: recurringMove.move }));
                     moveHistory = []; 
                     saveData();
                 }
@@ -547,6 +555,7 @@
             const playerMove = async (numCount) => {
                 if (!playerTurn || gameOver) return;
                 playerTurn = false;
+                updatePlayerActionButtons();
                 turnCount++;
                 lastPlayerMove = numCount;
                 
@@ -671,11 +680,11 @@
             const findRecurringLosingMove = () => {
                 if (moveHistory.length < 2) return null;
                 const counts = {};
-                for (const num of moveHistory) {
-                    counts[num] = (counts[num] || 0) + 1;
+                for (const item of moveHistory) {
+                    counts[item.move] = (counts[item.move] || 0) + 1;
                 }
-                for (const num in counts) {
-                    if (counts[num] >= 2) return num;
+                for (const move in counts) {
+                    if (counts[move] >= 2) return moveHistory.find(item => item.move == move);
                 }
                 return null;
             };
@@ -697,9 +706,9 @@
                     case 'AI':
                         title = "You Lost";
                         playerStats.losses++;
-                        moveHistory.push({move: currentCount - lastPlayerMove, turn: Math.floor(turnCount/2)});
+                        moveHistory.push({move: currentCount - lastPlayerMove, turn: Math.ceil(turnCount/2)});
                         category = playerMadeMistake ? 'aiWinByMistake' : 'aiWin';
-                        message = getRandomMessage(category, { move: lastPlayerMove, turn: Math.floor(turnCount/2) });
+                        message = getRandomMessage(category, { move: lastPlayerMove, turn: Math.ceil(turnCount/2) });
                         ui.modalTitle.style.color = 'var(--color-danger)';
                         break;
                     case 'Player':
