@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v3.8</title>
+    <title>The 1 to 20 Game v3.9</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -120,7 +120,6 @@
             display: flex; 
             justify-content: center; 
             align-items: center;
-            line-height: 1;
             padding: 0; /* More robust centering */
         }
         .action-btn:hover:not(:disabled) {
@@ -336,7 +335,7 @@
                     }
                 },
                  analyst: {
-                    name: 'Analyst',
+                    name: 'The Analyst',
                     dialogue: {
                         firstWelcome: ["Welcome. Let's begin the analysis.", "A new subject. Please, select a difficulty."],
                         welcome: ["Welcome back, {name}.", "Good to see you again, {name}."],
@@ -360,7 +359,7 @@
                     }
                 },
                 rival: {
-                    name: 'Rival',
+                    name: 'The Rival',
                     dialogue: {
                         firstWelcome: ["A new challenger? Don't waste my time.", "First time? Try not to make this too boring."],
                         welcome: ["Look who's back for more, {name}!", "Oh, it's you, {name}. Ready to lose again?"],
@@ -416,19 +415,19 @@
                         welcomeStats_many: ["My memory says you have {wins} wins and {losses} losses. That's a lot!", "You've played a bunch! Your record is {wins} to {losses}!"],
                         waiting: ["Ready when you are!", "It's not scary, I promise!"],
                         patternRecognized: ["Eep! My logs show you have trouble with {number}. Me too sometimes!", "Oh! Be careful around {number}. It's a tricky one!"],
-                        start: [ "Okay, you can go first. Phew.", "You start! I'm... still booting up.", "Here we go! Good luck! To both of us!" ],
+                        start: [ "Okay, you can go first. Phew.", "You start! I'm... still getting ready.", "Here we go! Good luck! To both of us!" ],
                         aiStart: [ "ME?! Oh, okay, I'll start! Um... one!", "I'll go! Let's try... this one!", "Okay okay okay, my turn, here I go!" ],
-                        thinking: [ "BEEP BOOP... Is this right?", "Wait, carry the one...", "My processors are overheating!", "Uh oh.", "Does not compute!", "Thinking... please wait..." ],
+                        thinking: [ "Ummmm...", "Wait, carry the one...", "Oh my gosh, thinking...", "So much pressure!", "Let's see, let's see...", "Thinking... please wait..." ],
                         playerPrompt: ["Your turn, {name}! I think!", "Um, you can go now, {name}."],
-                        playerMistake: [ "Oh! I think I see a thing!", "Is that a mistake? Maybe! I'll take it!", "Wait, that move... my circuits are buzzing!", "I think that's good for me! Yay!" ],
-                        playerGoodMove: [ "Oh, shoot. You're good at this.", "Drats. You blocked me.", "Wow, good move! How'd you see that?", "My poor circuits... that was a good move." ],
+                        playerMistake: [ "Oh! I think I see a thing!", "Is that a mistake? Maybe! I'll take it!", "Wait, that move... I think that helps me!", "I think that's good for me! Yay!" ],
+                        playerGoodMove: [ "Oh, shoot. You're good at this.", "Drats. You blocked me.", "Wow, good move! How'd you see that?", "Aww, that was a really good move." ],
                         baiting: ["I'm just gonna play {move}. Is that okay? I hope that's okay.", "Let's try {move}. I'm not sure if that's a good idea..."],
                         baitFailed: ["Oh, you didn't... oh. Okay. My turn again I guess!", "Phew! I was worried for a second there!"],
                         winningMove: ["I think... I think I'm going to win!", "YES! I DID IT!", "Is this the winning move? I hope so!"],
                         aiWin: [ "I WON! I can't believe it! Did you see?!", "Wow! I actually won! Hooray!", "Did I... did I win? Yes! Awesome!" ],
-                        aiWinByMistake: ["You picked {move} on turn {turn}, and then my lights went all blinky! I win!", "Your move {move} on turn {turn} made it easy! Thanks!"],
+                        aiWinByMistake: ["You picked {move} on turn {turn}, and then... oh! I think I win!", "Your move {move} on turn {turn} made it easy! Thanks!"],
                         playerWin: [ "Aw, you won! Good game!", "You're really good at this! Congratulations!", "I lost again! But that was fun!", "Congrats! You're the winner!" ],
-                        playerWinPerfect: ["WOW! A perfect game!", "You're like a super computer!", "That was amazing! You didn't make any mistakes!"],
+                        playerWinPerfect: ["WOW! A perfect game!", "You're like a super genius!", "That was amazing! You didn't make any mistakes!"],
                         playerWinBait: ["You saw my secret move! You're so smart!", "Yay! You figured out my little trap! Good job!"]
                     }
                 }
@@ -555,7 +554,6 @@
                     isBaiting = false; 
                     if (isTakingBait) {
                         playerTookBait = true;
-                        await displayAiMessage(getRandomMessage('playerWinBait'));
                     } else {
                          await displayAiMessage(getRandomMessage('baitFailed'));
                     }
