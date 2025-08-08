@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v4.2</title>
+    <title>The 1 to 20 Game v4.3</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -281,9 +281,8 @@
             };
 
             // Game State
-            let gameState = 'booting';
-            let currentCount = 0, turnCount = 0;
-            let lastPlayerMove = 0, playerMadeMistake = false, isBaiting = false;
+            let gameOver = true, playerTurn = true, aiDifficulty = 'hard', turnCount = 0;
+            let currentCount = 0, lastPlayerMove = 0, playerMadeMistake = false, isBaiting = false;
             let currentPersonality, lastPersonalityName = '';
             let shuffledDialogue = {};
 
@@ -479,35 +478,22 @@
                 localStorage.setItem('lastPersonality_1to20_v3', lastPersonalityName);
             };
 
-            // Game State Management
-            const setGameState = (newState) => {
-                gameState = newState;
-                ui.startRestartBtn.disabled = !['waiting', 'gameOver', 'playerTurn'].includes(newState);
-                ui.difficultySelect.disabled = !['waiting', 'gameOver'].includes(newState);
-                
-                if(newState === 'playerTurn') {
-                    ui.startRestartBtn.textContent = "Restart Game";
-                    updatePlayerActionButtons(true);
-                } else if (newState === 'aiTurn') {
-                    ui.startRestartBtn.textContent = "Restart Game";
-                    updatePlayerActionButtons(false);
-                } else { // waiting, gameOver, booting
-                    ui.startRestartBtn.textContent = "Start Game";
-                    updatePlayerActionButtons(false);
-                }
-            };
-            
-            // Game Flow
+            // Game Flow & State
+            const updateUIForState = (state, playerCanMove = false) => {
+                ui.startRestartBtn.disabled = !['waiting', 'gameOver'].includes(state);
+                ui.difficultySelect.disabled = !['waiting', 'gameOver'].includes(state);
+                ui.startRestartBtn.textContent = (state === 'waiting' || state === 'gameOver') ? "Start Game" : "Restart Game";
+                updatePlayerActionButtons(playerCanMove);
+            }
+
             const initGame = async () => {
-                currentCount = 0;
-                turnCount = 0;
-                isBaiting = false; 
-                playerMadeMistake = false;
+                gameState = 'booting';
+                currentCount = 0; turnCount = 0; isBaiting = false; playerMadeMistake = false;
                 ui.currentCountDisplay.textContent = currentCount;
                 ui.gameOverModal.classList.remove('visible');
                 ui.personalityDisplay.innerHTML = '';
-                setGameState('booting');
-                
+                updateUIForState(gameState);
+
                 loadData();
                 if (!playerName) {
                     ui.nameModal.classList.add('visible');
@@ -523,7 +509,8 @@
                     }
                     await displayAiMessage(getRandomMessage(statsCategory, { wins: playerStats.wins, losses: playerStats.losses }));
                     await displayAiMessage(getRandomMessage('waiting'));
-                    setGameState('waiting');
+                    gameState = 'waiting';
+                    updateUIForState(gameState);
                 }
             };
 
@@ -538,19 +525,20 @@
                     chooseNewPersonality();
                     shuffleDialogues();
                     await displayAiMessage(getRandomMessage('firstWelcome'));
-                    setGameState('waiting');
+                    gameState = 'waiting';
+                    updateUIForState(gameState);
                 }
             };
             
             const startGame = async () => {
                 if (gameState !== 'waiting') return;
-                setGameState('aiTurn');
-                turnCount = 1;
-                playerMadeMistake = false; 
-                isBaiting = false;
+                
+                gameState = 'starting';
+                updateUIForState(gameState, false);
+
+                turnCount = 1; playerMadeMistake = false; isBaiting = false;
                 chooseNewPersonality();
                 shuffleDialogues();
-                
                 aiDifficulty = ui.difficultySelect.value;
                 
                 const recurringMove = findRecurringLosingMove();
@@ -562,16 +550,19 @@
                 
                 if (Math.random() > 0.5) {
                     await displayAiMessage(getRandomMessage('start'));
-                    setGameState('playerTurn');
+                    playerTurn = true;
+                    updateUIForState('playerTurn', true);
                 } else {
+                    playerTurn = false;
                     await displayAiMessage(getRandomMessage('aiStart'));
                     await aiTurn();
                 }
             };
 
             const playerMove = async (numCount) => {
-                if (gameState !== 'playerTurn') return;
-                setGameState('aiTurn');
+                if (!playerTurn) return;
+                playerTurn = false;
+                updateUIForState('aiTurn', false);
                 turnCount++;
                 lastPlayerMove = numCount;
                 
@@ -611,7 +602,6 @@
             };
             
             const aiTurn = async () => {
-                if (gameState === 'gameOver') return;
                 turnCount++;
                 
                 if (aiDifficulty === 'hard' && !isBaiting && !isMultipleOfFour(currentCount) && Math.random() < 0.15) {
@@ -621,7 +611,8 @@
                     
                     await displayAiMessage(getRandomMessage('baiting', {move: baitMove}));
                     updateGame(currentCount + baitMove);
-                    setGameState('playerTurn');
+                    playerTurn = true;
+                    updateUIForState('playerTurn', true);
                     return;
                 }
 
@@ -652,7 +643,8 @@
                 
                 const promptMsg = getRandomMessage('playerPrompt', { name: playerName });
                 ui.aiStatusBox.innerHTML = promptMsg;
-                setGameState('playerTurn');
+                playerTurn = true;
+                updateUIForState('playerTurn', true);
                 await sleep(calculateReadingTime(promptMsg));
             };
             
@@ -707,7 +699,7 @@
             const updateGame = (newCount) => {
                 currentCount = newCount;
                 ui.currentCountDisplay.textContent = newCount;
-                updatePlayerActionButtons(gameState === 'playerTurn');
+                updatePlayerActionButtons(playerTurn);
             };
 
             const endGame = async (winner) => {
@@ -745,13 +737,15 @@
                 setTimeout(() => ui.gameOverModal.classList.add('visible'), 500);
             };
 
-            const updatePlayerActionButtons = (isPlayerTurn) => {
+            const updatePlayerActionButtons = (isPlayerActive) => {
                 ui.playerActionButtons.forEach(button => {
                     const moveCount = parseInt(button.dataset.move, 10);
                     const potentialCount = currentCount + moveCount;
                     
-                    if (potentialCount > 20 || gameState === 'gameOver' || gameState === 'waiting' || gameState === 'booting' || !isPlayerTurn) {
-                        button.textContent = 'X';
+                    if (potentialCount > 20 || !isPlayerActive) {
+                        button.textContent = (gameState === 'waiting' || gameState === 'gameOver') ? potentialCount : 'X';
+                        if(gameState === 'waiting' || gameState === 'gameOver') button.textContent = 'X';
+                        else button.textContent = potentialCount;
                         button.disabled = true;
                     } else {
                         button.textContent = potentialCount;
