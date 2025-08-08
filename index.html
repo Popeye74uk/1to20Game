@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v4.3</title>
+    <title>The 1 to 20 Game v3.8</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -121,7 +121,7 @@
             justify-content: center; 
             align-items: center;
             line-height: 1;
-            padding: 0;
+            padding: 0; /* More robust centering */
         }
         .action-btn:hover:not(:disabled) {
             background-color: var(--color-accent-dark); 
@@ -167,11 +167,7 @@
             font-weight: bold; 
             cursor: pointer; 
             width: 100%; 
-            transition: background-color 0.2s, opacity 0.2s;
-        }
-        #start-restart-btn:disabled {
-            cursor: not-allowed;
-            opacity: 0.6;
+            transition: background-color 0.2s;
         }
         .modal {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
@@ -204,9 +200,8 @@
             body { padding: 10px; }
             h1 { font-size: 1.6rem; }
             #game-container { padding: 1.5rem; }
-            #player-actions { gap: 0.5rem; }
-            .action-btn { font-size: 2rem; }
             #current-count { font-size: 6rem; }
+            .action-btn { font-size: 2rem; }
             #ai-status { font-size: 1rem; }
         }
     </style>
@@ -281,8 +276,8 @@
             };
 
             // Game State
-            let gameOver = true, playerTurn = true, aiDifficulty = 'hard', turnCount = 0;
-            let currentCount = 0, lastPlayerMove = 0, playerMadeMistake = false, isBaiting = false, isInitializing = false;
+            let currentCount = 0, playerTurn = true, gameOver = true, aiDifficulty = 'hard', turnCount = 0;
+            let lastPlayerMove = 0, playerMadeMistake = false, isBaiting = false, playerTookBait = false;
             let currentPersonality, lastPersonalityName = '';
             let shuffledDialogue = {};
 
@@ -295,25 +290,25 @@
                 creator: {
                     name: 'The Creator',
                     dialogue: {
-                        firstWelcome: ["Alright, let's get this over with. I designed this game, so don't expect to win.", "Welcome to my masterpiece. Try not to break anything."],
-                        welcome: ["Oh, it's you again, {name}. Ready to find more ways to lose my perfect game?", "{name}. Back for another lesson in superior design?"],
-                        welcomeStats: ["Your record is {wins}-{losses}. Not exactly impressive, is it?", "{wins} wins, {losses} losses. I've seen better beta testers."],
-                        waiting: ["The system is idle. And bored.", "Come on, press start. My code isn't going to admire itself."],
-                        patternRecognized: ["My logs show you always lose on {number}. A flaw in your user logic.", "I'm detecting a pattern: you and the number {number} don't get along."],
-                        start: [ "I'll let you start. I'll even give you a head start.", "Go on, your move. Let's see what you've got this time." ],
-                        aiStart: [ "I'll start. Pay attention, this is how it's done.", "Let's kick this off. My turn." ],
-                        thinking: [ "This is hardly a challenge.", "Let's see... not that it requires much thought.", "The optimal move is obvious, of course.", "It's a simple algorithm, really." ],
-                        playerPrompt: ["Your move, {name}. Don't take all day.", "It's your turn. Try not to mess it up."],
-                        playerMistake: [ "And there it is. The mistake I was waiting for.", "Was that... intentional? Because that was a terrible move.", "Yikes. That's not how I would have done it." ],
-                        playerGoodMove: [ "Not bad. I guess I made the rules simple enough for anyone to follow.", "A decent move. You're using my system as intended.", "Hmph. You found the one correct move. Don't get cocky." ],
-                        baiting: ["Here, I'll play {move}. I've left an 'exploit' for you. See if you're smart enough.", "Feeling bored, so I'll play {move}. It's a test. Don't fail."],
-                        baitFailed: ["You didn't take the opening I gave you. Disappointing.", "Wow, I literally handed you the win and you blew it. Pathetic."],
-                        winningMove: ["My victory algorithm is running perfectly.", "The logic is undeniable.", "A flawless victory is imminent."],
-                        aiWin: [ "I win. Of course.", "The creator is always victorious.", "My victory was a computational certainty."],
-                        aiWinByMistake: ["Your move of {move} on turn {turn} was the bug in your playthrough. I win.", "You made a fatal error with {move} on turn {turn}. Game over."],
-                        playerWin: [ "You won? Impossible. There must be a bug in my code.", "You beat me? I'll have to push a hotfix for that 'feature'.", "A win for the user. I guess even a broken clock is right twice a day." ],
-                        playerWinPerfect: ["A perfect game... against me? My code is more brilliant than I imagined!", "You played my game perfectly. I'm not sure whether to be proud or annoyed."],
-                        playerWinBait: ["You found the exploit! Clever. I was just testing you, of course.", "You passed my little test. Don't expect me to be so generous again."]
+                        firstWelcome: ["Alright, let's spin this up. I wrote this thing, so try not to break it.", "Welcome to my little project. I'm the architect of this game, so let's see if you can find any... 'undocumented features'."],
+                        welcome: ["Oh, it's {name}. Back to admire my work, I see.", "{name}. Ready for another round? Hope you've brushed up on basic logic since last time."],
+                        welcomeStats: ["Your W-L ratio is {wins}-{losses}. The data doesn't lie.", "Record shows {wins} wins and {losses} losses. Keep feeding my metrics, I guess."],
+                        waiting: ["The game loop is waiting for your input. Any day now...", "Ready to commit? Go on, press Start."],
+                        patternRecognized: ["My logs show you keep failing on {number}. It's not a bug, it's a feature of your playstyle.", "You have a recurring logic error around the number {number}. Predictable."],
+                        start: ["You can have the first turn. Call it a handicap.", "Go ahead, you start. Let's see your opening strategy. Or lack thereof."],
+                        aiStart: ["I'll start. Watch and learn the optimal play.", "My turn to initialize. This is my code, after all."],
+                        thinking: ["Compiling my next move...", "Running simulations... okay, it wasn't that hard.", "Parsing your... 'strategy'.", "This is just a simple conditional."],
+                        playerPrompt: ["Your move, {name}. Don't take all day, my processor is getting bored.", "Okay, {name}, your turn. Try not to throw an exception."],
+                        playerMistake: ["Yikes. That's not just a bad move, that's a user error.", "And... you've fallen right into the trap. As designed.", "That move is deprecated. And wrong."],
+                        playerGoodMove: ["Not bad. You found the one optimal path. Took you long enough.", "Huh. A decent move. You must have read the source code.", "Okay, you avoided the obvious trap. The game continues."],
+                        baiting: ["Alright, I'll play {move}. I'm leaving an obvious exploit for you. Let's see if you're smart enough to take it.", "I'm making a suboptimal move: {move}. Consider it a unit test for your brain."],
+                        baitFailed: ["You didn't take the bait. Test failed. Reverting to unbeatable_mode.js.", "Wow. I gift-wrapped the win for you and you just... ignored it. Disappointing."],
+                        winningMove: ["And... that's a forced win. My logic is impeccable.", "The final sequence is running. Checkmate.", "It's over. I saw this outcome 3 moves ago."],
+                        aiWin: ["I win. Shocker.", "As the creator, I am, by definition, the master of this domain.", "My victory was a computational certainty. GG."],
+                        aiWinByMistake: ["Your move of {move} on turn {turn} was a critical error. Game over.", "You choosing {move} on turn {turn} caused a fatal logic error in your strategy. I win."],
+                        playerWin: ["Wait, what? You won? Impossible. There must be a bug in the code.", "You won... I'll have to check the logs. This is... unexpected.", "A win for the user. Fine. I'll patch out that exploit in the next push."],
+                        playerWinPerfect: ["A perfect game... against my own logic? My code has achieved sentience!", "You played perfectly. I'm not sure whether to be impressed or to refactor the entire difficulty module."],
+                        playerWinBait: ["Hah, you found the exploit! Clever user. I'll mark that test case as 'passed'.", "You exploited the flaw I left for you. I'll log your success... for analytics, of course."]
                     }
                 },
                 gladiator: {
@@ -480,13 +475,12 @@
 
             // Game Flow
             const initGame = async () => {
-                gameOver = true; currentCount = 0; playerTurn = false; turnCount = 0;
-                isBaiting = false; playerMadeMistake = false;
+                gameOver = true; currentCount = 0; playerTurn = true; turnCount = 0;
+                isBaiting = false; playerMadeMistake = false; playerTookBait = false;
                 ui.difficultySelect.disabled = false;
                 ui.currentCountDisplay.textContent = currentCount;
                 ui.gameOverModal.classList.remove('visible');
                 ui.startRestartBtn.textContent = "Start Game";
-                ui.startRestartBtn.disabled = true;
                 ui.personalityDisplay.innerHTML = '';
                 updatePlayerActionButtons();
                 
@@ -505,7 +499,6 @@
                     }
                     await displayAiMessage(getRandomMessage(statsCategory, { wins: playerStats.wins, losses: playerStats.losses }));
                     await displayAiMessage(getRandomMessage('waiting'));
-                    ui.startRestartBtn.disabled = false;
                 }
             };
 
@@ -520,23 +513,22 @@
                     chooseNewPersonality();
                     shuffleDialogues();
                     await displayAiMessage(getRandomMessage('firstWelcome'));
-                    ui.startRestartBtn.disabled = false;
                     updatePlayerActionButtons();
                 }
             };
             
             const startGame = async () => {
-                gameOver = false; playerMadeMistake = false; isBaiting = false; turnCount = 1;
-                ui.startRestartBtn.disabled = true;
+                gameOver = false; playerMadeMistake = false; isBaiting = false; turnCount = 1; playerTookBait = false;
                 chooseNewPersonality();
                 shuffleDialogues();
                 
                 aiDifficulty = ui.difficultySelect.value;
                 ui.difficultySelect.disabled = true;
+                ui.startRestartBtn.textContent = "Restart Game";
                 
                 const recurringMove = findRecurringLosingMove();
                 if (recurringMove !== null) {
-                    await displayAiMessage(getRandomMessage('patternRecognized', { number: recurringMove.move }));
+                    await displayAiMessage(getRandomMessage('patternRecognized', { number: recurringMove }));
                     moveHistory = []; 
                     saveData();
                 }
@@ -549,15 +541,12 @@
                     await displayAiMessage(getRandomMessage('aiStart'));
                     await aiTurn();
                 }
-                ui.startRestartBtn.textContent = "Restart Game";
-                ui.startRestartBtn.disabled = false;
                 updatePlayerActionButtons();
             };
 
             const playerMove = async (numCount) => {
                 if (!playerTurn || gameOver) return;
                 playerTurn = false;
-                updatePlayerActionButtons();
                 turnCount++;
                 lastPlayerMove = numCount;
                 
@@ -565,9 +554,8 @@
                     const isTakingBait = isMultipleOfFour(currentCount + numCount);
                     isBaiting = false; 
                     if (isTakingBait) {
-                        updateGame(currentCount + numCount);
-                        await endGame('PlayerBait');
-                        return;
+                        playerTookBait = true;
+                        await displayAiMessage(getRandomMessage('playerWinBait'));
                     } else {
                          await displayAiMessage(getRandomMessage('baitFailed'));
                     }
@@ -622,14 +610,11 @@
                 
                 const isWinningMove = isMultipleOfFour(currentCount + numbersToSay) && numbersToSay > 0 && wasOptimal;
 
-                if (isWinningMove && currentPersonality.name === 'The Creator') {
-                    await countingWin(numbersToSay);
-                } else {
-                    if (isWinningMove && currentCount >= 16) {
-                        await displayAiMessage(getRandomMessage('winningMove'));
-                    }
-                    updateGame(currentCount + numbersToSay);
+                if (isWinningMove && currentCount >= 16) {
+                    await displayAiMessage(getRandomMessage('winningMove'));
                 }
+                
+                updateGame(currentCount + numbersToSay);
 
                 if (currentCount >= 20) {
                     await sleep(500);
@@ -642,15 +627,6 @@
                 playerTurn = true;
                 updatePlayerActionButtons();
                 await sleep(calculateReadingTime(promptMsg));
-            };
-            
-            const countingWin = async (numbersToSay) => {
-                const finalCount = currentCount + numbersToSay;
-                updateGame(finalCount);
-                 for (let i = 1; i <= numbersToSay; i++) {
-                    ui.aiStatusBox.innerHTML = `<em>${currentCount - numbersToSay + i}...</em>`;
-                    await sleep(600);
-                }
             };
 
             // AI Logic
@@ -685,8 +661,8 @@
                 for (const item of moveHistory) {
                     counts[item.move] = (counts[item.move] || 0) + 1;
                 }
-                for (const move in counts) {
-                    if (counts[move] >= 2) return moveHistory.find(item => item.move == move);
+                for (const num in counts) {
+                    if (counts[num] >= 2) return num;
                 }
                 return null;
             };
@@ -708,22 +684,20 @@
                     case 'AI':
                         title = "You Lost";
                         playerStats.losses++;
-                        moveHistory.push({move: currentCount - lastPlayerMove, turn: Math.ceil(turnCount/2)});
+                        moveHistory.push({move: lastPlayerMove, turn: Math.floor(turnCount/2)});
                         category = playerMadeMistake ? 'aiWinByMistake' : 'aiWin';
-                        message = getRandomMessage(category, { move: lastPlayerMove, turn: Math.ceil(turnCount/2) });
+                        message = getRandomMessage(category, { move: lastPlayerMove, turn: Math.floor(turnCount/2) });
                         ui.modalTitle.style.color = 'var(--color-danger)';
                         break;
                     case 'Player':
                         title = "You Win!";
                         playerStats.wins++;
-                        category = !playerMadeMistake && aiDifficulty === 'hard' ? 'playerWinPerfect' : 'playerWin';
+                        if (playerTookBait) {
+                            category = 'playerWinBait';
+                        } else {
+                            category = !playerMadeMistake && aiDifficulty === 'hard' ? 'playerWinPerfect' : 'playerWin';
+                        }
                         message = getRandomMessage(category);
-                        ui.modalTitle.style.color = 'var(--color-success)';
-                        break;
-                    case 'PlayerBait':
-                        title = "You Win!";
-                        playerStats.wins++;
-                        message = getRandomMessage('playerWinBait');
                         ui.modalTitle.style.color = 'var(--color-success)';
                         break;
                 }
@@ -802,13 +776,7 @@
             ui.playerActionButtons.forEach(button => {
                 button.addEventListener('click', () => playerMove(parseInt(button.dataset.move, 10)));
             });
-            ui.startRestartBtn.addEventListener('click', () => {
-                if (ui.startRestartBtn.textContent === "Start Game") {
-                    startGame();
-                } else {
-                    initGame();
-                }
-            });
+            ui.startRestartBtn.addEventListener('click', () => gameOver ? startGame() : initGame());
             ui.playAgainBtn.addEventListener('click', initGame);
             ui.nameForm.addEventListener('submit', handleNameConfirmation);
 
