@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v3.8</title>
+    <title>The 1 to 20 Game v4.3</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -204,8 +204,8 @@
             body { padding: 10px; }
             h1 { font-size: 1.6rem; }
             #game-container { padding: 1.5rem; }
-            #player-actions { gap: 0.5rem; } /* Mobile UI fix */
-            .action-btn { font-size: 2rem; } /* Mobile UI fix */
+            #player-actions { gap: 0.5rem; }
+            .action-btn { font-size: 2rem; }
             #current-count { font-size: 6rem; }
             #ai-status { font-size: 1rem; }
         }
@@ -281,8 +281,8 @@
             };
 
             // Game State
-            let currentCount = 0, playerTurn = true, gameOver = true, aiDifficulty = 'hard', turnCount = 0;
-            let lastPlayerMove = 0, playerMadeMistake = false, isBaiting = false, isInitializing = false;
+            let gameOver = true, playerTurn = true, aiDifficulty = 'hard', turnCount = 0;
+            let currentCount = 0, lastPlayerMove = 0, playerMadeMistake = false, isBaiting = false, isInitializing = false;
             let currentPersonality, lastPersonalityName = '';
             let shuffledDialogue = {};
 
@@ -480,7 +480,7 @@
 
             // Game Flow
             const initGame = async () => {
-                gameOver = true; currentCount = 0; playerTurn = true; turnCount = 0;
+                gameOver = true; currentCount = 0; playerTurn = false; turnCount = 0;
                 isBaiting = false; playerMadeMistake = false;
                 ui.difficultySelect.disabled = false;
                 ui.currentCountDisplay.textContent = currentCount;
@@ -527,12 +527,12 @@
             
             const startGame = async () => {
                 gameOver = false; playerMadeMistake = false; isBaiting = false; turnCount = 1;
+                ui.startRestartBtn.disabled = true;
                 chooseNewPersonality();
                 shuffleDialogues();
                 
                 aiDifficulty = ui.difficultySelect.value;
                 ui.difficultySelect.disabled = true;
-                ui.startRestartBtn.textContent = "Restart Game";
                 
                 const recurringMove = findRecurringLosingMove();
                 if (recurringMove !== null) {
@@ -549,6 +549,8 @@
                     await displayAiMessage(getRandomMessage('aiStart'));
                     await aiTurn();
                 }
+                ui.startRestartBtn.textContent = "Restart Game";
+                ui.startRestartBtn.disabled = false;
                 updatePlayerActionButtons();
             };
 
@@ -800,7 +802,13 @@
             ui.playerActionButtons.forEach(button => {
                 button.addEventListener('click', () => playerMove(parseInt(button.dataset.move, 10)));
             });
-            ui.startRestartBtn.addEventListener('click', () => gameOver ? startGame() : initGame());
+            ui.startRestartBtn.addEventListener('click', () => {
+                if (ui.startRestartBtn.textContent === "Start Game") {
+                    startGame();
+                } else {
+                    initGame();
+                }
+            });
             ui.playAgainBtn.addEventListener('click', initGame);
             ui.nameForm.addEventListener('submit', handleNameConfirmation);
 
