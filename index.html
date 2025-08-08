@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v4.9</title>
+    <title>The 1 to 20 Game v5.0</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -66,7 +66,9 @@
             width: 100%;
             height: 100%;
             border-radius: 0;
-            justify-content: center;
+            justify-content: space-between; /* This is the key fix */
+            padding: 2rem 0; /* Add vertical breathing room */
+            box-sizing: border-box;
         }
 
         #ai-status-wrapper {
@@ -78,6 +80,7 @@
             align-items: center; 
             justify-content: center; 
             gap: 10px;
+            margin: 0 2rem; /* Add horizontal margin in fullscreen */
             margin-bottom: 0;
         }
         #personality-display {
@@ -91,6 +94,10 @@
             color: var(--color-text-secondary);
             font-style: italic;
         }
+        #game-container:fullscreen #personality-display {
+            margin-right: 2rem; /* Align with status box in fullscreen */
+        }
+
         #ai-status {
             font-style: italic; 
             font-size: 1.2rem; 
@@ -116,6 +123,8 @@
             gap: 1rem;
             margin-bottom: 2rem;
             align-items: center;
+            margin-left: 2rem; /* Add horizontal margin in fullscreen */
+            margin-right: 2rem;
         }
         .action-btn {
             background-color: var(--color-accent);
@@ -149,6 +158,7 @@
             grid-template-columns: 1fr; 
             align-items: center; 
             gap: 1rem; 
+            margin: 0 2rem; /* Add horizontal margin in fullscreen */
         }
         .control-group { 
             display: flex; 
