@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v4.3</title>
+    <title>The 1 to 20 Game v4.4</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -109,6 +109,7 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 1rem;
             margin-bottom: 2rem;
+            align-items: center; /* Ensures vertical alignment of grid items */
         }
         .action-btn {
             background-color: var(--color-accent);
@@ -118,13 +119,12 @@
             font-size: 2.5rem;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.2s, opacity 0.2s; /* Removed transform from transition */
+            transition: background-color 0.2s, opacity 0.2s, transform 0.2s;
             aspect-ratio: 1 / 1;
             display: flex;
             justify-content: center;
             align-items: center;
         }
-        /* Media Query to apply hover effects only on devices that can hover */
         @media (hover: hover) {
             .action-btn:hover:not(:disabled) {
                 background-color: var(--color-accent-dark); 
@@ -505,16 +505,12 @@
             // Game Flow
             const initGame = async () => {
                 gameOver = true;
-                updateGame(0);
                 playerTurn = true;
-                turnCount = 0;
-                isBaiting = false;
-                playerMadeMistake = false;
-                playerTookBait = false;
                 ui.difficultySelect.disabled = false;
                 ui.gameOverModal.classList.remove('visible');
                 ui.startRestartBtn.textContent = "Start Game";
                 ui.personalityDisplay.innerHTML = '';
+                updateGame(0);
                 
                 loadData();
                 if (!playerName) {
@@ -536,10 +532,9 @@
                 }
             };
 
-            const handlePlayAgain = () => {
+            const handlePlayAgain = async () => {
                 ui.gameOverModal.classList.remove('visible');
-                updateGame(0);
-                startGame();
+                await startGame();
             };
 
             const handleNameConfirmation = async (event) => {
@@ -558,11 +553,14 @@
             };
             
             const startGame = async () => {
-                gameOver = false;
-                playerMadeMistake = false;
-                isBaiting = false;
+                updateGame(0); // Reset count display
+                playerTurn = true;
                 turnCount = 1;
+                isBaiting = false;
+                playerMadeMistake = false;
                 playerTookBait = false;
+                gameOver = false;
+                
                 chooseNewPersonality();
                 shuffleDialogues();
                 
@@ -632,18 +630,25 @@
                 if (gameOver) return;
                 turnCount++;
                 
+                // --- Baiting Logic ---
+                let decidedToBait = false;
                 if (aiDifficulty === 'hard' && !isBaiting && !isMultipleOfFour(currentCount) && Math.random() < 0.15) {
-                    isBaiting = true;
                     const optimalMove = 4 - (currentCount % 4);
                     let baitMove = (optimalMove % 3) + 1;
                     
-                    await displayAiMessage(getRandomMessage('baiting', {move: baitMove}));
-                    updateGame(currentCount + baitMove);
-                    playerTurn = true;
-                    updatePlayerActionButtons();
-                    return;
+                    // Bug Fix: Ensure bait move is legal
+                    if (currentCount + baitMove <= 20) {
+                        isBaiting = true;
+                        decidedToBait = true;
+                        await displayAiMessage(getRandomMessage('baiting', {move: baitMove}));
+                        updateGame(currentCount + baitMove);
+                        playerTurn = true;
+                        updatePlayerActionButtons();
+                        return; // End AI turn here
+                    }
                 }
 
+                // --- Standard Move Logic ---
                 await displayAiMessage(getRandomMessage('thinking'), true, null, 700 + Math.random() * 500);
 
                 const { move, wasOptimal } = getAiMove();
@@ -692,7 +697,7 @@
 
             const getOptimalMove = () => {
                 const remainder = currentCount % 4;
-                return (remainder === 0) ? { move: Math.floor(Math.random() * 3) + 1, wasOptimal: false } : { move: 4 - remainder, wasOptimal: true };
+                return (remainder === 0) ? { move: 0, wasOptimal: false } : { move: 4 - remainder, wasOptimal: true };
             };
 
             const getRandomMove = () => Math.floor(Math.random() * 3) + 1;
