@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v3.9</title>
+    <title>The 1 to 20 Game v4.0</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -120,7 +120,8 @@
             display: flex; 
             justify-content: center; 
             align-items: center;
-            padding: 0; /* More robust centering */
+            line-height: 1; /* Ensures consistent vertical alignment */
+            padding: 0;
         }
         .action-btn:hover:not(:disabled) {
             background-color: var(--color-accent-dark); 
@@ -534,13 +535,14 @@
                 
                 if (Math.random() > 0.5) {
                     playerTurn = true;
+                    updatePlayerActionButtons(); // Enable buttons immediately for player's turn
                     await displayAiMessage(getRandomMessage('start'));
                 } else {
                     playerTurn = false;
+                    updatePlayerActionButtons(); // Disable buttons for AI's turn
                     await displayAiMessage(getRandomMessage('aiStart'));
                     await aiTurn();
                 }
-                updatePlayerActionButtons();
             };
 
             const playerMove = async (numCount) => {
