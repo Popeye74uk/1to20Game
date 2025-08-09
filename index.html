@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v4.8</title>
+    <title>The 1 to 20 Game v4.9</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -625,16 +625,24 @@
 
             const updatePlayerActionButtons = () => {
                 ui.playerActionButtons.forEach(button => {
-                    const moveCount = parseInt(button.dataset.move, 10);
-                    const potentialCount = currentCount + moveCount;
+                    const moveValue = parseInt(button.dataset.move, 10);
+                    const potentialCount = currentCount + moveValue;
                     
-                    if (potentialCount > 20 || gameOver) {
-                        button.textContent = 'X';
-                        button.disabled = true;
-                    } else {
-                        button.textContent = potentialCount;
-                        button.disabled = !playerTurn;
-                    }
+                    // Determine if the move is valid (i.e., does not exceed 20)
+                    const isMoveValid = potentialCount <= 20;
+                    
+                    // --- State Calculation ---
+                    // A button should be disabled if the game is over, it's not the player's turn, or the move itself is invalid.
+                    const shouldBeDisabled = gameOver || !playerTurn || !isMoveValid;
+                    
+                    // The text content is the resulting number if the move is valid, otherwise it's 'X'.
+                    const buttonText = isMoveValid ? potentialCount : 'X';
+                    
+                    // --- State Application ---
+                    // This clear, two-step process ensures the button's text and disabled state are always perfectly in sync
+                    // with the game's logic, preventing any visual inconsistencies.
+                    button.textContent = buttonText;
+                    button.disabled = shouldBeDisabled;
                 });
             };
             
