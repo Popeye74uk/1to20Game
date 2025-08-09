@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v6.1</title>
+    <title>The 1 to 20 Game v6.2</title>
     <style>
         :root {
             --color-background: #f8f9fa;
@@ -201,8 +201,8 @@
         .personality-btn:hover { background-color: var(--color-accent); }
         
         @media (max-width: 500px) {
-            .header-spacer { display: none; }
-            .main-header h1 { text-align: center; font-size: 1.6rem; }
+            .main-header h1 { font-size: 1.6rem; }
+            .header-spacer { min-width: 54px; /* Matches width of single theme button + gap */ }
             #game-container { padding: 1.5rem; }
             #current-count { font-size: 6rem; }
             .action-btn { font-size: 2rem; }
@@ -760,7 +760,7 @@
             
             // Debug/Hidden Feature Logic
             const openPersonalitySelector = () => {
-                ui.personalitySelectList.innerHTML = ''; // Clear previous buttons
+                ui.personalitySelectList.innerHTML = '';
                 Object.keys(personalities).forEach(key => {
                     const btn = document.createElement('button');
                     btn.className = 'personality-btn';
@@ -798,8 +798,7 @@
 
             // Event Listeners
             document.addEventListener('keydown', (e) => {
-                const key = e.key.toLowerCase();
-                if (key === 'f') { toggleFullScreen(); }
+                if (e.key.toLowerCase() === 'f') { toggleFullScreen(); }
             });
 
             ui.fullscreenBtn.addEventListener('click', toggleFullScreen);
@@ -814,7 +813,6 @@
             ui.infoBtn.addEventListener('click', () => ui.infoModal.classList.add('visible'));
             ui.infoCloseBtn.addEventListener('click', () => ui.infoModal.classList.remove('visible'));
 
-            // Personality selector listeners (Mouse and Touch)
             const handlePressStart = (e) => {
                 if (gameOver) return; 
                 e.preventDefault();
