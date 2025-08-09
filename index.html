@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v5.7</title>
+    <title>The 1 to 20 Game v5.9</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -38,6 +38,8 @@
             width: 100%; 
             max-width: 420px; 
             text-align: center;
+            display: flex;
+            flex-direction: column;
         }
         .game-header {
             display: flex;
@@ -52,15 +54,34 @@
             margin: 0; 
             white-space: nowrap;
         }
+        /* #game-container is now the fullscreen TARGET and a flex container for centering */
         #game-container {
+            display: contents; /* This makes the container itself 'disappear' in the layout, promoting its child up */
+        }
+        #game-board {
             background-color: var(--color-container-bg); 
             border-radius: 16px; 
             box-shadow: 0 8px 32px var(--color-shadow); 
             padding: 2rem; 
             display: flex; 
             flex-direction: column;
+            width: 100%;
         }
-        body:fullscreen .game-header {
+        /* Specific rules for when the container is in fullscreen */
+        #game-container:fullscreen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--color-background);
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #game-container:fullscreen > #game-board {
+             max-width: 420px;
+        }
+
+        /* This rule hides the header when ANY element is fullscreen */
+        body:has(:fullscreen) .game-header {
             display: none;
         }
         #ai-status-wrapper {
@@ -258,7 +279,7 @@
         @media (max-width: 500px) {
             body { padding: 10px; }
             h1 { font-size: 1.6rem; }
-            #game-container { padding: 1.5rem; }
+            #game-board { padding: 1.5rem; }
             #current-count { font-size: 6rem; }
             .action-btn { font-size: 2rem; }
             #ai-status { font-size: 1rem; }
@@ -272,30 +293,32 @@
         </header>
 
         <div id="game-container">
-            <div id="ai-status-wrapper">
-                <span id="ai-status"></span>
-            </div>
-            <div id="personality-header">
-                <button id="info-btn">i</button>
-                <div id="personality-display"></div>
-            </div>
-            
-            <div id="current-count">0</div>
-            <div id="player-actions">
-                <button class="action-btn" data-move="1">1</button>
-                <button class="action-btn" data-move="2">2</button>
-                <button class="action-btn" data-move="3">3</button>
-            </div>
-            <div id="game-controls">
-                <div class="control-group">
-                    <label for="difficulty-select">Difficulty</label>
-                    <select id="difficulty-select">
-                        <option value="easy">Easy</option>
-                        <option value="medium">Medium</option>
-                        <option value="hard" selected>Hard</option>
-                    </select>
+            <div id="game-board">
+                <div id="ai-status-wrapper">
+                    <span id="ai-status"></span>
                 </div>
-                <button id="start-restart-btn">Start Game</button>
+                <div id="personality-header">
+                    <button id="info-btn">i</button>
+                    <div id="personality-display"></div>
+                </div>
+                
+                <div id="current-count">0</div>
+                <div id="player-actions">
+                    <button class="action-btn" data-move="1">1</button>
+                    <button class="action-btn" data-move="2">2</button>
+                    <button class="action-btn" data-move="3">3</button>
+                </div>
+                <div id="game-controls">
+                    <div class="control-group">
+                        <label for="difficulty-select">Difficulty</label>
+                        <select id="difficulty-select">
+                            <option value="easy">Easy</option>
+                            <option value="medium">Medium</option>
+                            <option value="hard" selected>Hard</option>
+                        </select>
+                    </div>
+                    <button id="start-restart-btn">Start Game</button>
+                </div>
             </div>
         </div>
     </div>
@@ -351,6 +374,7 @@
                 playerActionButtons: document.querySelectorAll('.action-btn'),
                 difficultySelect: document.getElementById('difficulty-select'),
                 startRestartBtn: document.getElementById('start-restart-btn'),
+                gameContainer: document.getElementById('game-container'),
                 gameOverModal: document.getElementById('game-over-modal'),
                 modalTitle: document.getElementById('modal-title'),
                 modalMessage: document.getElementById('modal-message'),
@@ -388,7 +412,6 @@
                 const wordsPerMinute = 200;
                 const words = text.split(' ').filter(word => word.length > 0).length;
                 const time = Math.ceil((words / wordsPerMinute) * 60 * 1000);
-                // Increased base time ensures even short sentences are readable.
                 return 800 + time + Math.random() * 250;
             };
 
@@ -787,7 +810,24 @@
                 ui.personalityModal.classList.add('visible');
             };
 
+            // Fullscreen Logic
+            const toggleFullScreen = () => {
+                if (!document.fullscreenElement) {
+                    ui.gameContainer.requestFullscreen().catch(err => {
+                        alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                    });
+                } else {
+                    document.exitFullscreen();
+                }
+            };
+
             // Event Listeners
+            document.addEventListener('keydown', (e) => {
+                if (e.key.toLowerCase() === 'f') {
+                    toggleFullScreen();
+                }
+            });
+
             ui.playerActionButtons.forEach(button => {
                 button.addEventListener('click', () => playerMove(parseInt(button.dataset.move, 10)));
             });
