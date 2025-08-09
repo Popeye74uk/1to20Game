@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v4.9</title>
+    <title>The 1 to 20 Game v5.3</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -74,16 +74,45 @@
             gap: 10px;
             margin-bottom: 0;
         }
-        #personality-display {
+        #personality-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             width: 100%;
-            text-align: right;
-            padding-right: 10px;
             margin-top: 4px;
             margin-bottom: 2rem;
             box-sizing: border-box;
+        }
+        #personality-display {
+            text-align: right;
             font-size: 0.8rem;
             color: var(--color-text-secondary);
             font-style: italic;
+            flex-grow: 1;
+            padding-left: 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+        #info-btn {
+            background-color: var(--color-accent-light);
+            color: var(--color-text-secondary);
+            border: 1px solid var(--color-text-secondary);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.2s, color 0.2s;
+            flex-shrink: 0;
+        }
+        #info-btn:hover {
+            background-color: var(--color-accent);
+            color: white;
+            border-color: var(--color-accent);
         }
         #ai-status {
             font-style: italic; 
@@ -184,21 +213,44 @@
         .modal.visible .modal-content { transform: scale(1); }
         .modal-content h2 { font-size: 2.5rem; margin: 0 0 1rem 0; }
         .modal-content p { font-size: 1.1rem; line-height: 1.6; color: var(--color-text-secondary); margin-bottom: 2rem; }
+        #info-modal p, #info-modal ul { text-align: left; }
+        #game-over-modal p { text-align: center; }
+        .modal-content ul { color: var(--color-text-secondary); padding-left: 20px; margin-bottom: 2rem; }
+        .modal-content li { margin-bottom: 0.5rem; line-height: 1.5; }
+        
         #name-form {
             display: flex; flex-direction: column; gap: 1rem; align-items: center;
         }
         #name-input {
              width: 80%; padding: 1rem; border-radius: 12px; border: 2px solid var(--color-accent-light); background-color: var(--color-background); color: var(--color-text-primary); font-size: 1.2rem; text-align: center; box-sizing: border-box;
-             text-transform: capitalize;
         }
         #name-input::placeholder {
             text-align: center;
-            text-transform: none;
         }
-        #confirm-name-btn, #play-again-btn {
-            background-color: var(--color-accent); color: white; border: none; padding: 1rem 2rem; border-radius: 12px; font-size: 1.2rem; cursor: pointer; transition: background-color 0.2s; width: 80%; box-sizing: border-box;
+        #confirm-name-btn, #play-again-btn, .modal-close-btn {
+            background-color: var(--color-accent); color: white; border: none; padding: 1rem 2rem; border-radius: 12px; font-size: 1.2rem; cursor: pointer; transition: background-color 0.2s; width: 80%; box-sizing: border-box; font-weight: bold;
         }
-        #confirm-name-btn:hover, #play-again-btn:hover { background-color: var(--color-accent-dark); }
+        #confirm-name-btn:hover, #play-again-btn:hover, .modal-close-btn:hover { background-color: var(--color-accent-dark); }
+        
+        #personality-select-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+        .personality-btn {
+            background-color: var(--color-accent-light);
+            color: var(--color-text-primary);
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .personality-btn:hover {
+            background-color: var(--color-accent);
+        }
         
         @media (max-width: 500px) {
             body { padding: 10px; }
@@ -220,7 +272,10 @@
             <div id="ai-status-wrapper">
                 <span id="ai-status"></span>
             </div>
-            <div id="personality-display"></div>
+            <div id="personality-header">
+                <button id="info-btn">i</button>
+                <div id="personality-display"></div>
+            </div>
             
             <div id="current-count">0</div>
             <div id="player-actions">
@@ -261,6 +316,28 @@
         </div>
     </div>
 
+    <div id="info-modal" class="modal">
+        <div class="modal-content">
+            <h2>How to Play</h2>
+            <p>The goal is simple: be the player who says the number <strong>20</strong>.</p>
+            <ul>
+                <li>Players take turns adding 1, 2, or 3 to the current total.</li>
+                <li>The game starts at 0.</li>
+                <li>The player who lands exactly on 20 wins the game.</li>
+                <li>You lose if the AI is able to land on 20 before you.</li>
+            </ul>
+            <button id="info-close-btn" class="modal-close-btn">Return to Game</button>
+        </div>
+    </div>
+
+    <div id="personality-modal" class="modal">
+        <div class="modal-content">
+            <h2>Select Personality</h2>
+            <div id="personality-select-list"></div>
+            <button id="personality-close-btn" class="modal-close-btn">Close</button>
+        </div>
+    </div>
+
     <script src="personalities.js"></script>
 
     <script>
@@ -279,7 +356,13 @@
                 playAgainBtn: document.getElementById('play-again-btn'),
                 nameModal: document.getElementById('name-modal'),
                 nameInput: document.getElementById('name-input'),
-                nameForm: document.getElementById('name-form')
+                nameForm: document.getElementById('name-form'),
+                infoBtn: document.getElementById('info-btn'),
+                infoModal: document.getElementById('info-modal'),
+                infoCloseBtn: document.getElementById('info-close-btn'),
+                personalityModal: document.getElementById('personality-modal'),
+                personalitySelectList: document.getElementById('personality-select-list'),
+                personalityCloseBtn: document.getElementById('personality-close-btn')
             };
 
             // Game State
@@ -293,6 +376,9 @@
             let playerStats = { wins: 0, losses: 0 };
             let streakData = { winStreak: 0, lossStreak: 0 };
             let moveHistory = [];
+            
+            // Debug State
+            let pressTimer = null;
 
             // Core Functions
             const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -380,9 +466,10 @@
 
             const handleNameConfirmation = async (event) => {
                 event.preventDefault();
-                const name = ui.nameInput.value.trim();
+                let name = ui.nameInput.value.trim();
                 if (name) {
-                    playerName = name;
+                    // Auto-capitalize the first letter
+                    playerName = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
                     playerStats = { wins: 0, losses: 0 };
                     streakData = { winStreak: 0, lossStreak: 0 };
                     moveHistory = [];
@@ -403,6 +490,7 @@
                 playerTookBait = false;
                 gameOver = false;
                 
+                // This logic is called at the start of every game.
                 chooseNewPersonality();
                 shuffleDialogues();
                 
@@ -588,7 +676,9 @@
                 gameOver = true; playerTurn = false;
                 updatePlayerActionButtons();
                 ui.difficultySelect.disabled = false;
-                let title, message, category;
+                let title, message, category, context;
+
+                context = { name: playerName, move: lastPlayerMove, turn: Math.floor(turnCount / 2) };
 
                 switch(winner) {
                     case 'AI':
@@ -598,7 +688,7 @@
                         streakData.winStreak = 0;
                         moveHistory.push({move: lastPlayerMove, turn: Math.floor(turnCount/2)});
                         category = playerMadeMistake ? 'aiWinByMistake' : 'aiWin';
-                        message = getRandomMessage(category, { move: lastPlayerMove, turn: Math.floor(turnCount/2) });
+                        message = getRandomMessage(category, context);
                         ui.modalTitle.style.color = 'var(--color-danger)';
                         break;
                     case 'Player':
@@ -611,7 +701,7 @@
                         } else {
                             category = !playerMadeMistake && aiDifficulty === 'hard' ? 'playerWinPerfect' : 'playerWin';
                         }
-                        message = getRandomMessage(category);
+                        message = getRandomMessage(category, context);
                         ui.modalTitle.style.color = 'var(--color-success)';
                         break;
                 }
@@ -627,20 +717,9 @@
                 ui.playerActionButtons.forEach(button => {
                     const moveValue = parseInt(button.dataset.move, 10);
                     const potentialCount = currentCount + moveValue;
-                    
-                    // Determine if the move is valid (i.e., does not exceed 20)
                     const isMoveValid = potentialCount <= 20;
-                    
-                    // --- State Calculation ---
-                    // A button should be disabled if the game is over, it's not the player's turn, or the move itself is invalid.
                     const shouldBeDisabled = gameOver || !playerTurn || !isMoveValid;
-                    
-                    // The text content is the resulting number if the move is valid, otherwise it's 'X'.
                     const buttonText = isMoveValid ? potentialCount : 'X';
-                    
-                    // --- State Application ---
-                    // This clear, two-step process ensures the button's text and disabled state are always perfectly in sync
-                    // with the game's logic, preventing any visual inconsistencies.
                     button.textContent = buttonText;
                     button.disabled = shouldBeDisabled;
                 });
@@ -674,6 +753,28 @@
                 }
                 return message;
             };
+            
+            // Debug/Hidden Feature Logic
+            const openPersonalitySelector = () => {
+                ui.personalitySelectList.innerHTML = ''; // Clear previous buttons
+                Object.keys(personalities).forEach(key => {
+                    const btn = document.createElement('button');
+                    btn.className = 'personality-btn';
+                    btn.textContent = personalities[key].name;
+                    btn.dataset.key = key;
+                    btn.addEventListener('click', () => {
+                        const selectedKey = btn.dataset.key;
+                        currentPersonality = personalities[selectedKey];
+                        lastPersonalityName = selectedKey; // Set this so the next auto-change avoids it
+                        ui.personalityDisplay.innerHTML = `&mdash; ${currentPersonality.name}`;
+                        shuffleDialogues();
+                        ui.personalityModal.classList.remove('visible');
+                        displayAiMessage(`Personality manually set to ${currentPersonality.name}.`);
+                    });
+                    ui.personalitySelectList.appendChild(btn);
+                });
+                ui.personalityModal.classList.add('visible');
+            };
 
             // Event Listeners
             ui.playerActionButtons.forEach(button => {
@@ -682,6 +783,22 @@
             ui.startRestartBtn.addEventListener('click', () => gameOver ? startGame() : initGame());
             ui.playAgainBtn.addEventListener('click', handlePlayAgain);
             ui.nameForm.addEventListener('submit', handleNameConfirmation);
+            ui.infoBtn.addEventListener('click', () => ui.infoModal.classList.add('visible'));
+            ui.infoCloseBtn.addEventListener('click', () => ui.infoModal.classList.remove('visible'));
+
+            // Personality selector listeners
+            ui.personalityDisplay.addEventListener('mousedown', () => {
+                pressTimer = setTimeout(() => {
+                    openPersonalitySelector();
+                }, 1500); // 1.5 second hold
+            });
+            ui.personalityDisplay.addEventListener('mouseup', () => {
+                clearTimeout(pressTimer);
+            });
+             ui.personalityDisplay.addEventListener('mouseleave', () => {
+                clearTimeout(pressTimer);
+            });
+            ui.personalityCloseBtn.addEventListener('click', () => ui.personalityModal.classList.remove('visible'));
 
             // Initial Load
             initGame();
