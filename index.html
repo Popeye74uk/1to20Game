@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v5.3</title>
+    <title>The 1 to 20 Game v5.4</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -91,7 +91,10 @@
             flex-grow: 1;
             padding-left: 10px;
             cursor: pointer;
-            user-select: none;
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* IE10+/Edge */
+            user-select: none; /* Standard */
         }
         #info-btn {
             background-color: var(--color-accent-light);
@@ -322,9 +325,7 @@
             <p>The goal is simple: be the player who says the number <strong>20</strong>.</p>
             <ul>
                 <li>Players take turns adding 1, 2, or 3 to the current total.</li>
-                <li>The game starts at 0.</li>
                 <li>The player who lands exactly on 20 wins the game.</li>
-                <li>You lose if the AI is able to land on 20 before you.</li>
             </ul>
             <button id="info-close-btn" class="modal-close-btn">Return to Game</button>
         </div>
@@ -786,18 +787,24 @@
             ui.infoBtn.addEventListener('click', () => ui.infoModal.classList.add('visible'));
             ui.infoCloseBtn.addEventListener('click', () => ui.infoModal.classList.remove('visible'));
 
-            // Personality selector listeners
-            ui.personalityDisplay.addEventListener('mousedown', () => {
-                pressTimer = setTimeout(() => {
-                    openPersonalitySelector();
-                }, 1500); // 1.5 second hold
-            });
-            ui.personalityDisplay.addEventListener('mouseup', () => {
+            // Personality selector listeners (Mouse and Touch)
+            const handlePressStart = (e) => {
+                if (gameOver) return; // Restrict access if game is not active
+                e.preventDefault(); // Prevent text selection
+                pressTimer = setTimeout(openPersonalitySelector, 1500); // 1.5 second hold
+            };
+
+            const handlePressEnd = () => {
                 clearTimeout(pressTimer);
-            });
-             ui.personalityDisplay.addEventListener('mouseleave', () => {
-                clearTimeout(pressTimer);
-            });
+            };
+
+            ui.personalityDisplay.addEventListener('mousedown', handlePressStart);
+            ui.personalityDisplay.addEventListener('touchstart', handlePressStart);
+
+            ui.personalityDisplay.addEventListener('mouseup', handlePressEnd);
+            ui.personalityDisplay.addEventListener('mouseleave', handlePressEnd);
+            ui.personalityDisplay.addEventListener('touchend', handlePressEnd);
+
             ui.personalityCloseBtn.addEventListener('click', () => ui.personalityModal.classList.remove('visible'));
 
             // Initial Load
