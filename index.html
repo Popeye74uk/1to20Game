@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v5.5</title>
+    <title>The 1 to 20 Game v5.6</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -324,8 +324,8 @@
             <h2>How to Play</h2>
             <p><strong>The goal:</strong> be the player who chooses the number 20.</p>
             <ul>
-                <li>Players take turns adding 1, 2, or 3 to the current total.</li>
-                <li>The player who lands exactly on 20 wins the game.</li>
+                <li>On your turn, you can add 1, 2, or 3 to the current running total.</li>
+                <li>The first player whose move results in the total reaching exactly 20 is declared the winner.</li>
             </ul>
             <button id="info-close-btn" class="modal-close-btn">Return to Game</button>
         </div>
@@ -478,7 +478,8 @@
                     // Show rules for new user and wait for them to close it
                     ui.infoModal.classList.add('visible');
                     await new Promise(resolve => {
-                        ui.infoCloseBtn.addEventListener('click', () => {
+                        const closeButton = document.getElementById('info-close-btn');
+                        closeButton.addEventListener('click', () => {
                             ui.infoModal.classList.remove('visible');
                             resolve();
                         }, { once: true });
