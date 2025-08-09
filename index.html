@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v5.6</title>
+    <title>The 1 to 20 Game v5.7</title>
     <style>
         :root {
             --color-background: #121212; 
@@ -322,7 +322,7 @@
     <div id="info-modal" class="modal">
         <div class="modal-content">
             <h2>How to Play</h2>
-            <p><strong>The goal:</strong> be the player who chooses the number 20.</p>
+            <p><strong>The goal:</strong> be the player who ultimately chooses the number 20.</p>
             <ul>
                 <li>On your turn, you can add 1, 2, or 3 to the current running total.</li>
                 <li>The first player whose move results in the total reaching exactly 20 is declared the winner.</li>
@@ -388,7 +388,8 @@
                 const wordsPerMinute = 200;
                 const words = text.split(' ').filter(word => word.length > 0).length;
                 const time = Math.ceil((words / wordsPerMinute) * 60 * 1000);
-                return 400 + time + Math.random() * 250;
+                // Increased base time ensures even short sentences are readable.
+                return 800 + time + Math.random() * 250;
             };
 
             const shuffleDialogues = () => {
