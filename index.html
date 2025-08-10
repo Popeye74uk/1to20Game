@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v6.9</title>
+    <title>The 1 to 20 Game v7.0</title>
     <style>
         :root {
             --color-background: #f8f9fa;
@@ -218,7 +218,7 @@
             .action-btn { font-size: 2rem; }
             #ai-status { font-size: 1rem; }
             #ai-status-wrapper {
-                min-height: 4.5rem; /* Ensures the box is roughly 3 lines tall */
+                height: 6.5rem; /* Set a FIXED height based on 3 lines of text + padding */
             }
 
             /* Mobile Modal Adjustments */
@@ -249,7 +249,7 @@
              body { padding-top: 10px; padding-bottom: 10px; }
             .main-header { margin-bottom: 10px; }
             #game-container { padding: 1rem 1.5rem; }
-            #ai-status-wrapper { min-height: 80px; padding: 0.8rem 1rem; }
+            #ai-status-wrapper { padding: 0.8rem 1rem; } /* Removed conflicting min-height */
             #personality-header { margin-bottom: 1rem; }
             #current-count { font-size: 5rem; margin-bottom: 1rem; }
             #player-actions { margin-bottom: 1rem; gap: 0.75rem; }
@@ -262,7 +262,7 @@
     <div class="container">
         <header class="main-header">
             <div class="header-spacer"></div>
-            <h1>The 1 to 20 Game</h1>
+            <h1>The 1 to 20 Game v7.0</h1>
             <div class="header-buttons">
                 <button id="fullscreen-btn" title="Toggle Fullscreen (F)">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
