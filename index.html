@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v6.8</title>
+    <title>The 1 to 20 Game v6.9</title>
     <style>
         :root {
             --color-background: #f8f9fa;
@@ -54,7 +54,7 @@
             color: var(--color-text-primary); 
             display: flex; 
             justify-content: center; 
-            align-items: center; /* Vertically centers the container */
+            align-items: flex-start; /* Default alignment for mobile/short screens */
             min-height: 100vh; 
             margin: 0; 
             padding: 20px; 
@@ -206,6 +206,13 @@
         .personality-btn { background-color: var(--color-accent-light); color: var(--color-text-primary); border: none; padding: 1rem; border-radius: 8px; cursor: pointer; transition: background-color 0.2s; }
         .personality-btn:hover { background-color: var(--color-accent); }
         
+        /* Responsive media query for Laptops and taller screens */
+        @media (min-height: 850px) {
+            body {
+                align-items: center; /* Center vertically ONLY if screen is tall enough */
+            }
+        }
+
         @media (max-width: 500px) {
             .main-header h1 { font-size: 1.6rem; }
             .header-spacer { min-width: 54px; /* Matches width of single theme button + gap */ }
