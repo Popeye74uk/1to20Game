@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v7.3</title>
+    <title>The 1 to 20 Game v7.4</title>
     <style>
         :root {
             --color-background: #f8f9fa;
@@ -52,17 +52,15 @@
             background-color: var(--color-background); 
             color: var(--color-text-primary); 
             margin: 0; 
-            padding: 20px;
-            min-height: 100vh;
-            display: grid; /* Using grid for robust centering */
-            align-content: flex-start; /* Default for mobile */
+            padding: 20px; /* Provides consistent side padding */
+            padding-top: 20px; /* Default top padding for mobile */
             transition: background-color 0.3s, color 0.3s;
         }
 
-        /* On taller screens, center the content vertically */
+        /* On taller screens, push the content down to appear more centered */
         @media (min-height: 850px) {
             body {
-                align-content: center;
+                padding-top: 5vh;
             }
         }
 
@@ -70,7 +68,7 @@
             width: 100%; 
             max-width: 420px; 
             text-align: center;
-            margin: 0 auto; /* Horizontal centering */
+            margin: 0 auto; /* Standard, reliable horizontal centering */
         }
         .main-header {
             display: flex;
