@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The 1 to 20 Game v6.4</title>
+    <title>The 1 to 20 Game v6.5</title>
     <style>
         :root {
             --color-background: #f8f9fa;
@@ -181,8 +181,7 @@
 
         .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--color-modal-bg); display: flex; justify-content: center; align-items: center; z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; backdrop-filter: blur(5px); }
         .modal.visible { opacity: 1; pointer-events: auto; }
-        .modal-content { background-color: var(--color-modal-content-bg); padding: 2rem; border-radius: 16px; text-align: center; box-shadow: 0 5px 15px var(--color-shadow); transform: scale(0.9); transition: transform 0.4s ease; width: 90%; max-width: 400px; }
-        .modal.visible .modal-content { transform: scale(1); }
+        .modal-content { background-color: var(--color-modal-content-bg); padding: 2rem; border-radius: 16px; text-align: center; box-shadow: 0 5px 15px var(--color-shadow); width: 90%; max-width: 400px; }
         .modal-content h2 { font-size: 2.5rem; margin: 0 0 1rem 0; color: var(--color-heading); }
         .modal-content p { font-size: 1.1rem; line-height: 1.6; color: var(--color-text-secondary); margin-bottom: 2rem; }
         #info-modal p, #info-modal ul { text-align: left; }
@@ -207,6 +206,28 @@
             #current-count { font-size: 6rem; }
             .action-btn { font-size: 2rem; }
             #ai-status { font-size: 1rem; }
+
+            /* Mobile Modal Adjustments */
+            .modal-content {
+                padding: 1.5rem;
+                width: calc(100% - 20px);
+                box-sizing: border-box;
+            }
+            .modal-content h2 {
+                font-size: 1.8rem;
+            }
+            .modal-content p, .modal-content ul {
+                font-size: 1rem;
+                margin-bottom: 1.5rem;
+            }
+            #confirm-name-btn, #play-again-btn, .modal-close-btn {
+                padding: 1rem;
+                font-size: 1rem;
+            }
+            #name-input {
+                padding: 1rem;
+                font-size: 1rem;
+            }
         }
 
         @media (max-height: 720px) and (max-width: 500px) {
